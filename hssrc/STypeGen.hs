@@ -1,5 +1,8 @@
 module GenSType where
 
+-- to deal with not having a deriving mechanism in PureScript
+-- we workaround it by generating some source code.
+
 import Data.List
 import Text.Printf
 

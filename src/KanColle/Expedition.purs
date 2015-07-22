@@ -39,7 +39,8 @@ type ExpeditionRequirement = Array FleetRequirement
 explainShipRequirement :: ShipRequirement -> String
 explainShipRequirement v = case v of
     ShipLevel lvl -> "ship level should be at least " <> show lvl
-    ShipTypeOneOf stypes -> "ship should have one of the following type: " <> Str.joinWith "," (map showSType stypes)
+    ShipTypeOneOf stypes ->
+      "ship should have one of the following type: " <> Str.joinWith "," (map showSType stypes)
     ShipDrum n -> "ship should have at least " <> show n <> " drum(s)"
     
 explainFleetRequirement :: FleetRequirement -> String
@@ -48,7 +49,8 @@ explainFleetRequirement v = case v of
     FleetLevel lvl -> "fleet level sum should be at least " <> show lvl
     FleetDrum drum -> "fleet should have at least " <> show drum <> " drum(s)"
     FleetShipWithDrum n -> "at least " <> show n <> " ship(s) should have drum(s)"
-    FleetSTypeCount n stypes -> "require at least " <> show n <> " ship(s) of the following type: " <> Str.joinWith "," (map showSType stypes)
+    FleetSTypeCount n stypes -> "require at least "
+      <> show n <> " ship(s) of the following type: " <> Str.joinWith "," (map showSType stypes)
     FleetShipCount n -> "fleet should have at least " <> show n <> " ship(s)"
 
 type Ship a =
@@ -168,3 +170,6 @@ checkExpedition eId fleet = validExpeditionId eId
 
 validExpeditionId :: Int -> Boolean
 validExpeditionId = getExpeditionRequirement >>> null >>> not
+
+expeditionIds :: Array Int
+expeditionIds = (1..32) <> (35..40)
