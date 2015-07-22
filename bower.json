@@ -18,5 +18,8 @@
         "purescript-maybe": "^0.3.2",
         "purescript-tuples": "^0.4.0",
         "purescript-maps": "^0.4.0"
+    },
+    "devDependencies": {
+        "purescript-test-unit": "^2.0.0"
     }
 }

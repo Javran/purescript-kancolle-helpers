@@ -7,6 +7,8 @@ module KanColle.Expedition
   , checkExpedition
   , validExpeditionId
   , unsatisfiedRequirements
+  , explainShipRequirement
+  , explainFleetRequirement
   , explainRequirements
   , getAvailableExpeditions
   , fromRawShip
