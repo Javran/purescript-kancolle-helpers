@@ -52,7 +52,10 @@ main = do
     cd buildDir
     -- build and optimize
     (ExitSuccess, _) <- shellStrict "pulp build" ""
-    (ExitSuccess, jsContent) <- shellStrict "psc-bundle 'output/*/*.js' -m KanColle.Expedition " ""
+    (ExitSuccess, jsContent) <- shellStrict "psc-bundle 'output/*/*.js' \
+                                            \-m KanColle.Expedition \
+                                            \-m KanColle.DamageAnalysis \
+                                            \ " ""
     (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (return jsContent)
     cd cwd
     let targetFile = "KanColleHelpers.js"
