@@ -8,7 +8,8 @@ import Text.Printf
 
 sourceContents :: [String]
 sourceContents =
-    [ "module KanColle.Generated.SType where", ""] ++
+    [ "-- Generated from STypeGen.hs"
+    , "module KanColle.Generated.SType where", ""] ++
     dataDef ++ [""] ++
     showDefs ++ [""] ++
     readDefs

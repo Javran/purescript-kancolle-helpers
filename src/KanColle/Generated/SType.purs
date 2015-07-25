@@ -1,3 +1,4 @@
+-- Generated from STypeGen.hs
 module KanColle.Generated.SType where
 
 data SType = DDE | DD | CL | CLT | CA | CAV | CVL | FBB | BB | BBV | CV | XBB | SS | SSV | AP | AV | LHA | CVB | AR | AS | CT
