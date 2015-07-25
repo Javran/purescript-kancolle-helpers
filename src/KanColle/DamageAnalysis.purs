@@ -18,6 +18,7 @@ import qualified Data.Array.Unsafe as AU
 -- information about damage took by a ship
 type DamageTookInfo =
   { aerial :: Int
+  , aerial2 :: Int
   , opening :: Int
   , hougeki1 :: Int
   , hougeki2 :: Int
@@ -35,6 +36,7 @@ pprDamageTookInfo :: DamageTookInfo -> String
 pprDamageTookInfo dti
   = "DamageInfo {"
  <> "aerial=" <> show dti.aerial <> ", "
+ <> "aerial2=" <> show dti.aerial2 <> ", "
  <> "opening=" <> show dti.opening <> ", "
  <> "hougeki1=" <> show dti.hougeki1 <> ", "
  <> "hougeki2=" <> show dti.hougeki2 <> ", "
@@ -70,6 +72,7 @@ type DamageAnalyzer = Battle
 noDamage :: Int -> DamageTookInfo
 noDamage hp =
   { aerial: 0
+  , aerial2: 0
   , opening: 0
   , hougeki1: 0
   , hougeki2: 0
@@ -97,7 +100,8 @@ damageNormalize :: Array Number -> Array Int
 damageNormalize = map (fromJust <<< fromNumber <<< floor)
 
 calcAerial :: DamageAnalyzer
-calcAerial b xs = if AU.unsafeIndex b.api_stage_flag 2 == 0
+calcAerial b xs | hasKouku b =
+ if AU.unsafeIndex b.api_stage_flag 2 == 0
     then xs
     else
       let k :: KoukuStage3
@@ -110,6 +114,24 @@ calcAerial b xs = if AU.unsafeIndex b.api_stage_flag 2 == 0
           combine dmg dti = dti { aerial=dmg, currentHp=dti.currentHp - dmg }
           damages = [0] <> fDam <> eDam
       in zipWith (map <<< combine) damages xs
+calcAerial _ xs = xs
+
+calcAerial2 :: DamageAnalyzer
+calcAerial2 b xs | hasKouku2 b =
+  if AU.unsafeIndex b.api_stage_flag2 2 == 0
+    then xs
+    else
+      let k :: KoukuStage3
+          k = b.api_kouku2.api_stage3
+          fDam :: Array Int
+          fDam = AU.tail $ damageNormalize k.api_fdam
+          eDam :: Array Int
+          eDam = AU.tail $ damageNormalize k.api_edam
+          combine :: Int -> DamageTookInfo -> DamageTookInfo
+          combine dmg dti = dti { aerial2=dmg, currentHp=dti.currentHp - dmg }
+          damages = [0] <> fDam <> eDam
+      in zipWith (map <<< combine) damages xs
+calcAerial2 _ xs = xs
 
 -- TODO: refactor.
 calcHougeki :: Hougeki
@@ -181,17 +203,19 @@ calcRaigeki r i xs = zipWith (map <<< combine) damages xs
         2 -> dti { closing = dmg, currentHp = dti.currentHp - dmg }
 
 calcOpeningRaigeki :: DamageAnalyzer
-calcOpeningRaigeki b xs = if b.api_opening_flag == 1
+calcOpeningRaigeki b xs | hasHourai b = if b.api_opening_flag == 1
   then calcRaigeki b.api_opening_atack 1 xs
   else xs
+calcOpeningRaigeki _ xs = xs
 
 calcClosingRaigeki :: DamageAnalyzer
-calcClosingRaigeki b xs = if AU.unsafeIndex b.api_hourai_flag 3 == 1
+calcClosingRaigeki b xs | hasHourai b = if AU.unsafeIndex b.api_hourai_flag 3 == 1
   then calcRaigeki b.api_raigeki 2 xs
   else xs
+calcClosingRaigeki _ xs = xs
 
 calcAllHougeki :: DamageAnalyzer
-calcAllHougeki b = runEndo (h1 <> h2 <> h3)
+calcAllHougeki b | hasHourai b = runEndo (h1 <> h2 <> h3)
   where
     actionFlags = take 3 b.api_hourai_flag
     h1 :: Endo (AllFleetInfo DamageTookInfo)
@@ -206,6 +230,7 @@ calcAllHougeki b = runEndo (h1 <> h2 <> h3)
     h3 = if AU.unsafeIndex actionFlags 2 == 1
            then Endo $ calcHougeki (b.api_hougeki3) 3
            else mempty
+calcAllHougeki b = id
 
 analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
 analyzeBattle b = runEndo analyzers (battleStart b)
@@ -213,6 +238,7 @@ analyzeBattle b = runEndo analyzers (battleStart b)
     analyzers :: Endo (AllFleetInfo DamageTookInfo)
     analyzers = foldMap (Endo <<< ($ b))
                         [ calcAerial
+                        , calcAerial2
                         , calcOpeningRaigeki
                         , calcAllHougeki
                         , calcClosingRaigeki
