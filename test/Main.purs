@@ -7,7 +7,12 @@ import Test.Unit.Console hiding (print)
 import Data.Array
 
 import KanColle.Expedition
+import KanColle.DamageAnalysis
 import KanColle.SType
+import Data.Foreign
+import Data.Maybe
+
+import BattleData
 
 instance eqFleetRequirementForTest :: Eq FleetRequirement where
     eq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2
@@ -57,20 +62,37 @@ testFleet4 =
 
 type MyTest e = Test (testOutput :: TestOutput | e)
 
--- cover all possible expeditions
+-- TODO: cover all possible expeditions
 testExpeditionHelper :: forall e. MyTest e
 testExpeditionHelper =
-  test "ExpeditionHelper: fleet tests" do
-    assert "fleet test 1" $
-      unsatisfiedRequirements 2 testFleet1 == []
-    assert "fleet test 2" $
-      getAvailableExpeditions testFleet1 == [1,2,3,6,27]
-    assert "fleet test 3" $
-      getAvailableExpeditions testFleet2 == [1,2,3,6,11,12]
-    assert "fleet test 3" $
-      getAvailableExpeditions testFleet3 == [1,2,3,4,5,6,9,11,12,21]
-    assert "fleet test 4" $
-      getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,37]
+    test "ExpeditionHelper" do
+      assert "fleet test 1" $
+        unsatisfiedRequirements 2 testFleet1 == []
+      assert "fleet test 2" $
+        getAvailableExpeditions testFleet1 == [1,2,3,6,27]
+      assert "fleet test 3" $
+        getAvailableExpeditions testFleet2 == [1,2,3,6,11,12]
+      assert "fleet test 3" $
+        getAvailableExpeditions testFleet3 == [1,2,3,4,5,6,9,11,12,21]
+      assert "fleet test 4" $
+        getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,37]
+
+testDamageAnalyzer :: forall e. MyTest e
+testDamageAnalyzer =
+    test "DamageAnalyzer" do
+      assert "battle sample 1" $
+        trimInfo (analyzeBattle (unsafeFromForeign battle1)) == [Nothing] <>
+          map Just [75,75,75,75-4,77,79-9
+                   ,84-127,60-95,60-21-98,53-213-145,35-164,35-159-157]
+      assert "battle sample 2" $
+        trimInfo (analyzeBattle (unsafeFromForeign battle2)) ==
+          map toMaybeInt [9999
+                         ,15,15-3,18,18,9999,9999
+                         ,90-81-41,55-116,28,28-236,70-121,70-131]
+  where
+    toMaybeInt x = if x == 9999 then Nothing else Just x
+    trimInfo = (map <<< map) (\x -> x.currentHp)
 
 main = runTest do
     testExpeditionHelper
+    testDamageAnalyzer
