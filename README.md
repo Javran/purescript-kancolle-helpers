@@ -12,3 +12,21 @@ Currently implemented features are:
 * Damage Analysis
 
     Calculate damage took for battles / night battles
+
+## Modules
+
+* `KanColle.Expedition`
+
+    Features related to expeditions
+
+* `KanColle.DamageAnalysis`
+
+    Damage calculation
+
+* `KanColle.Generated`
+
+    Generated codes
+
+* `KanColle.KCAPI`
+
+    Type definitions for KanColle API
