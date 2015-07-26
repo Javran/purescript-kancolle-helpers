@@ -89,8 +89,17 @@ testDamageAnalyzer =
           map toMaybeInt [9999
                          ,15,15-3,18,18,9999,9999
                          ,90-81-41,55-116,28,28-236,70-121,70-131]
+      assert "night battle sample 1" $
+        trimInfo (analyzeNightBattle (unsafeFromForeign nightBattle1)) ==
+          map toMaybeInt [9999
+                         ,15,12,18,18,9999,9999,0,0,28-94,0,0,0]
+      assert "aerial battle sample 1" $
+        trimInfo (analyzeBattle (unsafeFromForeign aerialBattle1)) ==
+          map toMaybeInt [9999
+                         ,37,31,31,32,32,44-6,96,70,60,20,20,20]
   where
     toMaybeInt x = if x == 9999 then Nothing else Just x
+    trimInfo :: forall a. Array (Maybe { currentHp:: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.currentHp)
 
 main = runTest do
