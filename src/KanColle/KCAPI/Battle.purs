@@ -57,10 +57,13 @@ hasField :: String -> Battle -> Boolean
 hasField s = hasOwnProperty s <<< toForeign
 
 hasKouku :: Battle -> Boolean
-hasKouku = hasField "api_stage_flag"
+hasKouku b | hasField "api_stage_flag" b =
+          AU.unsafeIndex b.api_stage_flag 2 == 1
+hasKouku _ = false          
 
 hasKouku2 :: Battle -> Boolean
-hasKouku2 = hasField "api_stage_flag2"
+hasKouku2 b | hasField "api_stage_flag2" b = AU.unsafeIndex b.api_stage_flag2 2 == 1
+hasKouku2 _ = false
 
 hasHourai :: Battle -> Boolean
 hasHourai = hasField "api_hourai_flag"
@@ -86,24 +89,36 @@ getOpeningAttack b =
       else Nothing
 
 getHougeki1 :: Battle -> Maybe Hougeki
-getHougeki1 b = if hasField "api_hougeki1" b
+getHougeki1 b
+  | hasField "api_hougeki1" b = if 
+               AU.unsafeIndex b.api_hourai_flag 0 == 1
   then Just b.api_hougeki1
   else Nothing
+getHougeki1 _ = Nothing
 
 getHougeki2 :: Battle -> Maybe Hougeki
-getHougeki2 b = if hasField "api_hougeki2" b
+getHougeki2 b
+  | hasField "api_hougeki2" b = if
+                AU.unsafeIndex b.api_hourai_flag 1 == 1
   then Just b.api_hougeki2
   else Nothing
+getHougeki2 _ = Nothing
 
 getHougeki3 :: Battle -> Maybe Hougeki
-getHougeki3 b = if hasField "api_hougeki3" b
+getHougeki3 b
+  | hasField "api_hougeki3" b = if
+                AU.unsafeIndex b.api_hourai_flag 2 == 1
   then Just b.api_hougeki3
   else Nothing
+getHougeki3 _ = Nothing  
 
 getRaigeki :: Battle -> Maybe Raigeki
-getRaigeki b = if hasField "api_raigeki" b
+getRaigeki b
+  | hasField "api_raigeki" b = if
+                AU.unsafeIndex b.api_hourai_flag 3 == 1
   then Just b.api_raigeki
   else Nothing
+getRaigeki _ = Nothing    
 
 getHougeki :: Battle -> Maybe Hougeki
 getHougeki b = if hasHougeki b

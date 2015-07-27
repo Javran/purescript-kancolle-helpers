@@ -1,5 +1,5 @@
-module KanColle.DamageAnalysis.DamageVector 
-  ( DamageVector()
+module KanColle.DamageAnalysis.DamageVector
+  ( DamageVector(..)
   , calcKoukuDamage
   , calcHougekiDamage
   , calcRaigekiDamage
@@ -31,6 +31,9 @@ instance damageVectorSemigroup :: Semigroup DamageVector where
 instance damageVectorMonoid :: Monoid DamageVector where
   mempty = DV (replicate 13 0)
 
+instance damageVectorShow :: Show DamageVector where
+  show (DV a) = "DV " <> show a
+
 -- | normalize damage, there are cases where the number not turns out
 -- | to be integers (0.1 for example), so we normalize the damage by
 -- | taking floor of it
@@ -44,11 +47,11 @@ modifyDamage :: (Array Int -> Array Int)
 modifyDamage f (DV s) = DV (f s)
 
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
-fromFDamAndEDam :: forall a. 
+fromFDamAndEDam :: forall a.
                 { api_fdam :: Array Number
                 , api_edam :: Array Number} -> DamageVector
-fromFDamAndEDam v = DV ([0] <> damageNormalize v.api_fdam 
-                            <> damageNormalize v.api_edam)
+fromFDamAndEDam v = DV ([0] <> damageNormalize (AU.tail v.api_fdam)
+                            <> damageNormalize (AU.tail v.api_edam))
 
 -- | calculate damage from kouku (aerial) stages
 calcKoukuDamage :: Kouku -> DamageVector

@@ -14,41 +14,27 @@ import Data.Foldable
 import Data.String (joinWith)
 import Math
 import qualified Data.Array.Unsafe as AU
+import KanColle.DamageAnalysis.DamageVector
+import KanColle.DamageAnalysis.Stages
 
 -- information about damage took by a ship
 type DamageTookInfo =
-  { aerial :: Int
-  , aerial2 :: Int
-  , opening :: Int
-  , hougeki1 :: Int
-  , hougeki2 :: Int
-  , hougeki3 :: Int
-  , closing :: Int
-  , currentHp :: Int
+  { currentHp :: Int
   }
 
 type DamageTookInfoNight =
-  { hougeki :: Int
-  , currentHp :: Int
+  { currentHp :: Int
   }
 
 pprDamageTookInfo :: DamageTookInfo -> String
 pprDamageTookInfo dti
   = "DamageInfo {"
- <> "aerial=" <> show dti.aerial <> ", "
- <> "aerial2=" <> show dti.aerial2 <> ", "
- <> "opening=" <> show dti.opening <> ", "
- <> "hougeki1=" <> show dti.hougeki1 <> ", "
- <> "hougeki2=" <> show dti.hougeki2 <> ", "
- <> "hougeki3=" <> show dti.hougeki3 <> ", "
- <> "closing=" <> show dti.closing <> ", "
  <> "currentHp=" <> show dti.currentHp
  <> "}"
 
 pprDamageTookInfoNight :: DamageTookInfoNight -> String
 pprDamageTookInfoNight dti
   = "DamageInfoNight {"
- <> "hougeki=" <> show dti.hougeki <> ", "
  <> "currentHp=" <> show dti.currentHp
  <> "}"
 
@@ -71,14 +57,7 @@ type DamageAnalyzer = Battle
 
 noDamage :: Int -> DamageTookInfo
 noDamage hp =
-  { aerial: 0
-  , aerial2: 0
-  , opening: 0
-  , hougeki1: 0
-  , hougeki2: 0
-  , hougeki3: 0
-  , closing: 0
-  , currentHp: hp
+  { currentHp: hp
   }
 
 -- initialize a battle, does nothing but setup currentHp
@@ -94,7 +73,7 @@ battleStartNight b = hpList
   where
     hpList = map fromRawHp b.api_nowhps
     fromRawHp -1 = Nothing
-    fromRawHp v = Just {hougeki: 0, currentHp: v}
+    fromRawHp v = Just {currentHp: v}
 
 damageNormalize :: Array Number -> Array Int
 damageNormalize = map (fromJust <<< fromNumber <<< floor)
@@ -111,7 +90,7 @@ calcAerial b xs | hasKouku b =
           eDam :: Array Int
           eDam = AU.tail $ damageNormalize k.api_edam
           combine :: Int -> DamageTookInfo -> DamageTookInfo
-          combine dmg dti = dti { aerial=dmg, currentHp=dti.currentHp - dmg }
+          combine dmg dti = dti { currentHp=dti.currentHp - dmg }
           damages = [0] <> fDam <> eDam
       in zipWith (map <<< combine) damages xs
 calcAerial _ xs = xs
@@ -128,7 +107,7 @@ calcAerial2 b xs | hasKouku2 b =
           eDam :: Array Int
           eDam = AU.tail $ damageNormalize k.api_edam
           combine :: Int -> DamageTookInfo -> DamageTookInfo
-          combine dmg dti = dti { aerial2=dmg, currentHp=dti.currentHp - dmg }
+          combine dmg dti = dti { currentHp=dti.currentHp - dmg }
           damages = [0] <> fDam <> eDam
       in zipWith (map <<< combine) damages xs
 calcAerial2 _ xs = xs
@@ -158,9 +137,9 @@ calcHougeki h i xs = zipWith (map <<< combine) fleetDamages xs
             combine t d = Endo $ fromJust <<< modifyAt t (+ d)
     combine :: Int -> DamageTookInfo -> DamageTookInfo
     combine dmg dti = case i of
-        1 -> dti { hougeki1 = dmg, currentHp = dti.currentHp - dmg }
-        2 -> dti { hougeki2 = dmg, currentHp = dti.currentHp - dmg }
-        3 -> dti { hougeki3 = dmg, currentHp = dti.currentHp - dmg }
+        1 -> dti { currentHp = dti.currentHp - dmg }
+        2 -> dti { currentHp = dti.currentHp - dmg }
+        3 -> dti { currentHp = dti.currentHp - dmg }
 
 calcNightHougeki :: NightBattle
                  -> AllFleetInfo DamageTookInfoNight
@@ -186,7 +165,7 @@ calcNightHougeki nb xs = zipWith (map <<< combine) fleetDamages xs
           where
             combine t d = Endo $ fromJust <<< modifyAt t (+ d)
     combine :: Int -> DamageTookInfoNight -> DamageTookInfoNight
-    combine dmg dti = dti { hougeki = dmg, currentHp = dti.currentHp - dmg }
+    combine dmg dti = dti { currentHp = dti.currentHp - dmg }
 
 calcRaigeki :: Raigeki
             -> Int -- 1 for opening, 2 for closing
@@ -199,8 +178,8 @@ calcRaigeki r i xs = zipWith (map <<< combine) damages xs
     damages = [-1] <> fDam <> eDam
     combine :: Int -> DamageTookInfo -> DamageTookInfo
     combine dmg dti = case i of
-        1 -> dti { opening = dmg, currentHp = dti.currentHp - dmg }
-        2 -> dti { closing = dmg, currentHp = dti.currentHp - dmg }
+        1 -> dti { currentHp = dti.currentHp - dmg }
+        2 -> dti { currentHp = dti.currentHp - dmg }
 
 calcOpeningRaigeki :: DamageAnalyzer
 calcOpeningRaigeki b xs | hasHourai b = if b.api_opening_flag == 1
@@ -233,7 +212,7 @@ calcAllHougeki b | hasHourai b = runEndo (h1 <> h2 <> h3)
 calcAllHougeki b = id
 
 analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
-analyzeBattle b = runEndo analyzers (battleStart b)
+analyzeBattle b = analyzeBattleAlt b
   where
     analyzers :: Endo (AllFleetInfo DamageTookInfo)
     analyzers = foldMap (Endo <<< ($ b))
@@ -258,3 +237,13 @@ analyzeRawBattleJS = map toNullable <<< analyzeRawBattle
 
 analyzeRawNightBattleJS :: Foreign -> Array (Nullable DamageTookInfoNight)
 analyzeRawNightBattleJS = map toNullable <<< analyzeRawNightBattle
+
+applyDamageVector :: DamageVector 
+                  -> AllFleetInfo DamageTookInfo 
+                  -> AllFleetInfo DamageTookInfo
+applyDamageVector (DV dv) = zipWith combine dv
+  where
+    combine dmg = map (\x -> x {currentHp = x.currentHp - dmg})
+
+analyzeBattleAlt :: Battle -> AllFleetInfo DamageTookInfo
+analyzeBattleAlt = applyDamageVector <$> battleDV <*> battleStart
