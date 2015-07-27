@@ -29,10 +29,7 @@ type Battle =
   , api_hougeki :: Hougeki
   }
 
-type NightBattle =
-  { api_nowhps :: Array Int
-  , api_hougeki :: Hougeki
-  }
+type NightBattle = Battle
 
 type Kouku =
   { api_stage3 :: KoukuStage3
@@ -59,7 +56,7 @@ hasField s = hasOwnProperty s <<< toForeign
 hasKouku :: Battle -> Boolean
 hasKouku b | hasField "api_stage_flag" b =
           AU.unsafeIndex b.api_stage_flag 2 == 1
-hasKouku _ = false          
+hasKouku _ = false
 
 hasKouku2 :: Battle -> Boolean
 hasKouku2 b | hasField "api_stage_flag2" b = AU.unsafeIndex b.api_stage_flag2 2 == 1
@@ -82,7 +79,7 @@ getKouku2 b = if hasKouku2 b
   else Nothing
 
 getOpeningAttack :: Battle -> Maybe Raigeki
-getOpeningAttack b = 
+getOpeningAttack b =
     if hasField "api_opening_flag" b
     && b.api_opening_flag == 1
       then Just b.api_opening_atack
@@ -90,7 +87,7 @@ getOpeningAttack b =
 
 getHougeki1 :: Battle -> Maybe Hougeki
 getHougeki1 b
-  | hasField "api_hougeki1" b = if 
+  | hasField "api_hougeki1" b = if
                AU.unsafeIndex b.api_hourai_flag 0 == 1
   then Just b.api_hougeki1
   else Nothing
@@ -110,7 +107,7 @@ getHougeki3 b
                 AU.unsafeIndex b.api_hourai_flag 2 == 1
   then Just b.api_hougeki3
   else Nothing
-getHougeki3 _ = Nothing  
+getHougeki3 _ = Nothing
 
 getRaigeki :: Battle -> Maybe Raigeki
 getRaigeki b
@@ -118,7 +115,7 @@ getRaigeki b
                 AU.unsafeIndex b.api_hourai_flag 3 == 1
   then Just b.api_raigeki
   else Nothing
-getRaigeki _ = Nothing    
+getRaigeki _ = Nothing
 
 getHougeki :: Battle -> Maybe Hougeki
 getHougeki b = if hasHougeki b
