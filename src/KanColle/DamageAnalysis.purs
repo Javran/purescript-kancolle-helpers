@@ -18,13 +18,9 @@ import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 
 -- information about damage took by a ship
-type DamageTookInfo =
-  { currentHp :: Int
-  }
+type DamageTookInfo = {currentHp :: Int}
 
-type DamageTookInfoNight =
-  { currentHp :: Int
-  }
+type DamageTookInfoNight = DamageTookInfo
 
 pprDamageTookInfo :: DamageTookInfo -> String
 pprDamageTookInfo dti
@@ -39,11 +35,10 @@ pprDamageTookInfoNight dti
  <> "}"
 
 pprFleetDamageTookInfo :: AllFleetInfo DamageTookInfo -> String
-pprFleetDamageTookInfo xs = joinWith " | " $ map (maybe "<N/A>" pprDamageTookInfo) xs
+pprFleetDamageTookInfo = joinWith " | " <<< map (maybe "<N/A>" pprDamageTookInfo)
 
 pprFleetDamageTookInfoNight :: AllFleetInfo DamageTookInfoNight -> String
-pprFleetDamageTookInfoNight xs = joinWith " | " $ map (maybe "<N/A>" pprDamageTookInfoNight) xs
-
+pprFleetDamageTookInfoNight = joinWith " | " <<< map (maybe "<N/A>" pprDamageTookInfoNight)
 
 -- invariant: the length is always 1+12,
 -- index 0 is never used
@@ -55,24 +50,20 @@ type DamageAnalyzer = Battle
                    -> AllFleetInfo DamageTookInfo
                    -> AllFleetInfo DamageTookInfo
 
-noDamage :: Int -> DamageTookInfo
-noDamage hp =
-  { currentHp: hp
-  }
-
 -- initialize a battle, does nothing but setup currentHp
 battleStart :: Battle -> AllFleetInfo DamageTookInfo
 battleStart b = hpList
   where
+    noDamage hp = {currentHp: hp}
     hpList = map fromRawHp b.api_nowhps
     fromRawHp -1 = Nothing
     fromRawHp v = Just (noDamage v)
-
+    
 analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
-analyzeBattle = analyzeBattleAlt
+analyzeBattle = applyDamageVector <$> battleDV <*> battleStart
 
 analyzeNightBattle :: NightBattle -> AllFleetInfo DamageTookInfoNight
-analyzeNightBattle = analyzeNightBattleAlt
+analyzeNightBattle = applyDamageVector <$> nightBattleDV <*> battleStart
 
 analyzeRawBattle :: Foreign -> AllFleetInfo DamageTookInfo
 analyzeRawBattle = analyzeBattle <<< unsafeFromForeign
@@ -92,9 +83,3 @@ applyDamageVector :: DamageVector
 applyDamageVector (DV dv) = zipWith combine dv
   where
     combine dmg = map (\x -> x {currentHp = x.currentHp - dmg})
-
-analyzeBattleAlt :: Battle -> AllFleetInfo DamageTookInfo
-analyzeBattleAlt = applyDamageVector <$> battleDV <*> battleStart
-
-analyzeNightBattleAlt :: NightBattle -> AllFleetInfo DamageTookInfoNight
-analyzeNightBattleAlt = applyDamageVector <$> nightBattleDV <*> battleStart
