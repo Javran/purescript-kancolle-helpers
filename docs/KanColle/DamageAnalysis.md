@@ -3,13 +3,13 @@
 #### `DamageTookInfo`
 
 ``` purescript
-type DamageTookInfo = { aerial :: Int, opening :: Int, hougeki1 :: Int, hougeki2 :: Int, hougeki3 :: Int, closing :: Int, currentHp :: Int }
+type DamageTookInfo = { currentHp :: Int }
 ```
 
 #### `DamageTookInfoNight`
 
 ``` purescript
-type DamageTookInfoNight = { hougeki :: Int, currentHp :: Int }
+type DamageTookInfoNight = { currentHp :: Int }
 ```
 
 #### `pprDamageTookInfo`
@@ -60,60 +60,6 @@ noDamage :: Int -> DamageTookInfo
 battleStart :: Battle -> AllFleetInfo DamageTookInfo
 ```
 
-#### `battleStartNight`
-
-``` purescript
-battleStartNight :: NightBattle -> AllFleetInfo DamageTookInfoNight
-```
-
-#### `damageNormalize`
-
-``` purescript
-damageNormalize :: Array Number -> Array Int
-```
-
-#### `calcAerial`
-
-``` purescript
-calcAerial :: DamageAnalyzer
-```
-
-#### `calcHougeki`
-
-``` purescript
-calcHougeki :: Hougeki -> Int -> AllFleetInfo DamageTookInfo -> AllFleetInfo DamageTookInfo
-```
-
-#### `calcNightHougeki`
-
-``` purescript
-calcNightHougeki :: NightBattle -> AllFleetInfo DamageTookInfoNight -> AllFleetInfo DamageTookInfoNight
-```
-
-#### `calcRaigeki`
-
-``` purescript
-calcRaigeki :: Raigeki -> Int -> AllFleetInfo DamageTookInfo -> AllFleetInfo DamageTookInfo
-```
-
-#### `calcOpeningRaigeki`
-
-``` purescript
-calcOpeningRaigeki :: DamageAnalyzer
-```
-
-#### `calcClosingRaigeki`
-
-``` purescript
-calcClosingRaigeki :: DamageAnalyzer
-```
-
-#### `calcAllHougeki`
-
-``` purescript
-calcAllHougeki :: DamageAnalyzer
-```
-
 #### `analyzeBattle`
 
 ``` purescript
@@ -148,6 +94,24 @@ analyzeRawBattleJS :: Foreign -> Array (Nullable DamageTookInfo)
 
 ``` purescript
 analyzeRawNightBattleJS :: Foreign -> Array (Nullable DamageTookInfoNight)
+```
+
+#### `applyDamageVector`
+
+``` purescript
+applyDamageVector :: DamageVector -> AllFleetInfo DamageTookInfo -> AllFleetInfo DamageTookInfo
+```
+
+#### `analyzeBattleAlt`
+
+``` purescript
+analyzeBattleAlt :: Battle -> AllFleetInfo DamageTookInfo
+```
+
+#### `analyzeNightBattleAlt`
+
+``` purescript
+analyzeNightBattleAlt :: NightBattle -> AllFleetInfo DamageTookInfoNight
 ```
 
 
