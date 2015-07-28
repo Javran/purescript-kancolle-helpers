@@ -29,8 +29,6 @@ type Battle =
   , api_hougeki :: Hougeki
   }
 
-type NightBattle = Battle
-
 type Kouku =
   { api_stage3 :: KoukuStage3
   }
@@ -49,6 +47,12 @@ type Raigeki =
   { api_fdam :: Array Number
   , api_edam :: Array Number
   }
+
+getInitHps :: Battle -> Array (Maybe Int)
+getInitHps b = map fromRawHp b.api_nowhps
+  where
+    fromRawHp -1 = Nothing
+    fromRawHp v = Just v
 
 hasField :: String -> Battle -> Boolean
 hasField s = hasOwnProperty s <<< toForeign

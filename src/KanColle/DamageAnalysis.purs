@@ -52,17 +52,12 @@ type DamageAnalyzer = Battle
 
 -- initialize a battle, does nothing but setup currentHp
 battleStart :: Battle -> AllFleetInfo DamageTookInfo
-battleStart b = hpList
-  where
-    noDamage hp = {currentHp: hp}
-    hpList = map fromRawHp b.api_nowhps
-    fromRawHp -1 = Nothing
-    fromRawHp v = Just (noDamage v)
-    
+battleStart = (map <<< map) (\x -> {currentHp: x}) <<< getInitHps
+
 analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
 analyzeBattle = applyDamageVector <$> battleDV <*> battleStart
 
-analyzeNightBattle :: NightBattle -> AllFleetInfo DamageTookInfoNight
+analyzeNightBattle :: Battle -> AllFleetInfo DamageTookInfoNight
 analyzeNightBattle = applyDamageVector <$> nightBattleDV <*> battleStart
 
 analyzeRawBattle :: Foreign -> AllFleetInfo DamageTookInfo
