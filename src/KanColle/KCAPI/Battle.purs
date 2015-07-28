@@ -5,6 +5,7 @@ import Data.Maybe
 import Data.Foreign
 import Data.Nullable
 import Data.Foreign.Index
+import Control.MonadPlus
 import qualified Data.Array.Unsafe as AU
 
 -- things might actually be "null" or even "undefined"
@@ -63,7 +64,8 @@ hasKouku b | hasField "api_stage_flag" b =
 hasKouku _ = false
 
 hasKouku2 :: Battle -> Boolean
-hasKouku2 b | hasField "api_stage_flag2" b = AU.unsafeIndex b.api_stage_flag2 2 == 1
+hasKouku2 b | hasField "api_stage_flag2" b =
+          AU.unsafeIndex b.api_stage_flag2 2 == 1
 hasKouku2 _ = false
 
 hasHourai :: Battle -> Boolean
@@ -82,6 +84,17 @@ getKouku2 b = if hasKouku2 b
   then Just b.api_kouku2
   else Nothing
 
+getHouraiFlags :: Battle -> Maybe (Array Int)
+getHouraiFlags b =
+   if hasField "api_hourai_flag" b
+     then Just b.api_hourai_flag
+     else Nothing
+
+checkHouraiFlag :: Int -> Battle -> Maybe Unit
+checkHouraiFlag ind b = do
+    flg <- (`AU.unsafeIndex` ind) <$> getHouraiFlags b
+    guard (flg == 1)
+
 getOpeningAttack :: Battle -> Maybe Raigeki
 getOpeningAttack b =
     if hasField "api_opening_flag" b
@@ -90,36 +103,24 @@ getOpeningAttack b =
       else Nothing
 
 getHougeki1 :: Battle -> Maybe Hougeki
-getHougeki1 b
-  | hasField "api_hougeki1" b = if
-               AU.unsafeIndex b.api_hourai_flag 0 == 1
-  then Just b.api_hougeki1
-  else Nothing
-getHougeki1 _ = Nothing
+getHougeki1 b = do
+    checkHouraiFlag 0 b
+    return b.api_hougeki1
 
 getHougeki2 :: Battle -> Maybe Hougeki
-getHougeki2 b
-  | hasField "api_hougeki2" b = if
-                AU.unsafeIndex b.api_hourai_flag 1 == 1
-  then Just b.api_hougeki2
-  else Nothing
-getHougeki2 _ = Nothing
+getHougeki2 b = do
+    checkHouraiFlag 1 b
+    return b.api_hougeki2
 
 getHougeki3 :: Battle -> Maybe Hougeki
-getHougeki3 b
-  | hasField "api_hougeki3" b = if
-                AU.unsafeIndex b.api_hourai_flag 2 == 1
-  then Just b.api_hougeki3
-  else Nothing
-getHougeki3 _ = Nothing
+getHougeki3 b = do
+    checkHouraiFlag 2 b
+    return b.api_hougeki3
 
 getRaigeki :: Battle -> Maybe Raigeki
-getRaigeki b
-  | hasField "api_raigeki" b = if
-                AU.unsafeIndex b.api_hourai_flag 3 == 1
-  then Just b.api_raigeki
-  else Nothing
-getRaigeki _ = Nothing
+getRaigeki b = do
+    checkHouraiFlag 3 b
+    return b.api_raigeki
 
 getHougeki :: Battle -> Maybe Hougeki
 getHougeki b = if hasHougeki b
