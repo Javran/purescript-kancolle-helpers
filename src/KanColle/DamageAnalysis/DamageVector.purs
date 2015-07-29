@@ -11,7 +11,7 @@ import Data.Array
 import qualified Data.Array.Unsafe as AU
 import Data.Foldable
 import Data.Int
-import Data.Maybe.Unsafe
+import Data.Maybe
 import Data.Monoid
 import Data.Monoid.Endo
 import Data.Foreign
@@ -40,7 +40,10 @@ instance damageVectorShow :: Show DamageVector where
 -- | NOTE: as an array of damages does not necessarily contain 13 elements
 -- | let's not make the return type `DamageVector`
 damageNormalize :: Array Number -> Array Int
-damageNormalize = map (fromJust <<< fromNumber <<< floor)
+damageNormalize = map normalize
+  where
+    normalize x | x >= 0.0 = fromMaybe 0 (fromNumber (floor x))
+    normalize _ = 0
 
 modifyDamage :: (Array Int -> Array Int)
              -> DamageVector -> DamageVector
@@ -80,8 +83,8 @@ calcHougekiDamage h =
 
     modifiers = foldMap Endo (zipWith toDamageModifier eventTargets eventDamages)
     toDamageModifier :: Int -> Int -> Array Int -> Array Int
-    toDamageModifier target damage =
-        fromJust <<< modifyAt target (+ damage)
+    toDamageModifier target damage arr =
+        fromMaybe arr (modifyAt target (+ damage) arr)
 
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> DamageVector

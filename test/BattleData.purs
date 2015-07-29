@@ -8,6 +8,7 @@ foreign import battle1 :: Foreign
 foreign import battle2 :: Foreign
 
 foreign import nightBattle1 :: Foreign
+foreign import nightBattle2 :: Foreign
 
 foreign import aerialBattle1 :: Foreign
 
@@ -20,5 +21,9 @@ battle2Result = pprFleetDamageTookInfo $ analyzeRawBattle battle2
 nightBattle1Result :: String
 nightBattle1Result = pprFleetDamageTookInfoNight $ analyzeRawNightBattle nightBattle1
 
+nightBattle2Result :: String
+nightBattle2Result = pprFleetDamageTookInfoNight $ analyzeRawNightBattle nightBattle2
+
 aerialBattle1Result :: String
 aerialBattle1Result = pprFleetDamageTookInfo $ analyzeRawBattle aerialBattle1
+

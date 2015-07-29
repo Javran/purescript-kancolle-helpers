@@ -77,6 +77,7 @@ testExpeditionHelper =
       assert "fleet test 4" $
         getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,37]
 
+-- TODO: break into stages
 testDamageAnalyzer :: forall e. MyTest e
 testDamageAnalyzer =
     test "DamageAnalyzer" do
@@ -93,6 +94,10 @@ testDamageAnalyzer =
         trimInfo (analyzeNightBattle (unsafeFromForeign nightBattle1)) ==
           map toMaybeInt [9999
                          ,15,12,18,18,9999,9999,0,0,28-94,0,0,0]
+      assert "night battle sample 2" $
+        trimInfo (analyzeNightBattle (unsafeFromForeign nightBattle2)) ==
+          map toMaybeInt [9999
+                         ,75,75,6,69,23,43,0,41-181,21-124,0,0,9999]
       assert "aerial battle sample 1" $
         trimInfo (analyzeBattle (unsafeFromForeign aerialBattle1)) ==
           map toMaybeInt [9999
