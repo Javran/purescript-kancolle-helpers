@@ -1,19 +1,19 @@
-module KanColle.Expedition.Consumption where
+module KanColle.Expedition.Cost where
 
 import Prelude
 import Data.Int
 
-type Consumption =
+type Cost =
   { fuel :: Number
   , ammo :: Number
   , time :: Int -- in minutes
   }
 
-noConsumption :: Consumption
-noConsumption = { fuel: 0.0, ammo: 0.0, time: 0 }
+noCost :: Cost
+noCost = { fuel: 0.0, ammo: 0.0, time: 0 }
 
-getExpeditionConsumption :: Int -> Consumption
-getExpeditionConsumption eId = case eId of
+getExpeditionCost :: Int -> Cost
+getExpeditionCost eId = case eId of
     1 ->  c 3 0   15
     2 ->  c 5 0   30
     3 ->  c 3 2   20
@@ -39,7 +39,7 @@ getExpeditionConsumption eId = case eId of
     21 -> c 8 7 $ hm 2 20
     22 -> c 8 7 $ hr 3
     23 -> c 8 8 $ hr 4
-    24 -> c 8 6 $ hm 8 20
+    24 -> c 9 6 $ hm 8 20
 
     25 -> c 5 8 $ hr 40
     26 -> c 8 8 $ hr 80
@@ -56,7 +56,7 @@ getExpeditionConsumption eId = case eId of
     38 -> c 8 8 $ hm 2 55
     39 -> c 9 9 $ hr 30
     40 -> c 8 7 $ hm 6 50
-    _ -> noConsumption
+    _ -> noCost
   where
     hr = (* 60)
     hm h m = h*60 + m
