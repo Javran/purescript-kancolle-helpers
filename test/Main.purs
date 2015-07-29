@@ -7,6 +7,7 @@ import Test.Unit.Console hiding (print)
 import Data.Array
 
 import KanColle.Expedition
+import KanColle.Expedition.Requirement
 import KanColle.DamageAnalysis
 import KanColle.SType
 import Data.Foreign
