@@ -5,9 +5,11 @@ import Control.Monad.Eff.Console
 import Test.Unit
 import Test.Unit.Console hiding (print)
 import Data.Array
+import Data.Foldable
 
 import KanColle.Expedition
 import KanColle.Expedition.Requirement
+import KanColle.Expedition.Minimal
 import KanColle.DamageAnalysis
 import KanColle.SType
 import Data.Foreign
@@ -108,6 +110,18 @@ testDamageAnalyzer =
     trimInfo :: forall a. Array (Maybe { currentHp:: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.currentHp)
 
+testExpeditionMinimal :: forall e. MyTest e
+testExpeditionMinimal =
+    test "ExpeditionMinimalCost" $
+      assert "minimal costs are likely to be achivable" $
+        all verify expeditionIds
+  where
+    verify eId = checkExpedition eId fleet
+      where
+        fleet = case getExpeditionMinCost eId of
+            ECost ec -> ec.fleet
+
 main = runTest do
     testExpeditionHelper
     testDamageAnalyzer
+    testExpeditionMinimal
