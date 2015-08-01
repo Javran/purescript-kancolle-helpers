@@ -63,6 +63,13 @@ testFleet4 =
     , mkShip CL 41 1
     ]
 
+testFleet5 :: Fleet ()
+testFleet5 =
+    [ mkShip CT 5 0
+    , mkShip DD 1 0
+    , mkShip DD 1 0
+    ]
+
 type MyTest e = Test (testOutput :: TestOutput | e)
 
 -- TODO: cover all possible expeditions
@@ -79,6 +86,8 @@ testExpeditionHelper =
         getAvailableExpeditions testFleet3 == [1,2,3,4,5,6,9,11,12,21]
       assert "fleet test 4" $
         getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,37]
+      assert "Expedition #32, 3 ships should also do" $
+        unsatisfiedRequirements 32 testFleet5 == []
 
 -- TODO: break into stages
 testDamageAnalyzer :: forall e. MyTest e
