@@ -55,11 +55,15 @@ main = do
     (ExitSuccess, jsContent) <- shellStrict "psc-bundle 'output/*/*.js' \
                                             \-m KanColle.Expedition \
                                             \-m KanColle.DamageAnalysis \
+                                            \-m KanColle.Expedition.Evaluate \
                                             \ " ""
     (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (return jsContent)
     cd cwd
     let targetFile = "KanColleHelpers.js"
+        targetFileNode = "KanColleHelpersN.js"
     -- write to file
     T.writeFile targetFile jsOptimized
     T.putStrLn $ "Saved to: " <> toText' (cwd </> decodeString targetFile)
+    T.writeFile targetFileNode (jsOptimized <> "\nmodule.exports = PS;\n")
+    T.putStrLn $ "Saved to: " <> toText' (cwd </> decodeString targetFileNode)
     return ()
