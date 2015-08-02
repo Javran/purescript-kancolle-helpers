@@ -54,6 +54,7 @@ main = do
     (ExitSuccess, _) <- shellStrict "pulp build" ""
     (ExitSuccess, jsContent) <- shellStrict "psc-bundle 'output/*/*.js' \
                                             \-m KanColle.Expedition \
+                                            \-m KanColle.Expedition.Requirement \
                                             \-m KanColle.DamageAnalysis \
                                             \-m KanColle.Expedition.Evaluate \
                                             \ " ""
