@@ -16,9 +16,9 @@ unzip purescript-master.zip
 
 pushd purescript-master
 cabal update
-cabal install happy
-cabal install alex
-cabal install --only-dependencies
+cabal install happy --force-reinstalls
+cabal install alex --force-reinstalls
+cabal install --only-dependencies --force-reinstalls
 cabal install
 popd # purescript-master
 
