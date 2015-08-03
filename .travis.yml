@@ -2,6 +2,6 @@ language: haskell
 ghc:
   - 7.8
 install: ./scripts/travis.sh
-build:
+script:
   - pulp build
   - pulp test
