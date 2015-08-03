@@ -4,8 +4,10 @@ import Prelude
 import Data.Array
 import qualified Data.String as S
 import Data.Int
+import Data.Maybe
 import Math
 import Data.Function
+import Data.Foldable
 
 import KanColle.Expedition
 import KanColle.Expedition.Income
@@ -19,14 +21,26 @@ type EvalResult =
   , time :: Int
   }
 
-incomeDiff :: Income -> ECost -> Income
-incomeDiff (Income i) (ECost e) = case e.shipCost of
-    ShipCost sc -> Income
-        { fuel: i.fuel - sc.fuel
-        , ammo: i.ammo - sc.ammo
-        , steel: i.steel
-        , bauxite: i.bauxite
-        }
+nToFloor :: Number -> Int
+nToFloor = fromMaybe 0 <<< fromNumber
+
+incomeDiff :: Cost -> Income -> ECost -> Income
+incomeDiff cost (Income i) (ECost e) = Income
+    { fuel: i.fuel - sum fuelCosts
+    , ammo: i.ammo - sum ammoCosts
+    , steel: i.steel
+    , bauxite: i.bauxite
+    }
+  where
+    sc = e.shipCost
+
+    fuelCostPercent = cost.fuel
+    ammoCostPercent = cost.ammo
+
+    fuelCosts :: Array Int
+    fuelCosts = map (\x -> nToFloor (toNumber x.fuel * fuelCostPercent)) sc
+    ammoCosts :: Array Int
+    ammoCosts = map (\x -> nToFloor (toNumber x.ammo * ammoCostPercent)) sc
 
 ordMax :: forall a. (Ord a) => a -> a -> a
 ordMax a b = if a >= b then a else b
@@ -48,7 +62,7 @@ sortByHourlyGain evalCost = sortBy (flip compareScore) expeditions
                       , time: cost.time
                       , score: score }
       where
-        netIncome = getExpeditionIncome eId `incomeDiff` getExpeditionMinCost eId
+        netIncome = getExpeditionIncome eId `incomeDiff cost` getExpeditionMinCost eId
         cost = getExpeditionCost eId
         score = toNumber (evalCost netIncome) / minToHour cost.time
 
@@ -63,8 +77,9 @@ sortWithAfkTime evalCost timePenalty afkMinutes = sortBy (flip compareScore) exp
                       , time: totalExpTime
                       , score: score }
       where
-        costMinutes = (getExpeditionCost eId).time
-        netIncome = getExpeditionIncome eId `incomeDiff` getExpeditionMinCost eId
+        cost = getExpeditionCost eId
+        costMinutes = cost.time
+        netIncome = getExpeditionIncome eId `incomeDiff cost` getExpeditionMinCost eId
         totalExpTime = ordMax costMinutes afkMinutes
         scoreNoPenalty = toNumber (evalCost netIncome) / minToHour totalExpTime
         timeDiffPenalty :: Number

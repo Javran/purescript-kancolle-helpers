@@ -11,19 +11,10 @@ import KanColle.Expedition
 import KanColle.Expedition.Requirement
 import KanColle.Util
 
-newtype ShipCost = ShipCost
+type ShipMaxCost =
   { fuel :: Int
   , ammo :: Int
   }
-
-instance shipCostSemigroup :: Semigroup ShipCost where
-  append (ShipCost a) (ShipCost b) =
-      ShipCost { fuel: a.fuel + b.fuel
-               , ammo: a.ammo + b.ammo
-               }
-
-instance shipCostMonoid :: Monoid ShipCost where
-  mempty = ShipCost {fuel: 0, ammo: 0}
 
 -- | minimal cost of an expedition, just for the purpose of estimation
 -- | despite that we are trying to provide a possible ship composition
@@ -31,7 +22,7 @@ instance shipCostMonoid :: Monoid ShipCost where
 -- | due to many factors (e.g. other running expeditions are using the same ship,
 -- | or you have not yet obtained the ship)
 newtype ECost = ECost
-  { shipCost :: ShipCost
+  { shipCost :: Array ShipMaxCost
   , fleet :: Fleet ()
   }
 
@@ -52,7 +43,7 @@ dummyShip s =
 
 mkECost :: SType -> Int -> Int -> ECost
 mkECost s f a = ECost
-    { shipCost: ShipCost { fuel: f, ammo: a }
+    { shipCost: [{ fuel: f, ammo: a }]
     , fleet: [dummyShip s] }
 
 -- | minimal DD cost, achivable by taking any of Mutsuki class ships
