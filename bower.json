@@ -21,7 +21,8 @@
         "purescript-nullable": "^0.2.1",
         "purescript-integers": "0.2.0",
         "purescript-strings": "0.5.4",
-        "purescript-foreign": "0.5.1"
+        "purescript-foreign": "0.5.1",
+        "purescript-math": "0.2.0"
     },
     "devDependencies": {
         "purescript-test-unit": "^2.0.0"
