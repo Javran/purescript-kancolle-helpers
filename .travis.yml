@@ -1,6 +1,12 @@
 language: haskell
 ghc:
   - 7.8
+before_install:
+  - export PATH="/opt/ghc/$GHCVER/bin:$PATH"
+  - export PATH="/opt/cabal/1.22/bin:$PATH"
+  - export PATH="$HOME/.cabal/bin:$PATH"
+  - export PATH="/opt/happy/1.19.5/bin:/$PATH"
+  - export PATH="/opt/alex/3.1.4/bin:/$PATH"
 install: ./scripts/travis.sh
 script:
   - pulp build
