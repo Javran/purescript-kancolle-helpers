@@ -14,8 +14,10 @@ pushd "$PURESCRIPT_HOME"
 curl 'https://codeload.github.com/purescript/purescript/zip/master' -o 'purescript-master.zip' -L
 unzip purescript-master.zip
 
-pushd purescript-master 
+pushd purescript-master
 cabal update
+cabal install happy
+cabal install alex
 cabal install --only-dependencies
 cabal install
 popd # purescript-master
