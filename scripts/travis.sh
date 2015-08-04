@@ -2,8 +2,6 @@
 
 set -x
 
-export CI=true
-
 cabal update
 cabal install happy --force-reinstalls
 cabal install alex --force-reinstalls
