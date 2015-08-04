@@ -1,31 +1,13 @@
 #!/bin/bash
 
+set -x
+
 export CI=true
 
-# assume we are in PROJECT_HOME
-export PROJECT_HOME=`pwd`
-export PURESCRIPT_HOME="$HOME/purescript"
-
-mkdir -p "$PURESCRIPT_HOME"
-
-pushd "$PURESCRIPT_HOME"
-
-# download and compiler purescript's compiler
-curl 'https://codeload.github.com/purescript/purescript/zip/master' -o 'purescript-master.zip' -L
-unzip purescript-master.zip
-
-pushd purescript-master
 cabal update
 cabal install happy --force-reinstalls
 cabal install alex --force-reinstalls
-cabal install --only-dependencies --force-reinstalls
-cabal install
-popd # purescript-master
-
-popd # $PURESCRIPT_HOME
-
-# now we are ready to build the project
-cd "$PROJECT_HOME"
+cabal install purescript-0.7.2.0
 
 # dependencies
 npm install pulp
