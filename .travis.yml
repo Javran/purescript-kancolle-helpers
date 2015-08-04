@@ -1,13 +1,17 @@
-language: haskell
-ghc:
-  - 7.8
-before_install:
-  - export PATH="/opt/ghc/$GHCVER/bin:$PATH"
-  - export PATH="/opt/cabal/1.22/bin:$PATH"
-  - export PATH="$HOME/.cabal/bin:$PATH"
-  - export PATH="/opt/happy/1.19.5/bin:/$PATH"
-  - export PATH="/opt/alex/3.1.4/bin:/$PATH"
-install: ./scripts/travis.sh
+language: node_js
+sudo: false
+node_js:
+  - 0.10
+env:
+  - PATH=`npm bin`:$HOME/purescript:$PATH
+install:
+  - TAG=$(wget -q -O - https://github.com/purescript/purescript/releases/latest --server-response --max-redirect 0 2>&1 | sed -n -e 's/.*Location:.*tag\///p')
+  - wget -O $HOME/purescript.tar.gz https://github.com/purescript/purescript/releases/download/$TAG/linux64.tar.gz
+  - tar -xvf $HOME/purescript.tar.gz -C $HOME/
+  - chmod a+x $HOME/purescript
+  - npm install pulp
+  - npm install uglify-js
+  - pulp dep install
 script:
   - pulp build
   - pulp test
