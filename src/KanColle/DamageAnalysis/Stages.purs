@@ -14,6 +14,12 @@ import KanColle.DamageAnalysis.DamageVector
 koukuDV :: Battle -> DamageVector
 koukuDV = foldMap calcKoukuDamage <<< getKouku
 
+supportAirAttackDV :: Battle -> DamageVector
+supportAirAttackDV = foldMap calcSupportAirAttackDamage <<< getSupportAirInfo
+
+supportHouraiDV :: Battle -> DamageVector
+supportHouraiDV = foldMap calcSupportHouraiDamage <<< getSupportHouraiInfo
+
 kouku2DV :: Battle -> DamageVector
 kouku2DV = foldMap calcKoukuDamage <<< getKouku2
 
@@ -47,6 +53,7 @@ hougekiDV = foldMap calcHougekiDamage <<< getHougeki
 -- | * `raigeki` (closing torpedo attack)
 battleDV :: Battle -> DamageVector
 battleDV = mconcat [ koukuDV, kouku2DV
+                   , supportAirAttackDV, supportHouraiDV
                    , openingDV
                    , hougeki1DV, hougeki2DV, hougeki3DV
                    , raigekiDV

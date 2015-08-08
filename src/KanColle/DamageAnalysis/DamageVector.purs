@@ -3,6 +3,8 @@ module KanColle.DamageAnalysis.DamageVector
   , calcKoukuDamage
   , calcHougekiDamage
   , calcRaigekiDamage
+  , calcSupportAirAttackDamage
+  , calcSupportHouraiDamage
   ) where
 
 import Prelude
@@ -89,3 +91,11 @@ calcHougekiDamage h =
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> DamageVector
 calcRaigekiDamage = fromFDamAndEDam
+
+calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
+calcSupportAirAttackDamage info = DV $
+    [-1] <> replicate 6 0 <> damageNormalize (AU.tail info.api_stage3.api_edam)
+
+calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
+calcSupportHouraiDamage info = DV $
+    [-1] <> replicate 6 0 <> damageNormalize (AU.tail info.api_damage)

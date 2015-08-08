@@ -3,6 +3,7 @@ module BattleData where
 import Prelude
 import Data.Foreign
 import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.Stages
 
 foreign import battle1 :: Foreign
 foreign import battle2 :: Foreign
@@ -11,6 +12,9 @@ foreign import nightBattle1 :: Foreign
 foreign import nightBattle2 :: Foreign
 
 foreign import aerialBattle1 :: Foreign
+
+foreign import withSupportExpedition1 :: Foreign
+foreign import withSupportExpedition2 :: Foreign
 
 battle1Result :: String
 battle1Result = pprFleetDamageTookInfo $ analyzeRawBattle battle1
@@ -26,3 +30,9 @@ nightBattle2Result = pprFleetDamageTookInfoNight $ analyzeRawNightBattle nightBa
 
 aerialBattle1Result :: String
 aerialBattle1Result = pprFleetDamageTookInfo $ analyzeRawBattle aerialBattle1
+
+supportHouraiDebug1 :: String
+supportHouraiDebug1 = show $ supportHouraiDV (unsafeFromForeign withSupportExpedition1)
+
+supportHouraiDebug2 :: String
+supportHouraiDebug2 = show $ supportHouraiDV (unsafeFromForeign withSupportExpedition2)
