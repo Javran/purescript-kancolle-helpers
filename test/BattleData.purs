@@ -26,4 +26,3 @@ nightBattle2Result = pprFleetDamageTookInfoNight $ analyzeRawNightBattle nightBa
 
 aerialBattle1Result :: String
 aerialBattle1Result = pprFleetDamageTookInfo $ analyzeRawBattle aerialBattle1
-
