@@ -5,14 +5,8 @@ import Prelude hiding (FilePath)
 import Control.Arrow
 import Turtle
 import Filesystem.Path.CurrentOS
-import qualified Control.Foldl as FL
-import Control.Applicative
-import Control.Monad
-import Text.Printf
-import System.Directory
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Data.Either
 
 -- | guess project home directory
 --   make sure to run this somewhere under the project home
@@ -23,13 +17,6 @@ guessProjectHome fPath = do
     if b
       then return fPath
       else guessProjectHome (parent fPath)
-
-touchTempBuildDir :: IO FilePath
-touchTempBuildDir = do
-    tmpDir <- decodeString <$> getTemporaryDirectory
-    let dst = tmpDir </> "psbuild/kancolle-helpers"
-    mktree dst
-    return dst
 
 toText' :: FilePath -> T.Text
 toText' = either id id . toText
@@ -43,7 +30,7 @@ main = do
     let uglifyJsBin = fromText npmBin </> "uglifyjs"
     True <- testfile uglifyJsBin
     putStrLn $ "Found uglifyjs in: " <> encodeString uglifyJsBin
-    buildDir <- touchTempBuildDir
+    let buildDir = prjHome
     -- sync files
     let excludeArgs = map ("--exclude=" <>)
                           [".git/", ".cabal-sandbox/", "output/"]
