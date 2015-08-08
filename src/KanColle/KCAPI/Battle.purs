@@ -28,6 +28,8 @@ type Battle =
   , api_hougeki3 :: Hougeki
   , api_raigeki :: Raigeki
   , api_hougeki :: Hougeki
+  , api_support_flag :: Int
+  , api_support_info :: SupportInfo
   }
 
 type Kouku =
@@ -47,6 +49,17 @@ type Hougeki =
 type Raigeki =
   { api_fdam :: Array Number
   , api_edam :: Array Number
+  }
+
+type SupportAirInfo =
+  { api_stage3 :: { api_edam :: Array Number } }
+
+type SupportHouraiInfo =
+  { api_damage :: Array Number }
+
+type SupportInfo =
+  { api_support_airatack :: SupportAirInfo
+  , api_support_hourai :: SupportHouraiInfo
   }
 
 getInitHps :: Battle -> Array (Maybe Int)
@@ -78,6 +91,23 @@ getKouku :: Battle -> Maybe Kouku
 getKouku b = if hasKouku b
   then Just b.api_kouku
   else Nothing
+
+getSupportFlag :: Battle -> Maybe Int
+getSupportFlag b = if hasField "api_support_flag" b
+  then Just b.api_support_flag
+  else Nothing
+
+getSupportAirInfo :: Battle -> Maybe SupportAirInfo
+getSupportAirInfo b = do
+    i <- getSupportFlag b
+    guard (i == 1)
+    return b.api_support_info.api_support_airatack
+
+getSupportHouraiInfo :: Battle -> Maybe SupportHouraiInfo
+getSupportHouraiInfo b = do
+    i <- getSupportFlag b
+    guard $ i == 2 || i == 3
+    return b.api_support_info.api_support_hourai
 
 getKouku2 :: Battle -> Maybe Kouku
 getKouku2 b = if hasKouku2 b
