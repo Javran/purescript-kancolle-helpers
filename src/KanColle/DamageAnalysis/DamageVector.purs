@@ -1,10 +1,14 @@
 module KanColle.DamageAnalysis.DamageVector
   ( DamageVector(..)
+  , CombinedDamageVector(..)
+  , FleetRole(..)
   , calcKoukuDamage
+  , calcKoukuDamageCombined
   , calcHougekiDamage
   , calcRaigekiDamage
   , calcSupportAirAttackDamage
   , calcSupportHouraiDamage
+  , toCombined
   ) where
 
 import Prelude
@@ -62,6 +66,12 @@ fromFDamAndEDam v = DV ([0] <> damageNormalize (AU.tail v.api_fdam)
 calcKoukuDamage :: Kouku -> DamageVector
 calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
+calcKoukuDamageCombined :: Kouku -> DamageVector
+calcKoukuDamageCombined kk = fromFDam kk.api_stage3_combined
+  where
+    fromFDam v = DV ([0] <> damageNormalize (AU.tail v.api_fdam)
+                         <> replicate 6 0)
+
 -- | calculate damage from hougeki (shelling) stages
 calcHougekiDamage :: Hougeki -> DamageVector
 calcHougekiDamage h =
@@ -99,3 +109,24 @@ calcSupportAirAttackDamage info = DV $
 calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV $
     [-1] <> replicate 6 0 <> damageNormalize (AU.tail info.api_damage)
+
+data FleetRole = FRMain | FREscort | FRSupport
+
+newtype CombinedDamageVector = CDV
+  { main   :: DamageVector
+  , escort :: DamageVector }
+
+instance combinedDamageVectorSemigroup :: Semigroup CombinedDamageVector where
+  append (CDV a) (CDV b) = CDV
+      { main:   a.main   <> b.main
+      , escort: a.escort <> b.escort
+      }
+
+instance combinedDamageVectorMonoid :: Monoid CombinedDamageVector where
+  mempty = CDV { main: mempty, escort: mempty }
+
+toCombined :: FleetRole -> DamageVector -> CombinedDamageVector
+toCombined r dv = case r of
+    FRMain    -> CDV { main: dv, escort: mempty }
+    FREscort  -> CDV { main: mempty, escort: dv }
+    FRSupport -> mempty

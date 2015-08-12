@@ -16,6 +16,7 @@ import qualified Data.Array.Unsafe as AU
 -- TODO: change this to foreign, or hide the definition
 type Battle =
   { api_nowhps :: Array Int
+  , api_nowhps_combined :: Array Int
   , api_stage_flag :: Array Int
   , api_stage_flag2 :: Array Int
   , api_kouku :: Kouku
@@ -34,8 +35,10 @@ type Battle =
 
 type Kouku =
   { api_stage3 :: KoukuStage3
+  , api_stage3_combined :: KoukuStage3
   }
 
+-- WARNING: keep in mind that combined fleet does not have "api_edam" field
 type KoukuStage3 =
   { api_fdam :: Array Number
   , api_edam :: Array Number
@@ -64,6 +67,12 @@ type SupportInfo =
 
 getInitHps :: Battle -> Array (Maybe Int)
 getInitHps b = map fromRawHp b.api_nowhps
+  where
+    fromRawHp -1 = Nothing
+    fromRawHp v = Just v
+
+getInitHpsCombined :: Battle -> Array (Maybe Int)
+getInitHpsCombined b = map fromRawHp b.api_nowhps_combined
   where
     fromRawHp -1 = Nothing
     fromRawHp v = Just v

@@ -46,13 +46,30 @@ pprFleetDamageTookInfoNight = joinWith " | " <<< map (maybe "<N/A>" pprDamageToo
 -- index 7-12 for enemies
 type AllFleetInfo a = Array (Maybe a)
 
-type DamageAnalyzer = Battle
-                   -> AllFleetInfo DamageTookInfo
-                   -> AllFleetInfo DamageTookInfo
+-- for all inner "Array (Maybe a)"
+-- index 0 is never used
+-- index 1-6 is for the current fleet
+type CombinedFleetInfo a =
+  { main :: Array (Maybe a)
+  , escort :: Array (Maybe a)
+  , enemy :: Array (Maybe a)
+  }
 
 -- initialize a battle, does nothing but setup currentHp
 battleStart :: Battle -> AllFleetInfo DamageTookInfo
 battleStart = (map <<< map) (\x -> {currentHp: x}) <<< getInitHps
+
+battleCombinedStart :: Battle -> CombinedFleetInfo DamageTookInfo
+battleCombinedStart b =
+    { main: mk (slice 1 7 mainAndEnemy)
+    , escort: mk escort
+    , enemy: mk (slice 7 13 mainAndEnemy)
+    }
+  where
+    -- convert to the right format & pad with "Nothing"
+    mk = ([Nothing] <>) <<< (map <<< map) (\x -> {currentHp: x})
+    mainAndEnemy = getInitHps b
+    escort = AU.tail $ getInitHpsCombined b
 
 analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
 analyzeBattle = applyDamageVector <$> battleDV <*> battleStart
@@ -78,3 +95,43 @@ applyDamageVector :: DamageVector
 applyDamageVector (DV dv) = zipWith combine dv
   where
     combine dmg = map (\x -> x {currentHp = x.currentHp - dmg})
+
+applyCombinedDamageVector :: CombinedDamageVector
+                          -> CombinedFleetInfo DamageTookInfo
+                          -> CombinedFleetInfo DamageTookInfo
+applyCombinedDamageVector (CDV cdv) nowhps =
+    { main: phaseResult1Main
+    , escort: phaseResult2Escort
+    , enemy: phaseResult2Enemy
+    }
+  where
+    -- note that damage accumulation is not accumulated in chronological order
+    -- but this won't effect the final result
+    -- phase 1: main fleet & enemy
+    fleetInfo1 = [Nothing] <> AU.tail nowhps.main <> AU.tail nowhps.enemy
+    phaseResult1 = applyDamageVector cdv.main fleetInfo1
+    phaseResult1Main = [Nothing] <> slice 1 7 phaseResult1
+    phaseResult1Enemy = [Nothing] <> slice 7 13 phaseResult1
+    -- phase 2: escort fleet & enemy
+    fleetInfo2 = [Nothing] <> AU.tail nowhps.escort <> AU.tail phaseResult1Enemy
+    phaseResult2 = applyDamageVector cdv.escort fleetInfo2
+    phaseResult2Escort = [Nothing] <> slice 1 7 phaseResult2
+    phaseResult2Enemy = [Nothing] <> slice 7 13 phaseResult2
+
+analyzeSurfaceTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
+analyzeSurfaceTaskForceBattle =
+    applyCombinedDamageVector
+      <$> battleCombinedDV
+      <*> battleCombinedStart
+
+analyzeRawSurfaceTaskForceBattle :: Foreign -> CombinedFleetInfo DamageTookInfo
+analyzeRawSurfaceTaskForceBattle = analyzeSurfaceTaskForceBattle <<< unsafeFromForeign
+
+analyzeRawSurfaceTaskForceBattleJS :: Foreign
+                                   -> { main   :: Array (Nullable DamageTookInfo)
+                                      , escort :: Array (Nullable DamageTookInfo)
+                                      , enemy  :: Array (Nullable DamageTookInfo) }
+analyzeRawSurfaceTaskForceBattleJS = cov <<< analyzeRawSurfaceTaskForceBattle
+  where
+    c = map toNullable
+    cov v = { main: c v.main, escort: c v.escort, enemy: c v.enemy }

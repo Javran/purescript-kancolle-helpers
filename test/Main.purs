@@ -11,6 +11,8 @@ import KanColle.Expedition
 import KanColle.Expedition.Requirement
 import KanColle.Expedition.Minimal
 import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.DamageVector
+import KanColle.KCAPI.Battle
 import KanColle.SType
 import Data.Foreign
 import Data.Maybe

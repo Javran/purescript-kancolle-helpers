@@ -14,6 +14,9 @@ import KanColle.DamageAnalysis.DamageVector
 koukuDV :: Battle -> DamageVector
 koukuDV = foldMap calcKoukuDamage <<< getKouku
 
+koukuCombinedDV :: Battle -> DamageVector
+koukuCombinedDV = foldMap calcKoukuDamageCombined <<< getKouku
+
 supportAirAttackDV :: Battle -> DamageVector
 supportAirAttackDV = foldMap calcSupportAirAttackDamage <<< getSupportAirInfo
 
@@ -63,3 +66,17 @@ battleDV = mconcat [ koukuDV, kouku2DV
 -- | a night battle involves only `hougeki` (shelling stage)
 nightBattleDV :: Battle -> DamageVector
 nightBattleDV = hougekiDV
+
+-- TODO: for now it works only with surface task force battles
+battleCombinedDV :: Battle -> CombinedDamageVector
+battleCombinedDV = mconcat
+    [ toCombined FRMain    <<< koukuDV
+    , toCombined FREscort  <<< koukuCombinedDV
+    , toCombined FRSupport <<< supportAirAttackDV
+    , toCombined FRSupport <<< supportHouraiDV
+    , toCombined FREscort  <<< openingDV
+    , toCombined FRMain    <<< hougeki1DV
+    , toCombined FRMain    <<< hougeki2DV
+    , toCombined FREscort  <<< hougeki3DV
+    , toCombined FREscort  <<< raigekiDV
+    ]
