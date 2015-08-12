@@ -153,3 +153,19 @@ analyzeRawCarrierTaskForceBattleJS = cov <<< analyzeRawCarrierTaskForceBattle
   where
     c = map toNullable
     cov v = { main: c v.main, escort: c v.escort, enemy: c v.enemy }
+
+-- for combined fleet's night battle, whose "nowhps_combined"
+-- should be taken into account instead of "nowhps"
+analyzeNightBattleCombined :: Battle -> AllFleetInfo DamageTookInfoNight
+analyzeNightBattleCombined b = applyDamageVector (nightBattleDV b) nightBattleHps
+  where
+    nightBattleInfo = battleCombinedStart b
+    nightBattleHps = [Nothing]
+                   <> AU.tail (nightBattleInfo.escort)
+                   <> AU.tail (nightBattleInfo.enemy)
+
+analyzeRawNightBattleCombined :: Foreign -> AllFleetInfo DamageTookInfoNight
+analyzeRawNightBattleCombined = analyzeNightBattleCombined <<< unsafeFromForeign
+
+analyzeRawNightBattleCombinedJS :: Foreign -> Array (Nullable DamageTookInfoNight)
+analyzeRawNightBattleCombinedJS = map toNullable <<< analyzeRawNightBattleCombined

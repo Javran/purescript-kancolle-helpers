@@ -20,6 +20,8 @@ foreign import surfaceTaskForceBattle1 :: Foreign
 foreign import carrierTaskForceBattle1 :: Foreign
 foreign import carrierTaskForceAirBattle1 :: Foreign
 
+foreign import combinedFleetNightBattle1 :: Foreign
+
 battle1Result :: String
 battle1Result = pprFleetDamageTookInfo $ analyzeRawBattle battle1
 
