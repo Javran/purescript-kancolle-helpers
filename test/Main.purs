@@ -3,7 +3,6 @@ module Test.Main where
 import Prelude
 import Control.Monad.Eff.Console
 import Test.Unit
-import Test.Unit.Console hiding (print)
 import Data.Array
 import Data.Foldable
 
@@ -18,6 +17,7 @@ import Data.Foreign
 import Data.Maybe
 
 import BattleData
+import Base
 
 instance eqFleetRequirementForTest :: Eq FleetRequirement where
     eq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2
@@ -71,8 +71,6 @@ testFleet5 =
     , mkShip DD 1 0
     , mkShip DD 1 0
     ]
-
-type MyTest e = Test (testOutput :: TestOutput | e)
 
 -- TODO: cover all possible expeditions
 testExpeditionHelper :: forall e. MyTest e
