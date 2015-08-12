@@ -121,7 +121,7 @@ applyCombinedDamageVector (CDV cdv) nowhps =
 analyzeSurfaceTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
 analyzeSurfaceTaskForceBattle =
     applyCombinedDamageVector
-      <$> battleCombinedDV
+      <$> battleSurfaceTaskForceDV
       <*> battleCombinedStart
 
 analyzeRawSurfaceTaskForceBattle :: Foreign -> CombinedFleetInfo DamageTookInfo
@@ -132,6 +132,24 @@ analyzeRawSurfaceTaskForceBattleJS :: Foreign
                                       , escort :: Array (Nullable DamageTookInfo)
                                       , enemy  :: Array (Nullable DamageTookInfo) }
 analyzeRawSurfaceTaskForceBattleJS = cov <<< analyzeRawSurfaceTaskForceBattle
+  where
+    c = map toNullable
+    cov v = { main: c v.main, escort: c v.escort, enemy: c v.enemy }
+
+analyzeCarrierTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
+analyzeCarrierTaskForceBattle =
+    applyCombinedDamageVector
+      <$> battleCarrierTaskForceDV
+      <*> battleCombinedStart
+
+analyzeRawCarrierTaskForceBattle :: Foreign -> CombinedFleetInfo DamageTookInfo
+analyzeRawCarrierTaskForceBattle = analyzeCarrierTaskForceBattle <<< unsafeFromForeign
+
+analyzeRawCarrierTaskForceBattleJS :: Foreign
+                                   -> { main   :: Array (Nullable DamageTookInfo)
+                                      , escort :: Array (Nullable DamageTookInfo)
+                                      , enemy  :: Array (Nullable DamageTookInfo) }
+analyzeRawCarrierTaskForceBattleJS = cov <<< analyzeRawCarrierTaskForceBattle
   where
     c = map toNullable
     cov v = { main: c v.main, escort: c v.escort, enemy: c v.enemy }

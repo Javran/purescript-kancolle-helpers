@@ -38,7 +38,7 @@ type Kouku =
   , api_stage3_combined :: KoukuStage3
   }
 
--- WARNING: keep in mind that combined fleet does not have "api_edam" field
+-- WARNING: keep in mind that combined fleet does not have an "api_edam" field
 type KoukuStage3 =
   { api_fdam :: Array Number
   , api_edam :: Array Number
@@ -165,3 +165,26 @@ getHougeki :: Battle -> Maybe Hougeki
 getHougeki b = if hasHougeki b
   then Just b.api_hougeki
   else Nothing
+
+-- TODO: unify this with other functions
+-- Carrier Task Force is using a different ordering.
+-- specalized as "CT" here.
+getHougeki1CT :: Battle -> Maybe Hougeki
+getHougeki1CT b = do
+    checkHouraiFlag 0 b
+    return b.api_hougeki1
+
+getRaigekiCT :: Battle -> Maybe Raigeki
+getRaigekiCT b = do
+    checkHouraiFlag 1 b
+    return b.api_raigeki
+
+getHougeki2CT :: Battle -> Maybe Hougeki
+getHougeki2CT b = do
+    checkHouraiFlag 2 b
+    return b.api_hougeki2
+
+getHougeki3CT :: Battle -> Maybe Hougeki
+getHougeki3CT b = do
+    checkHouraiFlag 3 b
+    return b.api_hougeki3

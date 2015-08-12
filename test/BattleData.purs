@@ -17,6 +17,8 @@ foreign import withSupportExpedition1 :: Foreign
 foreign import withSupportExpedition2 :: Foreign
 
 foreign import surfaceTaskForceBattle1 :: Foreign
+foreign import carrierTaskForceBattle1 :: Foreign
+foreign import carrierTaskForceAirBattle1 :: Foreign
 
 battle1Result :: String
 battle1Result = pprFleetDamageTookInfo $ analyzeRawBattle battle1

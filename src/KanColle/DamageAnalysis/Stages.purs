@@ -17,6 +17,9 @@ koukuDV = foldMap calcKoukuDamage <<< getKouku
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = foldMap calcKoukuDamageCombined <<< getKouku
 
+kouku2CombinedDV :: Battle -> DamageVector
+kouku2CombinedDV = foldMap calcKoukuDamageCombined <<< getKouku2
+
 supportAirAttackDV :: Battle -> DamageVector
 supportAirAttackDV = foldMap calcSupportAirAttackDamage <<< getSupportAirInfo
 
@@ -40,6 +43,19 @@ hougeki3DV = foldMap calcHougekiDamage <<< getHougeki3
 
 raigekiDV :: Battle -> DamageVector
 raigekiDV = foldMap calcRaigekiDamage <<< getRaigeki
+
+-- specalized for Carrier Task Force
+hougeki1CTDV :: Battle -> DamageVector
+hougeki1CTDV = foldMap calcHougekiDamage <<< getHougeki1CT
+
+raigekiCTDV :: Battle -> DamageVector
+raigekiCTDV = foldMap calcRaigekiDamage <<< getRaigekiCT
+
+hougeki2CTDV :: Battle -> DamageVector
+hougeki2CTDV = foldMap calcHougekiDamage <<< getHougeki2CT
+
+hougeki3CTDV :: Battle -> DamageVector
+hougeki3CTDV = foldMap calcHougekiDamage <<< getHougeki3CT
 
 hougekiDV :: Battle -> DamageVector
 hougekiDV = foldMap calcHougekiDamage <<< getHougeki
@@ -67,9 +83,8 @@ battleDV = mconcat [ koukuDV, kouku2DV
 nightBattleDV :: Battle -> DamageVector
 nightBattleDV = hougekiDV
 
--- TODO: for now it works only with surface task force battles
-battleCombinedDV :: Battle -> CombinedDamageVector
-battleCombinedDV = mconcat
+battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
+battleSurfaceTaskForceDV = mconcat
     [ toCombined FRMain    <<< koukuDV
     , toCombined FREscort  <<< koukuCombinedDV
     , toCombined FRSupport <<< supportAirAttackDV
@@ -79,4 +94,21 @@ battleCombinedDV = mconcat
     , toCombined FRMain    <<< hougeki2DV
     , toCombined FREscort  <<< hougeki3DV
     , toCombined FREscort  <<< raigekiDV
+    ]
+
+battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
+battleCarrierTaskForceDV = mconcat
+    [ toCombined FRMain    <<< koukuDV
+    , toCombined FREscort  <<< koukuCombinedDV
+    , toCombined FRSupport <<< supportAirAttackDV
+    , toCombined FRSupport <<< supportHouraiDV
+    -- the following 2 for aerial battles
+    , toCombined FRMain    <<< kouku2DV
+    , toCombined FREscort  <<< kouku2CombinedDV
+    -- the followings are for regular battles
+    , toCombined FREscort  <<< openingDV
+    , toCombined FRMain    <<< hougeki1CTDV
+    , toCombined FREscort  <<< raigekiCTDV
+    , toCombined FRMain    <<< hougeki2CTDV
+    , toCombined FREscort  <<< hougeki3CTDV
     ]
