@@ -107,8 +107,8 @@ battleCarrierTaskForceDV = mconcat
     , toCombined FREscort  <<< kouku2CombinedDV
     -- the followings are for regular battles
     , toCombined FREscort  <<< openingDV
-    , toCombined FRMain    <<< hougeki1CTDV
+    , toCombined FREscort  <<< hougeki1CTDV
     , toCombined FREscort  <<< raigekiCTDV
     , toCombined FRMain    <<< hougeki2CTDV
-    , toCombined FREscort  <<< hougeki3CTDV
+    , toCombined FRMain    <<< hougeki3CTDV
     ]

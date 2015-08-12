@@ -18,6 +18,7 @@ foreign import withSupportExpedition2 :: Foreign
 
 foreign import surfaceTaskForceBattle1 :: Foreign
 foreign import carrierTaskForceBattle1 :: Foreign
+foreign import carrierTaskForceBattle2 :: Foreign
 foreign import carrierTaskForceAirBattle1 :: Foreign
 
 foreign import combinedFleetNightBattle1 :: Foreign
