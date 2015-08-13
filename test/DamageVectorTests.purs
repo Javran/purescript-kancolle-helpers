@@ -33,7 +33,7 @@ testDamageVector = do
       assert "sample aerialBattle1" $
           dvToStr mempty == dvToStr (koukuDV (unsafeFromForeign aerialBattle1))
       assert "sample withSupportExpedition1" $
-          "15,0,0,7,8,0 -- 55,0,0,0,0,0" 
+          "15,0,0,7,8,0 -- 55,0,0,0,0,0"
               == dvToStr (koukuDV (unsafeFromForeign withSupportExpedition1))
     test "DamageVector: support fleet attack stage" do
       let dvF = supportAirAttackDV <> supportHouraiDV

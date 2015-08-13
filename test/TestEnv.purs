@@ -29,4 +29,4 @@ import KanColle.DamageAnalysis.Stages
 import BattleData
 import DamageVectorTests
 
-testStr = ""
+testStr = dvToStr $ supportHouraiDV (unsafeFromForeign surfaceTaskForceBattleWithSupport1)

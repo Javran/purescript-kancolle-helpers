@@ -102,7 +102,7 @@ applyCombinedDamageVector :: CombinedDamageVector
 applyCombinedDamageVector (CDV cdv) nowhps =
     { main: phaseResult1Main
     , escort: phaseResult2Escort
-    , enemy: phaseResult2Enemy
+    , enemy: phaseResult3Enemy
     }
   where
     -- note that damage accumulation is not accumulated in chronological order
@@ -117,6 +117,10 @@ applyCombinedDamageVector (CDV cdv) nowhps =
     phaseResult2 = applyDamageVector cdv.escort fleetInfo2
     phaseResult2Escort = [Nothing] <> slice 1 7 phaseResult2
     phaseResult2Enemy = [Nothing] <> slice 7 13 phaseResult2
+    -- phase 3: support fleet & enemy
+    fleetInfo3 = [Nothing] <> replicate 6 Nothing <> AU.tail phaseResult2Enemy
+    phaseResult3 = applyDamageVector cdv.support fleetInfo3
+    phaseResult3Enemy = [Nothing] <> slice 7 13 phaseResult3
 
 analyzeSurfaceTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
 analyzeSurfaceTaskForceBattle =

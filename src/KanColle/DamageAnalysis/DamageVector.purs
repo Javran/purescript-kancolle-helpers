@@ -113,20 +113,22 @@ calcSupportHouraiDamage info = DV $
 data FleetRole = FRMain | FREscort | FRSupport
 
 newtype CombinedDamageVector = CDV
-  { main   :: DamageVector
-  , escort :: DamageVector }
+  { main    :: DamageVector
+  , escort  :: DamageVector
+  , support :: DamageVector }
 
 instance combinedDamageVectorSemigroup :: Semigroup CombinedDamageVector where
   append (CDV a) (CDV b) = CDV
-      { main:   a.main   <> b.main
-      , escort: a.escort <> b.escort
+      { main:    a.main    <> b.main
+      , escort:  a.escort  <> b.escort
+      , support: a.support <> b.support
       }
 
 instance combinedDamageVectorMonoid :: Monoid CombinedDamageVector where
-  mempty = CDV { main: mempty, escort: mempty }
+  mempty = CDV { main: mempty, escort: mempty, support: mempty }
 
 toCombined :: FleetRole -> DamageVector -> CombinedDamageVector
 toCombined r dv = case r of
-    FRMain    -> CDV { main: dv, escort: mempty }
-    FREscort  -> CDV { main: mempty, escort: dv }
-    FRSupport -> mempty
+    FRMain    -> CDV { main: dv, escort: mempty, support: mempty }
+    FREscort  -> CDV { main: mempty, escort: dv, support: mempty }
+    FRSupport -> CDV { main: mempty, escort: mempty, support: dv }
