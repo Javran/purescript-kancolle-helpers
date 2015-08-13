@@ -19,14 +19,14 @@ import Prelude
 
 import Data.Foreign
 import Data.Maybe
+import Data.Monoid
 
 import KanColle.KCAPI.Battle
 import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.DamageVector
+import KanColle.DamageAnalysis.Stages
 
 import BattleData
+import DamageVectorTests
 
-testKoukuCombined :: Maybe DamageVector
-testKoukuCombined = map calcKoukuDamageCombined kk
-  where
-    kk = getKouku (unsafeFromForeign surfaceTaskForceBattle1)
+testStr = ""

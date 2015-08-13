@@ -16,6 +16,7 @@ import KanColle.SType
 import Data.Foreign
 import Data.Maybe
 
+import DamageVectorTests
 import BattleData
 import Base
 
@@ -132,5 +133,6 @@ testExpeditionMinimal =
 
 main = runTest do
     testExpeditionHelper
+    testDamageVector
     testDamageAnalyzer
     testExpeditionMinimal
