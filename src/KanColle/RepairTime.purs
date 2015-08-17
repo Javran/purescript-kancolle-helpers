@@ -5,6 +5,7 @@ import Math hiding (round,floor,ceil)
 import Data.Int
 import KanColle.SType
 import Data.Maybe
+import Data.Function
 
 dockingInSec :: SType -> Int -> Int -> Int -> Int
 dockingInSec s lvl curHp maxHp = fromMaybe 0 (fromNumber repairTime) + baseTime
@@ -17,6 +18,9 @@ dockingInSec s lvl curHp maxHp = fromMaybe 0 (fromNumber repairTime) + baseTime
         then toNumber (lvl * 10) * stypeFactor s * toNumber lostHp
         else toNumber (lvl * 5 + a) * stypeFactor s * toNumber lostHp
 
+dockingInSecJS :: Fn4 String Int Int Int Int
+dockingInSecJS = mkFn4 (\s -> dockingInSec (readSType s))
+
 facilityInSec :: SType -> Int -> Int -> Int -> Int
 facilityInSec s lvl curHp maxHp = if facilitySlowestTime <= roundDockingTime
     then facilitySlowestTime
@@ -27,6 +31,9 @@ facilityInSec s lvl curHp maxHp = if facilitySlowestTime <= roundDockingTime
     roundDockingTime :: Int
     roundDockingTime = ceil (toNumber dockingTime / toNumber m20) * m20
     facilitySlowestTime = m20 * (maxHp - curHp)
+
+facilityInSecJS :: Fn4 String Int Int Int Int
+facilityInSecJS = mkFn4 (\s -> facilityInSec (readSType s))
 
 stypeFactor :: SType -> Number
 stypeFactor SS = 0.5
