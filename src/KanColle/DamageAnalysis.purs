@@ -6,7 +6,7 @@ import Data.Maybe.Unsafe
 import KanColle.KCAPI.Battle
 import Data.Array
 import Data.Foreign
-import Data.Int
+import Data.Int hiding (ceil,floor,round)
 import Data.Monoid
 import Data.Monoid.Endo
 import Data.Nullable

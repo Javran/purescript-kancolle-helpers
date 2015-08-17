@@ -44,6 +44,7 @@ main = do
                                             \-m KanColle.Expedition.Requirement \
                                             \-m KanColle.DamageAnalysis \
                                             \-m KanColle.Expedition.Evaluate \
+                                            \-m KanColle.RepairTime \
                                             \ " ""
     (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (return jsContent)
     cd cwd

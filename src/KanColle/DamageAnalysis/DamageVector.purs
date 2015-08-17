@@ -16,7 +16,7 @@ import Math
 import Data.Array
 import qualified Data.Array.Unsafe as AU
 import Data.Foldable
-import Data.Int
+import Data.Int hiding (ceil,floor,round)
 import Data.Maybe
 import Data.Monoid
 import Data.Monoid.Endo
