@@ -42,4 +42,4 @@ import Control.Monad.Eff
 import KanColle.Util
 
 testArr :: Array Int
-testArr = heapSort [1,9,2,8,3,7,4,6,5]
+testArr = heapSort compare [1,9,2,8,3,7,4,6,5]

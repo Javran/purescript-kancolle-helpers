@@ -89,6 +89,10 @@ battleSurfaceTaskForceDV = mconcat
     , toCombined FREscort  <<< koukuCombinedDV
     , toCombined FRSupport <<< supportAirAttackDV
     , toCombined FRSupport <<< supportHouraiDV
+    -- the following 2 for aerial battles
+    , toCombined FRMain    <<< kouku2DV
+    , toCombined FREscort  <<< kouku2CombinedDV
+    -- the followings are for reguler battles
     , toCombined FREscort  <<< openingDV
     , toCombined FRMain    <<< hougeki1DV
     , toCombined FRMain    <<< hougeki2DV
