@@ -17,6 +17,7 @@ import Data.String (joinWith)
 import Number.Format
 import Data.Maybe
 import Math (sqrt)
+import Data.Function
 
 import Control.Monad.Eff.Console
 import Control.Monad.Eff
@@ -61,6 +62,11 @@ calcNetIncome alp pF pA pS pB afkMins = A.sortBy (flip compare `on` (\x -> x.res
               + x.hourly.steel * pS
               + x.hourly.bauxite * pB
 
+type PlanEvaluation =
+  { eIds :: Array Int
+  , hourly :: HourlyIncome
+  , resourceScore :: Number }
+
 showNI :: { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number } -> String
 showNI x = joinWith " | " [ show x.eIds
                           , f x.hourly.fuel
@@ -82,6 +88,14 @@ dbg pF pA pS pB atime a = do
     void $ traverse (showNI >>> log) $ A.take 50 $ calcNetIncome a pF pA pS pB atime
     return unit
 
+
+quickCalc :: Number -> Number -> Number -> Number -> Int -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
+quickCalc pF pA pS pB atime = A.take 50 $ calcNetIncome 0.0 pF pA pS pB atime
+
+quickCalcJS :: Fn5 Number Number Number Number Int (Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number })
+quickCalcJS = mkFn5 quickCalc
+
+
 ratioPenalty :: Array Number -> Array Number -> Number
 ratioPenalty expect actual = scoresSq
   where
@@ -90,3 +104,30 @@ ratioPenalty expect actual = scoresSq
     actualSum = sum (A.filter (>= 0.0) actual)
     actualR = map (/ actualSum) actual
     scoresSq = sqrt $ sum $ A.zipWith (\x y -> (x-y)*(x-y)) expectR actualR
+
+calcWithExpeditionIds :: Number
+                      -> Number
+                      -> Number
+                      -> Number
+                      -> Int
+                      -> Array Int
+                      -> Array PlanEvaluation
+calcWithExpeditionIds pF pA pS pB afkTime availableEIds = A.sortBy (flip compare `on` (\x -> x.resourceScore)) hourlyNetIncomeTable          
+  where
+    alp = 0.0
+    allExpeds = netIncomeWithAfkTime afkTime
+    filteredExpeds = A.filter isAvailable allExpeds
+    isAvailable info = isJust (info.eId `A.elemIndex` availableEIds)
+    hourlyNetIncomeTable = map (calcResourceScore <<< mergeHNetIncome) $ filteredExpeds `chooseN` 3
+    calcResourceScore :: { eIds :: Array Int, hourly :: HourlyIncome }
+                      -> { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
+    calcResourceScore x = { eIds: x.eIds, hourly: x.hourly, resourceScore: score - rPenalty * alp }
+      where
+        rPenalty = ratioPenalty [pF,pA,pS,pB] [x.hourly.fuel, x.hourly.ammo, x.hourly.steel, x.hourly.bauxite]
+        score = x.hourly.fuel * pF
+              + x.hourly.ammo * pA
+              + x.hourly.steel * pS
+              + x.hourly.bauxite * pB
+
+calcWithExpeditionIdsJS :: Fn6 Number Number Number Number Int (Array Int) (Array PlanEvaluation)
+calcWithExpeditionIdsJS = mkFn6 calcWithExpeditionIds
