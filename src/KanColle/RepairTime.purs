@@ -11,12 +11,13 @@ dockingInSec :: SType -> Int -> Int -> Int -> Int
 dockingInSec s lvl curHp maxHp = fromMaybe 0 (fromNumber repairTime) + baseTime
   where
     lostHp = maxHp - curHp
-    a = floor (sqrt (toNumber (lvl - 11))) * 10 + 50
     baseTime = 30
     repairTime :: Number
     repairTime = if lvl <= 11
         then toNumber (lvl * 10) * stypeFactor s * toNumber lostHp
-        else toNumber (lvl * 5 + a) * stypeFactor s * toNumber lostHp
+        else
+          let a = floor (sqrt (toNumber (lvl - 11))) * 10 + 50
+          in toNumber (lvl * 5 + a) * stypeFactor s * toNumber lostHp
 
 dockingInSecJS :: Fn4 String Int Int Int Int
 dockingInSecJS = mkFn4 (\s -> dockingInSec (readSType s))
