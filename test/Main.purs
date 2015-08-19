@@ -151,6 +151,7 @@ testRepairTime = do
       assert "sample 8" $ dockingInSec CAV 72 45 58 == hhmmss 2 36 30
       assert "sample 9" $ dockingInSec CV 79 70 77 == hhmmss 2 3 0
       assert "sample with full HP" $ dockingInSec AR 46 45 45 == 0
+      assert "sample Hayasui" $ dockingInSec AO 2 19 43 == mmss 8 30
     test "Facility time" do
       assert "sample 1" $ facilityInSec SS 72 1 15 == hhmmss 1 0 0
       assert "sample 2" $ facilityInSec SSV 75 1 18 == hhmmss 2 40 0

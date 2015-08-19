@@ -47,6 +47,7 @@ stypeFactor CT = 1.0
 stypeFactor AV = 1.0
 stypeFactor SSV = 1.0
 stypeFactor LHA = 1.0
+stypeFactor AO = 1.0
 
 stypeFactor CA = 1.5
 stypeFactor CAV = 1.5
@@ -65,3 +66,5 @@ stypeFactor AR = 2.0
 stypeFactor DDE = 1.0
 stypeFactor XBB = 2.0
 stypeFactor AP = 2.0
+
+stypeFactor (Unknown _) = 1.0
