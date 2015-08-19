@@ -1,7 +1,9 @@
 -- Generated from STypeGen.hs
 module KanColle.Generated.SType where
 
-data SType = DDE | DD | CL | CLT | CA | CAV | CVL | FBB | BB | BBV | CV | XBB | SS | SSV | AP | AV | LHA | CVB | AR | AS | CT
+import Prelude
+
+data SType = DDE | DD | CL | CLT | CA | CAV | CVL | FBB | BB | BBV | CV | XBB | SS | SSV | AP | AV | LHA | CVB | AR | AS | CT | AO | Unknown String
 
 showSType :: SType -> String
 showSType DDE = "DDE"
@@ -25,6 +27,8 @@ showSType CVB = "CVB"
 showSType AR = "AR"
 showSType AS = "AS"
 showSType CT = "CT"
+showSType AO = "AO"
+showSType (Unknown s) = "<Unknown:" <> s <> ">"
 
 readSType :: String -> SType
 readSType "DDE" = DDE
@@ -48,3 +52,5 @@ readSType "CVB" = CVB
 readSType "AR" = AR
 readSType "AS" = AS
 readSType "CT" = CT
+readSType "AO" = AO
+readSType s = Unknown s

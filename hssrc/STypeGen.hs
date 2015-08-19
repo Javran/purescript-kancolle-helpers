@@ -9,22 +9,25 @@ import Text.Printf
 sourceContents :: [String]
 sourceContents =
     [ "-- Generated from STypeGen.hs"
-    , "module KanColle.Generated.SType where", ""] ++
+    , "module KanColle.Generated.SType where", ""
+    , "import Prelude", ""] ++
     dataDef ++ [""] ++
     showDefs ++ [""] ++
     readDefs
   where
-    dataDef = ["data SType = " ++ intercalate " | "  alts]
+    dataDef = ["data SType = " ++ intercalate " | "  alts ++ " | Unknown String"]
     showDefs = "showSType :: SType -> String"
              : map (\x -> printf "showSType %s = \"%s\"" x x) alts
+            ++ ["showSType (Unknown s) = \"<Unknown:\" <> s <> \">\""]
     readDefs = "readSType :: String -> SType"
              : map (\x -> printf "readSType \"%s\" = %s" x x) alts
+            ++ ["readSType s = Unknown s"]
     alts = words "DDE DD  CL  CLT \
                  \CA  CAV CVL FBB \
                  \BB  BBV CV  XBB \
                  \SS  SSV AP  AV  \
                  \LHA CVB AR  AS  \
-                 \CT "
+                 \CT  AO"
 
 main :: IO ()
 main = mapM_ putStrLn sourceContents
