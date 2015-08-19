@@ -9,7 +9,7 @@ import Data.Function
 
 dockingInSec :: SType -> Int -> Int -> Int -> Int
 dockingInSec _ _ curHp maxHp | curHp == maxHp = 0
-dockingInSec s lvl curHp maxHp = fromMaybe 0 (fromNumber repairTime) + baseTime
+dockingInSec s lvl curHp maxHp = (floor repairTime) + baseTime
   where
     lostHp = maxHp - curHp
     baseTime = 30
