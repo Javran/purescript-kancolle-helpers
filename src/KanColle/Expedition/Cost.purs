@@ -23,18 +23,13 @@ type Cost =
 noCost :: Cost
 noCost = { fuel: 0.0, ammo: 0.0, time: 0 }
 
-
-nToFloor :: Number -> Int
-nToFloor = fromMaybe 0 <<< fromNumber
-
 -- TODO: need document, or it looks confusing
 -- TODO: integrate other parts to use this function
 calcCost :: Cost 
          -> { fuel :: Int, ammo :: Int }
          -> { fuel :: Int, ammo :: Int }
-calcCost c x = { fuel: nToFloor (toNumber x.fuel * c.fuel)
-               , ammo: nToFloor (toNumber x.ammo * c.ammo) }
-
+calcCost c x = { fuel: floor (toNumber x.fuel * c.fuel)
+               , ammo: floor (toNumber x.ammo * c.ammo) }
 
 -- | input a valid expedition id and get expedition cost.
 getExpeditionCost :: Int -> Cost

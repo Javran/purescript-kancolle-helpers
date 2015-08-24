@@ -3,9 +3,9 @@ module KanColle.Expedition.Evaluate where
 import Prelude
 import Data.Array
 import qualified Data.String as S
-import Data.Int hiding (ceil,floor,round)
+import Data.Int
 import Data.Maybe
-import Math
+import Math hiding (ceil,floor,round)
 import Data.Function
 import Data.Foldable
 
@@ -22,7 +22,7 @@ type EvalResult =
   }
 
 nToFloor :: Number -> Int
-nToFloor = fromMaybe 0 <<< fromNumber
+nToFloor = floor
 
 incomeDiff :: Cost -> Income -> ECost -> Income
 incomeDiff cost (Income i) (ECost e) = Income
