@@ -9,7 +9,7 @@ type DamageTookInfo = { currentHp :: Int }
 #### `DamageTookInfoNight`
 
 ``` purescript
-type DamageTookInfoNight = { currentHp :: Int }
+type DamageTookInfoNight = DamageTookInfo
 ```
 
 #### `pprDamageTookInfo`
@@ -42,22 +42,22 @@ pprFleetDamageTookInfoNight :: AllFleetInfo DamageTookInfoNight -> String
 type AllFleetInfo a = Array (Maybe a)
 ```
 
-#### `DamageAnalyzer`
+#### `CombinedFleetInfo`
 
 ``` purescript
-type DamageAnalyzer = Battle -> AllFleetInfo DamageTookInfo -> AllFleetInfo DamageTookInfo
-```
-
-#### `noDamage`
-
-``` purescript
-noDamage :: Int -> DamageTookInfo
+type CombinedFleetInfo a = { main :: Array (Maybe a), escort :: Array (Maybe a), enemy :: Array (Maybe a) }
 ```
 
 #### `battleStart`
 
 ``` purescript
 battleStart :: Battle -> AllFleetInfo DamageTookInfo
+```
+
+#### `battleCombinedStart`
+
+``` purescript
+battleCombinedStart :: Battle -> CombinedFleetInfo DamageTookInfo
 ```
 
 #### `analyzeBattle`
@@ -69,7 +69,7 @@ analyzeBattle :: Battle -> AllFleetInfo DamageTookInfo
 #### `analyzeNightBattle`
 
 ``` purescript
-analyzeNightBattle :: NightBattle -> AllFleetInfo DamageTookInfoNight
+analyzeNightBattle :: Battle -> AllFleetInfo DamageTookInfoNight
 ```
 
 #### `analyzeRawBattle`
@@ -102,16 +102,64 @@ analyzeRawNightBattleJS :: Foreign -> Array (Nullable DamageTookInfoNight)
 applyDamageVector :: DamageVector -> AllFleetInfo DamageTookInfo -> AllFleetInfo DamageTookInfo
 ```
 
-#### `analyzeBattleAlt`
+#### `applyCombinedDamageVector`
 
 ``` purescript
-analyzeBattleAlt :: Battle -> AllFleetInfo DamageTookInfo
+applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo DamageTookInfo -> CombinedFleetInfo DamageTookInfo
 ```
 
-#### `analyzeNightBattleAlt`
+#### `analyzeSurfaceTaskForceBattle`
 
 ``` purescript
-analyzeNightBattleAlt :: NightBattle -> AllFleetInfo DamageTookInfoNight
+analyzeSurfaceTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
+```
+
+#### `analyzeRawSurfaceTaskForceBattle`
+
+``` purescript
+analyzeRawSurfaceTaskForceBattle :: Foreign -> CombinedFleetInfo DamageTookInfo
+```
+
+#### `analyzeRawSurfaceTaskForceBattleJS`
+
+``` purescript
+analyzeRawSurfaceTaskForceBattleJS :: Foreign -> { main :: Array (Nullable DamageTookInfo), escort :: Array (Nullable DamageTookInfo), enemy :: Array (Nullable DamageTookInfo) }
+```
+
+#### `analyzeCarrierTaskForceBattle`
+
+``` purescript
+analyzeCarrierTaskForceBattle :: Battle -> CombinedFleetInfo DamageTookInfo
+```
+
+#### `analyzeRawCarrierTaskForceBattle`
+
+``` purescript
+analyzeRawCarrierTaskForceBattle :: Foreign -> CombinedFleetInfo DamageTookInfo
+```
+
+#### `analyzeRawCarrierTaskForceBattleJS`
+
+``` purescript
+analyzeRawCarrierTaskForceBattleJS :: Foreign -> { main :: Array (Nullable DamageTookInfo), escort :: Array (Nullable DamageTookInfo), enemy :: Array (Nullable DamageTookInfo) }
+```
+
+#### `analyzeNightBattleCombined`
+
+``` purescript
+analyzeNightBattleCombined :: Battle -> AllFleetInfo DamageTookInfoNight
+```
+
+#### `analyzeRawNightBattleCombined`
+
+``` purescript
+analyzeRawNightBattleCombined :: Foreign -> AllFleetInfo DamageTookInfoNight
+```
+
+#### `analyzeRawNightBattleCombinedJS`
+
+``` purescript
+analyzeRawNightBattleCombinedJS :: Foreign -> Array (Nullable DamageTookInfoNight)
 ```
 
 

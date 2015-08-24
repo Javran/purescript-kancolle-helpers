@@ -8,9 +8,11 @@ module TestEnv
   , module KanColle.Util
   , module BattleData
   , module KanColle.Expedition.Plan
+  , module KanColle.Expedition.Minimal
   , module KanColle.SType
   , module KanColle.Generated.SType
   , module KanColle.RepairTime
+  , module Control.Monad.Eff.Console
   , module TestEnv
   )
 where
@@ -25,12 +27,14 @@ import Data.Foreign
 import Data.Maybe
 import Data.Monoid
 import Data.Array.ST
+import Control.Monad.Eff.Console
 
 import KanColle.KCAPI.Battle
 import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 import KanColle.Expedition.Plan
+import KanColle.Expedition.Minimal
 import KanColle.SType
 import KanColle.RepairTime
 

@@ -10,6 +10,30 @@ get `DamageVector` of kouku stage from battle data
 all the names in this module are kept consistent with functions in
 `KanColle.DamageAnalysis.DamageVector`.
 
+#### `koukuCombinedDV`
+
+``` purescript
+koukuCombinedDV :: Battle -> DamageVector
+```
+
+#### `kouku2CombinedDV`
+
+``` purescript
+kouku2CombinedDV :: Battle -> DamageVector
+```
+
+#### `supportAirAttackDV`
+
+``` purescript
+supportAirAttackDV :: Battle -> DamageVector
+```
+
+#### `supportHouraiDV`
+
+``` purescript
+supportHouraiDV :: Battle -> DamageVector
+```
+
 #### `kouku2DV`
 
 ``` purescript
@@ -46,6 +70,30 @@ hougeki3DV :: Battle -> DamageVector
 raigekiDV :: Battle -> DamageVector
 ```
 
+#### `hougeki1CTDV`
+
+``` purescript
+hougeki1CTDV :: Battle -> DamageVector
+```
+
+#### `raigekiCTDV`
+
+``` purescript
+raigekiCTDV :: Battle -> DamageVector
+```
+
+#### `hougeki2CTDV`
+
+``` purescript
+hougeki2CTDV :: Battle -> DamageVector
+```
+
+#### `hougeki3CTDV`
+
+``` purescript
+hougeki3CTDV :: Battle -> DamageVector
+```
+
 #### `hougekiDV`
 
 ``` purescript
@@ -77,5 +125,17 @@ nightBattleDV :: Battle -> DamageVector
 
 get `DamageVector` of a night battle
 a night battle involves only `hougeki` (shelling stage)
+
+#### `battleSurfaceTaskForceDV`
+
+``` purescript
+battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
+```
+
+#### `battleCarrierTaskForceDV`
+
+``` purescript
+battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
+```
 
 

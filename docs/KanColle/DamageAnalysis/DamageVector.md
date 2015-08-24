@@ -28,6 +28,12 @@ calcKoukuDamage :: Kouku -> DamageVector
 
 calculate damage from kouku (aerial) stages
 
+#### `calcKoukuDamageCombined`
+
+``` purescript
+calcKoukuDamageCombined :: Kouku -> DamageVector
+```
+
 #### `calcHougekiDamage`
 
 ``` purescript
@@ -43,5 +49,45 @@ calcRaigekiDamage :: Raigeki -> DamageVector
 ```
 
 calculate damage from raigeki (torpedo) stages
+
+#### `calcSupportAirAttackDamage`
+
+``` purescript
+calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
+```
+
+#### `calcSupportHouraiDamage`
+
+``` purescript
+calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
+```
+
+#### `FleetRole`
+
+``` purescript
+data FleetRole
+  = FRMain
+  | FREscort
+  | FRSupport
+```
+
+#### `CombinedDamageVector`
+
+``` purescript
+newtype CombinedDamageVector
+  = CDV { main :: DamageVector, escort :: DamageVector, support :: DamageVector }
+```
+
+##### Instances
+``` purescript
+instance combinedDamageVectorSemigroup :: Semigroup CombinedDamageVector
+instance combinedDamageVectorMonoid :: Monoid CombinedDamageVector
+```
+
+#### `toCombined`
+
+``` purescript
+toCombined :: FleetRole -> DamageVector -> CombinedDamageVector
+```
 
 

@@ -25,6 +25,8 @@ data SType
   | AR
   | AS
   | CT
+  | AO
+  | Unknown String
 ```
 
 #### `showSType`
