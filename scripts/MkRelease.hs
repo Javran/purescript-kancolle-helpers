@@ -3,10 +3,13 @@ module MkRelease where
 
 import Prelude hiding (FilePath)
 import Control.Arrow
+import Data.Maybe
 import Turtle
 import Filesystem.Path.CurrentOS
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import qualified Control.Foldl as Fold
+import qualified Data.List as L
 
 -- | guess project home directory
 --   make sure to run this somewhere under the project home
@@ -31,17 +34,35 @@ main = do
     True <- testfile uglifyJsBin
     putStrLn $ "Found uglifyjs in: " <> encodeString uglifyJsBin
     let buildDir = prjHome
+        -- srcDir = prjHome </> "src"
+        srcDir' = prjHome </> "src/" -- for stripping prefix
     cd buildDir
+    -- search "purs" files
+    pursFiles <- fold (find (suffix ".purs") srcDir') Fold.list
+    let toRelativePursFileParts =
+              map encodeString
+            . splitDirectories
+            . fromJust
+            . stripPrefix srcDir'
+        relativeFilePartsToModuleName xs = L.intercalate "." (modulePath ++ [moduleName])
+          where
+            -- drop last char ("/" in this case)
+            modulePath = map init (init xs)
+            moduleName = take (l-5) ys
+              where
+                ys = last xs
+                l = length ys
+    putStrLn "==== Detecting PureScript modules ===="
+    let pursModules = L.sort $
+            map ( relativeFilePartsToModuleName
+                . toRelativePursFileParts) pursFiles
+    mapM_ (putStrLn . ("* " ++)) pursModules
+    putStrLn "=== End of list ===="
     -- build and optimize
     (ExitSuccess, _) <- shellStrict "pulp build" ""
-    (ExitSuccess, jsContent) <- shellStrict "psc-bundle 'output/*/*.js' \
-                                            \-m KanColle.Expedition \
-                                            \-m KanColle.Expedition.Plan \
-                                            \-m KanColle.Expedition.Requirement \
-                                            \-m KanColle.DamageAnalysis \
-                                            \-m KanColle.Expedition.Evaluate \
-                                            \-m KanColle.RepairTime \
-                                            \ " ""
+    let pscBundleArgs = "output/*/*.js" : concatMap pmConvert pursModules
+        pmConvert pm = ["-m", pm]
+    (ExitSuccess, jsContent) <- procStrict "psc-bundle" (map T.pack pscBundleArgs) ""
     (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (return jsContent)
     cd cwd
     let targetFile = "KanColleHelpers.js"
