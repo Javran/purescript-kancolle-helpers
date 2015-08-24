@@ -6,7 +6,6 @@
 data ShipRequirement
   = ShipLevel Int
   | ShipTypeOneOf (Array SType)
-  | ShipDrum Int
 ```
 
 #### `FleetRequirement`

@@ -12,7 +12,6 @@ import KanColle.SType
 data ShipRequirement
   = ShipLevel Int
   | ShipTypeOneOf (Array SType)
-  | ShipDrum Int
 
 data FleetRequirement
   = Flagship ShipRequirement
@@ -29,7 +28,6 @@ explainShipRequirement v = case v of
     ShipLevel lvl -> "ship level should be at least " <> show lvl
     ShipTypeOneOf stypes ->
       "ship should have one of the following type: " <> Str.joinWith "," (map showSType stypes)
-    ShipDrum n -> "ship should have at least " <> show n <> " drum(s)"
 
 explainFleetRequirement :: FleetRequirement -> String
 explainFleetRequirement v = case v of
@@ -69,7 +67,6 @@ checkShip :: forall a. ShipRequirement -> Ship a -> Boolean
 checkShip req s = case req of
   ShipLevel n -> s.level >= n
   ShipTypeOneOf stype -> any ((==) s.stype) stype
-  ShipDrum n -> s.drumCount >= n
 
 checkFleet :: forall a. FleetRequirement -> Fleet a -> Boolean
 checkFleet req fleet = case uncons fleet of
