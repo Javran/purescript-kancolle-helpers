@@ -31,11 +31,6 @@ main = do
     True <- testfile uglifyJsBin
     putStrLn $ "Found uglifyjs in: " <> encodeString uglifyJsBin
     let buildDir = prjHome
-    -- sync files
-    let excludeArgs = map ("--exclude=" <>)
-                          [".git/", ".cabal-sandbox/", "output/"]
-    (ExitSuccess, _) <-
-         procStrict "rsync" ("-r" : excludeArgs <> [toText' prjHome, toText' buildDir]) ""
     cd buildDir
     -- build and optimize
     (ExitSuccess, _) <- shellStrict "pulp build" ""
