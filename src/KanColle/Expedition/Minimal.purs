@@ -69,7 +69,7 @@ mkECostWithNote s f a n = ECost
 ddCost :: Int -> ECost
 ddCost n = times n mutsukiClass
   where
-    mutsukiClass = mkECostWithNote DD 15 15 "Mutsuki class (Kai / Kai 2 are ok)"
+    mutsukiClass = mkECostWithNote DD 15 15 "睦月级(改/改二皆可)"
 
 -- | minimal SS/SSV cost, achivable by taking
 -- | Maruyu and I-168 (Kai) / I-58 / I-19 / I-8 / U-511 / Ro-500
@@ -78,8 +78,8 @@ ssCost n = case n of
     1 -> maruyu
     _ -> maruyu <> times (n-1) nonSSV
   where
-    maruyu = mkECostWithNote SS 10 10 "Maruyu"
-    nonSSV = mkECostWithNote SS 10 20 "any non-Maruyu SS"
+    maruyu = mkECostWithNote SS 10 10 "马战神"
+    nonSSV = mkECostWithNote SS 10 20 "非马战神SS"
 
 -- | minimal CVL cost, achivable by taking
 -- | Houshou / Shouhou class (without Kai).
@@ -91,8 +91,8 @@ cvlCost n = case n of
     1 -> houshou
     _ -> houshou <> times (n-1) shouhou
   where
-    houshou = mkECostWithNote CVL 25 25 "Houshou"
-    shouhou = mkECostWithNote CVL 35 35 "Shouhou class"
+    houshou = mkECostWithNote CVL 25 25 "凤翔"
+    shouhou = mkECostWithNote CVL 35 35 "祥凤级"
 
 -- | minimal AV cost, input takes value [1..4]
 avCost :: Int -> ECost
@@ -103,20 +103,20 @@ avCost n = if n <= 3
       -- since the input <= 4, this must be the branch where n == 4
       times 3 chitoseOrMizuho <> akitsushima
   where
-    chitoseOrMizuho = mkECostWithNote AV 35 35 "Chitose class / Mizuho"
-    akitsushima = mkECostWithNote AV 50 10 "Akitsushima"
+    chitoseOrMizuho = mkECostWithNote AV 35 35 "千岁级/瑞穗"
+    akitsushima = mkECostWithNote AV 50 10 "秋津洲"
 
 -- | minimal BBV cost, input takes value [1..4]
 -- | achivable by taking any non-Kai-Ni BBV
 bbvCost :: Int -> ECost
 bbvCost n = times n fusouOrIse
   where
-    fusouOrIse = mkECostWithNote BBV 95 105 "Fushou class Kai / Ise class Kai"
+    fusouOrIse = mkECostWithNote BBV 95 105 "扶桑级改/伊势级改"
 
 -- | minimal CA cost, achivable by taking
 -- | Furutaka class + Aoba class, takes [1..4]
 caCost :: Int -> ECost
-caCost n = times n (mkECostWithNote CA 35 50 "Furutaka class / Aoba class")
+caCost n = times n (mkECostWithNote CA 35 50 "古鹰级/青叶级")
 
 -- | minimal CL cost, achivable by taking
 -- | Tenryuu class + non-Kai Kuma class
@@ -125,16 +125,16 @@ clCost n = if n <= 2
     then times n tenryuu
     else times 2 tenryuu <> times (n-2) kuma
   where
-    tenryuu = mkECostWithNote CL 25 20 "Tenryuu class"
-    kuma = mkECostWithNote CL 25 25 "Kuma class"
+    tenryuu = mkECostWithNote CL 25 20 "天龙级"
+    kuma = mkECostWithNote CL 25 25 "球磨级"
 
 -- | the sole submarine tender (AS) is Taigei
 taigei :: ECost
-taigei = mkECostWithNote AS 35 10 "Taigei"
+taigei = mkECostWithNote AS 35 10 "大鲸"
 
 -- | the sole training cruiser (CT) is Katori
 katori :: ECost
-katori = mkECostWithNote CT 35 20 "Katori"
+katori = mkECostWithNote CT 35 20 "香取"
 
 -- | fill in submarines to meet a ship number requirement
 fillSS :: Int -> ECost -> ECost
