@@ -9,7 +9,7 @@ import Math
 import Data.Function
 import Data.Foldable
 
-import KanColle.Expedition
+import KanColle.Expedition.Base
 import KanColle.Expedition.Income
 import KanColle.Expedition.Minimal
 import KanColle.Expedition.Cost
@@ -56,7 +56,7 @@ sortByHourlyGain evalCost = sortBy (flip compareScore) expeditions
   where
     compareScore = comparing (\x -> x.score)
     expeditions :: Array EvalResult
-    expeditions = map collectInfo expeditionIds
+    expeditions = map collectInfo allExpeditionIds
     collectInfo eId = { eId: eId
                       , netIncome: netIncome
                       , time: cost.time
@@ -71,7 +71,7 @@ sortWithAfkTime evalCost timePenalty afkMinutes = sortBy (flip compareScore) exp
   where
     compareScore = comparing (\x -> x.score)
     expeditions :: Array EvalResult
-    expeditions = map collectInfo expeditionIds
+    expeditions = map collectInfo allExpeditionIds
     collectInfo eId = { eId: eId
                       , netIncome: netIncome
                       , time: totalExpTime

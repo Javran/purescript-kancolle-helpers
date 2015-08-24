@@ -10,16 +10,17 @@ import qualified Data.Map as M
 import KanColle.Expedition.Requirement
 import KanColle.Expedition.Income
 import KanColle.Expedition.Cost
+import KanColle.Expedition.Base
 
 validExpeditionId :: Int -> Boolean
 validExpeditionId = getExpeditionRequirement >>> null >>> not
 
-expeditionIds :: Array Int
-expeditionIds = (1..32) <> (35..40)
+-- expeditionIds :: Array Int
+-- expeditionIds = (1..32) <> (35..40)
 
 getAvailableExpeditions :: forall a. Fleet a -> Array Int
 getAvailableExpeditions fleet =
-  filter (\eId -> checkExpedition eId fleet) expeditionIds
+  filter (\eId -> checkExpedition eId fleet) allExpeditionIds
 
 checkExpedition :: forall a. Int -> Fleet a -> Boolean
 checkExpedition eId fleet = validExpeditionId eId
@@ -33,7 +34,7 @@ type Expedition =
   }
 
 allExpeditions :: Array Expedition
-allExpeditions = map mkEntry expeditionIds
+allExpeditions = map mkEntry allExpeditionIds
   where
     mkEntry eId = { id: eId
                   , req: getExpeditionRequirement eId

@@ -9,6 +9,7 @@ import Data.Foldable
 import Control.Monad.Eff
 
 import KanColle.Expedition
+import KanColle.Expedition.Base
 import KanColle.Expedition.Requirement
 import KanColle.Expedition.Minimal
 import KanColle.DamageAnalysis
@@ -129,7 +130,7 @@ testExpeditionMinimal :: forall e. MyTest e
 testExpeditionMinimal =
     test "ExpeditionMinimalCost" $
       assert "minimal costs are likely to be achivable" $
-        all verify expeditionIds
+        all verify allExpeditionIds
   where
     verify eId = checkExpedition eId fleet
       where

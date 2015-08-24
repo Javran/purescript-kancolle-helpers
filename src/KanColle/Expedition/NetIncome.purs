@@ -5,7 +5,7 @@ import KanColle.Expedition.Evaluate
 import KanColle.Expedition.Income
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Minimal
-import KanColle.Expedition
+import KanColle.Expedition.Base
 import Data.Array
 import Data.Maybe
 import Data.Monoid
@@ -44,7 +44,7 @@ mergeHNetIncome xs = { eIds: foldMap (\x -> [x.eId]) xs
                                } }
 
 netIncomeTable :: Array NetIncome
-netIncomeTable = map collectInfo expeditionIds
+netIncomeTable = map collectInfo allExpeditionIds
   where
     collectInfo eId = { eId: eId
                       , netIncome: netIncome
