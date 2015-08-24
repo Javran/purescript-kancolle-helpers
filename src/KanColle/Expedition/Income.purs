@@ -1,14 +1,31 @@
-module KanColle.Expedition.Income where
+module KanColle.Expedition.Income
+  ( Income(..)
+  , getIncome
+  , getExpeditionIncome
+  ) where
+
+-- this module serves as a database about the resource
+-- running an expedition would get.
+-- note that "great success" is not taken into account.
 
 import Prelude
 import Data.Monoid
 
+-- | `Income` includes `fuel`, `ammo` `steel` and `bauxite` resource income.
 newtype Income = Income
   { fuel :: Int
   , ammo :: Int
   , steel :: Int
   , bauxite :: Int
   }
+
+-- | unwrap `Income` to expose its members
+getIncome :: Income -> { fuel :: Int
+                       , ammo :: Int
+                       , steel :: Int
+                       , bauxite :: Int
+                       }
+getIncome (Income i) = i                       
 
 income :: Int -> Int -> Int -> Int -> Income
 income f a s b = Income { fuel: f
@@ -26,6 +43,7 @@ instance incomeSemigroup :: Semigroup Income where
 instance incomeMonoid :: Monoid Income where
     mempty = income 0 0 0 0
 
+-- | input a valid expedition id and get expedition income.
 getExpeditionIncome :: Int -> Income
 getExpeditionIncome eId = case eId of
     1 ->  i   0  30   0   0

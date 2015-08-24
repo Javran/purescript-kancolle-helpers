@@ -3,13 +3,18 @@ module KanColle.Expedition.Minimal where
 import Prelude
 import Data.Monoid
 import Data.Array
+import qualified Data.Array.Unsafe as AU
 import Data.Foldable
+import qualified Data.String as Str
 
 import KanColle.SType
 
 import KanColle.Expedition
+import KanColle.Expedition.Base
+import KanColle.Expedition.Cost
 import KanColle.Expedition.Requirement
 import KanColle.Util
+import Data.Maybe
 
 type ShipMaxCost =
   { fuel :: Int
@@ -23,9 +28,13 @@ type ShipMaxCost =
 -- | or you have not yet obtained the ship)
 newtype ECost = ECost
   { shipCost :: Array ShipMaxCost
-  , fleet :: Fleet ()
+  , fleet :: Fleet (note :: Maybe String)
   }
-
+  
+getECost :: ECost -> { shipCost :: Array ShipMaxCost
+                     , fleet :: Fleet (note :: Maybe String)}
+getECost (ECost ec) = ec
+  
 instance eCostSemigroup :: Semigroup ECost where
   append (ECost a) (ECost b) =
       ECost { shipCost: a.shipCost <> b.shipCost
@@ -34,23 +43,33 @@ instance eCostSemigroup :: Semigroup ECost where
 instance eCostMonoid :: Monoid ECost where
   mempty = ECost { shipCost: mempty, fleet: mempty }
 
-
-dummyShip :: SType -> Ship ()
+dummyShip :: SType -> Ship (note :: Maybe String)
 dummyShip s =
     { ammo: 400, morale: 100
     , stype: s, level: 150
-    , drumCount: 4 }
+    , drumCount: 4
+    , note: Nothing }
+    
+shipWithNote :: SType -> String -> Ship (note :: Maybe String)
+shipWithNote s n = (dummyShip s) { note= Just n }
 
 mkECost :: SType -> Int -> Int -> ECost
 mkECost s f a = ECost
     { shipCost: [{ fuel: f, ammo: a }]
-    , fleet: [dummyShip s] }
+    , fleet: [dummyShip s]
+    }
+    
+mkECostWithNote :: SType -> Int -> Int -> String -> ECost
+mkECostWithNote s f a n = ECost
+    { shipCost: [{ fuel: f, ammo: a }]
+    , fleet: [shipWithNote s n]
+    }
 
 -- | minimal DD cost, achivable by taking any of Mutsuki class ships
 ddCost :: Int -> ECost
 ddCost n = times n mutsukiClass
   where
-    mutsukiClass = mkECost DD 15 15
+    mutsukiClass = mkECostWithNote DD 15 15 "Mutsuki class (Kai / Kai 2 are ok)"
 
 -- | minimal SS/SSV cost, achivable by taking
 -- | Maruyu and I-168 (Kai) / I-58 / I-19 / I-8 / U-511 / Ro-500
@@ -59,8 +78,8 @@ ssCost n = case n of
     1 -> maruyu
     _ -> maruyu <> times (n-1) nonSSV
   where
-    maruyu = mkECost SS 10 10
-    nonSSV = mkECost SS 10 20
+    maruyu = mkECostWithNote SS 10 10 "Maruyu"
+    nonSSV = mkECostWithNote SS 10 20 "any non-Maruyu SS"
 
 -- | minimal CVL cost, achivable by taking
 -- | Houshou / Shouhou class (without Kai).
@@ -72,39 +91,50 @@ cvlCost n = case n of
     1 -> houshou
     _ -> houshou <> times (n-1) shouhou
   where
-    houshou = mkECost CVL 30 30
-    shouhou = mkECost CVL 35 35
+    houshou = mkECostWithNote CVL 25 25 "Houshou"
+    shouhou = mkECostWithNote CVL 35 35 "Shouhou class"
 
--- | minimal AV cost, input takes value [1..3]
+-- | minimal AV cost, input takes value [1..4]
 avCost :: Int -> ECost
-avCost n = if n <= 2
-    then times n chitose
-    else times 2 chitose <> (mkECost AV 60 15)
+avCost n = if n <= 3
+    then
+      times n chitoseOrMizuho
+    else
+      -- since the input <= 4, this must be the branch where n == 4
+      times 3 chitoseOrMizuho <> akitsushima
   where
-    chitose = mkECost AV 35 35
+    chitoseOrMizuho = mkECostWithNote AV 35 35 "Chitose class / Mizuho"
+    akitsushima = mkECostWithNote AV 50 10 "Akitsushima"
 
 -- | minimal BBV cost, input takes value [1..4]
 -- | achivable by taking any non-Kai-Ni BBV
 bbvCost :: Int -> ECost
-bbvCost n = times n (mkECost BBV 95 105)
+bbvCost n = times n fusouOrIse
+  where
+    fusouOrIse = mkECostWithNote BBV 95 105 "Fushou class Kai / Ise class Kai"
 
 -- | minimal CA cost, achivable by taking
 -- | Furutaka class + Aoba class, takes [1..4]
 caCost :: Int -> ECost
-caCost n = times n (mkECost CA 35 55)
+caCost n = times n (mkECostWithNote CA 35 50 "Furutaka class / Aoba class")
 
 -- | minimal CL cost, achivable by taking
 -- | Tenryuu class + non-Kai Kuma class
 clCost :: Int -> ECost
-clCost n = times n (mkECost CL 25 25)
+clCost n = if n <= 2
+    then times n tenryuu
+    else times 2 tenryuu <> times (n-2) kuma
+  where
+    tenryuu = mkECostWithNote CL 25 20 "Tenryuu class"
+    kuma = mkECostWithNote CL 25 25 "Kuma class"
 
 -- | the sole submarine tender (AS) is Taigei
 taigei :: ECost
-taigei = mkECost AS 35 10
+taigei = mkECostWithNote AS 35 10 "Taigei"
 
 -- | the sole training cruiser (CT) is Katori
 katori :: ECost
-katori = mkECost CT 35 20
+katori = mkECostWithNote CT 35 20 "Katori"
 
 -- | fill in submarines to meet a ship number requirement
 fillSS :: Int -> ECost -> ECost
@@ -116,14 +146,14 @@ fillSS n v@(ECost ec) = if l >= n
 
 getExpeditionMinCost :: Int -> ECost
 getExpeditionMinCost v = case v of
-    1 -> ssCost 2
-    2 -> ssCost 4
-    3 -> ssCost 3
+    1 -> fillSS 2 mempty
+    2 -> fillSS 4 mempty
+    3 -> fillSS 3 mempty
     4 -> clCost 1 <> ddCost 2
     5 -> fillSS 4 (clCost 1 <> ddCost 2)
-    6 -> ssCost 4
-    7 -> ssCost 6
-    8 -> ssCost 6
+    6 -> fillSS 4 mempty
+    7 -> fillSS 6 mempty
+    8 -> fillSS 6 mempty
 
     9 -> fillSS 4 (clCost 1 <> ddCost 2)
     10 -> fillSS 3 (clCost 2)
@@ -160,3 +190,29 @@ getExpeditionMinCost v = case v of
     40 -> fillSS 6 (clCost 1 <> avCost 2 <> ddCost 2)
 
     _ -> mempty
+
+pprFleetNotes :: Fleet (note :: Maybe String) -> String
+pprFleetNotes xs = if null notes
+    then "<N/A>"
+    else
+      let grouppedNotes = map formatNote (group notes)
+          formatNote note = "{" <> AU.head note <> "}x" <> show (length note)
+      in Str.joinWith ", " grouppedNotes
+  where
+    notes = mapMaybe (\x -> x.note) xs
+
+-- | generate markdown string for pretty printing the minimal cost table
+minimalCostMarkdownTable :: String
+minimalCostMarkdownTable = header <> "\n" <> Str.joinWith "\n" rows
+  where
+    header = "Expedition Id | Fuel | Ammo | Minimal Cost Fleet Composition" <> "\n"
+          <> " --- | --- | --- | ---"
+    rows = map mkRow allExpeditionIds
+    mkRow eId = Str.joinWith " | " [show eId, show fuelCosts, show ammoCosts, notes]
+      where
+        notes = pprFleetNotes minCost.fleet
+        cost = getExpeditionCost eId
+        minCost = getECost (getExpeditionMinCost eId)
+        costVec = map (\sc -> calcCost cost sc) minCost.shipCost
+        fuelCosts = sum (map (\x -> x.fuel) costVec)
+        ammoCosts = sum (map (\x -> x.ammo) costVec)

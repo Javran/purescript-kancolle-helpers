@@ -1,17 +1,42 @@
-module KanColle.Expedition.Cost where
+module KanColle.Expedition.Cost
+  ( Cost(..)
+  , calcCost
+  , getExpeditionCost
+  ) where
+  
+-- this module serves as a database about expedition's cost
 
 import Prelude
 import Data.Int
+import Data.Maybe
 
+-- | Expedition cost. `fuel` and `ammo` are floating numbers
+-- | (valid values are taken from `0.0` to `1.0`) representing
+-- | percentage of fuel / ammo running an expedition would cost.
+-- | And `time` records the total time (in minutes) of running this expedition.
 type Cost =
   { fuel :: Number
   , ammo :: Number
-  , time :: Int -- in minutes
+  , time :: Int -- | in minutes
   }
 
 noCost :: Cost
 noCost = { fuel: 0.0, ammo: 0.0, time: 0 }
 
+
+nToFloor :: Number -> Int
+nToFloor = fromMaybe 0 <<< fromNumber
+
+-- TODO: need document, or it looks confusing
+-- TODO: integrate other parts to use this function
+calcCost :: Cost 
+         -> { fuel :: Int, ammo :: Int }
+         -> { fuel :: Int, ammo :: Int }
+calcCost c x = { fuel: nToFloor (toNumber x.fuel * c.fuel)
+               , ammo: nToFloor (toNumber x.ammo * c.ammo) }
+
+
+-- | input a valid expedition id and get expedition cost.
 getExpeditionCost :: Int -> Cost
 getExpeditionCost eId = case eId of
     1 ->  c 3 0   15
