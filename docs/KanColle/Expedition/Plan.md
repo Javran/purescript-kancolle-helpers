@@ -18,6 +18,12 @@ chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (List a)
 calcNetIncome :: Number -> Number -> Number -> Number -> Number -> Int -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
 ```
 
+#### `calcNetIncomeWithFleetCount`
+
+``` purescript
+calcNetIncomeWithFleetCount :: Int -> Number -> Number -> Number -> Number -> Number -> Int -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
+```
+
 #### `PlanEvaluation`
 
 ``` purescript
@@ -60,10 +66,22 @@ ratioPenalty :: Array Number -> Array Number -> Number
 calcWithExpeditionIds :: Number -> Number -> Number -> Number -> Int -> Array Int -> Array PlanEvaluation
 ```
 
+#### `calcWithExpeditionIdsFleetCount`
+
+``` purescript
+calcWithExpeditionIdsFleetCount :: Int -> Number -> Number -> Number -> Number -> Int -> Array Int -> Array PlanEvaluation
+```
+
 #### `calcWithExpeditionIdsJS`
 
 ``` purescript
 calcWithExpeditionIdsJS :: Fn6 Number Number Number Number Int (Array Int) (Array PlanEvaluation)
+```
+
+#### `calcWithExpeditionIdsFleetCountJS`
+
+``` purescript
+calcWithExpeditionIdsFleetCountJS :: Fn7 Int Number Number Number Number Int (Array Int) (Array PlanEvaluation)
 ```
 
 

@@ -49,9 +49,20 @@ calcNetIncome :: Number
               -> Number
               -> Int
               -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
-calcNetIncome alp pF pA pS pB afkMins = A.sortBy (flip compare `on` (\x -> x.resourceScore)) hourlyNetIncomeTable
+calcNetIncome = calcNetIncomeWithFleetCount 3
+
+-- with resource priority and afktime
+calcNetIncomeWithFleetCount :: Int
+                            -> Number
+                            -> Number
+                            -> Number
+                            -> Number
+                            -> Number
+                            -> Int
+                            -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
+calcNetIncomeWithFleetCount fltCnt alp pF pA pS pB afkMins = A.sortBy (flip compare `on` (\x -> x.resourceScore)) hourlyNetIncomeTable
   where
-    hourlyNetIncomeTable = map (calcResourceScore <<< mergeHNetIncome) $ netIncomeWithAfkTime afkMins `chooseN` 3
+    hourlyNetIncomeTable = map (calcResourceScore <<< mergeHNetIncome) $ netIncomeWithAfkTime afkMins `chooseN` fltCnt
     calcResourceScore :: { eIds :: Array Int, hourly :: HourlyIncome }
                       -> { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
     calcResourceScore x = { eIds: x.eIds, hourly: x.hourly, resourceScore: score - rPenalty * alp }
@@ -112,13 +123,23 @@ calcWithExpeditionIds :: Number
                       -> Int
                       -> Array Int
                       -> Array PlanEvaluation
-calcWithExpeditionIds pF pA pS pB afkTime availableEIds = A.sortBy (flip compare `on` (\x -> x.resourceScore)) hourlyNetIncomeTable          
+calcWithExpeditionIds = calcWithExpeditionIdsFleetCount 3
+
+calcWithExpeditionIdsFleetCount :: Int
+                                -> Number
+                                -> Number
+                                -> Number
+                                -> Number
+                                -> Int
+                                -> Array Int
+                                -> Array PlanEvaluation
+calcWithExpeditionIdsFleetCount fltCnt pF pA pS pB afkTime availableEIds = A.sortBy (flip compare `on` (\x -> x.resourceScore)) hourlyNetIncomeTable
   where
     alp = 0.0
     allExpeds = netIncomeWithAfkTime afkTime
     filteredExpeds = A.filter isAvailable allExpeds
     isAvailable info = isJust (info.eId `A.elemIndex` availableEIds)
-    hourlyNetIncomeTable = map (calcResourceScore <<< mergeHNetIncome) $ filteredExpeds `chooseN` 3
+    hourlyNetIncomeTable = map (calcResourceScore <<< mergeHNetIncome) $ filteredExpeds `chooseN` fltCnt
     calcResourceScore :: { eIds :: Array Int, hourly :: HourlyIncome }
                       -> { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
     calcResourceScore x = { eIds: x.eIds, hourly: x.hourly, resourceScore: score - rPenalty * alp }
@@ -131,3 +152,6 @@ calcWithExpeditionIds pF pA pS pB afkTime availableEIds = A.sortBy (flip compare
 
 calcWithExpeditionIdsJS :: Fn6 Number Number Number Number Int (Array Int) (Array PlanEvaluation)
 calcWithExpeditionIdsJS = mkFn6 calcWithExpeditionIds
+
+calcWithExpeditionIdsFleetCountJS :: Fn7 Int Number Number Number Number Int (Array Int) (Array PlanEvaluation)
+calcWithExpeditionIdsFleetCountJS = mkFn7 calcWithExpeditionIdsFleetCount
