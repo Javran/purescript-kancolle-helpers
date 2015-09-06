@@ -56,3 +56,13 @@ Currently implemented features are:
     * `analyzeRawNightBattleCombinedJS(data)`
 
         Analyze night battle data (for combined fleet)
+
+* `KanColle.RepairTime`
+
+    * `dockingInSecJS(stype, level, current HP, max HP)`
+
+        Calculate docking time for ships
+
+    * `facilityInSecJS(stype, level, current HP, max HP)`
+
+        Calculate docking time if Akashi is used for repairing
