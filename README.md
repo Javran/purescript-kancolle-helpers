@@ -32,3 +32,27 @@ Currently implemented features are:
 * `KanColle.KCAPI`
 
     Type definitions for KanColle API
+
+## JavaScript interfaces
+
+* `KanColle.DamageAnalysis`
+
+    * `analyzeRawBattleJS(data)`
+
+        Analyze regular battle data
+
+    * `analyzeRawNightBattleJS(data)`
+
+        Analyze regular night battle data (for combined fleet)
+
+    * `analyzeRawCarrierTaskForceBattleJS(data)`
+
+        Analyze battle with Combined Fleet, specialized for Carrier Task Force
+
+    * `analyzeRawSurfaceTaskForceBattleJS(data)`
+
+        Analyze battle with Combined Fleet, specialized for Surface Task Force
+
+    * `analyzeRawNightBattleCombinedJS(data)`
+
+        Analyze night battle data (for combined fleet)
