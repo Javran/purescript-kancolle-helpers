@@ -2,6 +2,7 @@ module KanColle.Expedition.Income
   ( Income(..)
   , getIncome
   , getExpeditionIncome
+  , withGreatSuccess
   ) where
 
 -- this module serves as a database about the resource
@@ -10,6 +11,7 @@ module KanColle.Expedition.Income
 
 import Prelude
 import Data.Monoid
+import qualified Data.Int as DI
 
 -- | `Income` includes `fuel`, `ammo` `steel` and `bauxite` resource income.
 newtype Income = Income
@@ -25,13 +27,24 @@ getIncome :: Income -> { fuel :: Int
                        , steel :: Int
                        , bauxite :: Int
                        }
-getIncome (Income i) = i                       
+getIncome (Income i) = i
 
 income :: Int -> Int -> Int -> Int -> Income
 income f a s b = Income { fuel: f
                         , ammo: a
                         , steel: s
                         , bauxite: b }
+
+withGreatSuccess :: Income -> Income
+withGreatSuccess (Income i) =
+    income
+      (toGS i.fuel)
+      (toGS i.ammo)
+      (toGS i.steel)
+      (toGS i.bauxite)
+
+toGS :: Int -> Int
+toGS = DI.toNumber >>> (* 1.5) >>> DI.floor
 
 instance incomeSemigroup :: Semigroup Income where
     append (Income i1) (Income i2) =
