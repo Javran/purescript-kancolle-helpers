@@ -23,6 +23,9 @@ dockingInSec s lvl curHp maxHp = (floor repairTime) + baseTime
 dockingInSecJS :: Fn4 String Int Int Int Int
 dockingInSecJS = mkFn4 (\s -> dockingInSec (readSType s))
 
+dockingInSecJSNum :: Fn4 Int Int Int Int Int
+dockingInSecJSNum = mkFn4 (\sNum -> dockingInSec (fromInt sNum))
+
 facilityInSec :: SType -> Int -> Int -> Int -> Int
 facilityInSec s lvl curHp maxHp = if facilitySlowestTime <= roundDockingTime
     then facilitySlowestTime
@@ -36,6 +39,9 @@ facilityInSec s lvl curHp maxHp = if facilitySlowestTime <= roundDockingTime
 
 facilityInSecJS :: Fn4 String Int Int Int Int
 facilityInSecJS = mkFn4 (\s -> facilityInSec (readSType s))
+
+facilityInSecJSNum :: Fn4 Int Int Int Int Int
+facilityInSecJSNum = mkFn4 (\sNum -> facilityInSec (fromInt sNum))
 
 stypeFactor :: SType -> Number
 stypeFactor SS = 0.5

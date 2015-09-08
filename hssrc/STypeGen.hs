@@ -13,7 +13,8 @@ sourceContents =
     , "import Prelude", ""] ++
     dataDef ++ [""] ++
     showDefs ++ [""] ++
-    readDefs
+    readDefs ++ [""] ++
+    fromIntDefs
   where
     dataDef = ["data SType = " ++ intercalate " | "  alts ++ " | Unknown String"]
     showDefs = "showSType :: SType -> String"
@@ -22,6 +23,11 @@ sourceContents =
     readDefs = "readSType :: String -> SType"
              : map (\x -> printf "readSType \"%s\" = %s" x x) alts
             ++ ["readSType s = Unknown s"]
+    fromIntDefs = "fromInt :: Int -> SType"
+                : zipWith (\n st -> "fromInt " ++ show n ++ " = " ++ st)
+                          [1 :: Int ..]
+                          alts
+               ++ ["fromInt v = Unknown (\"num \" ++ show v)"]
     alts = words "DDE DD  CL  CLT \
                  \CA  CAV CVL FBB \
                  \BB  BBV CV  XBB \
