@@ -56,21 +56,21 @@ netIncomeTable = map collectInfo allExpeditionIds
         netIncome = eIncome `incomeDiff cost` minCost
 
 showNetIncome :: NetIncome -> String
-showNetIncome ni = case ni.netIncome of
-    Income i -> joinWith " | " [show ni.eId, s i.fuel, s i.ammo, s i.steel, s i.bauxite]
+showNetIncome ni = joinWith " | " [show ni.eId, s i.fuel, s i.ammo, s i.steel, s i.bauxite]
   where
+    i = getIncome ni.netIncome
     s = show
 
 netIncomeWithAfkTime :: Int -> Array ExpeNetIncomeHourly
 netIncomeWithAfkTime atime = map transform netIncomeTable
   where
-    transform ni = case ni.netIncome of
-        Income i -> { eId: ni.eId
-                    , hourly: { fuel: t i.fuel
-                              , ammo: t i.ammo
-                              , steel: t i.steel
-                              , bauxite: t i.bauxite } }
+    transform ni = { eId: ni.eId
+                   , hourly: { fuel: t i.fuel
+                             , ammo: t i.ammo
+                             , steel: t i.steel
+                             , bauxite: t i.bauxite } }
       where
+        i = getIncome ni.netIncome
         t resource = toNumber resource / (toNumber totalTime / 60.0)
         totalTime = ordMax (getExpeditionCost ni.eId).time atime
 

@@ -1,9 +1,13 @@
 module KanColle.Expedition.Income
-  ( Income(..)
+  ( Income()
+  , mkIncome
   , getIncome
   , getExpeditionIncome
   , withGreatSuccess
   ) where
+
+-- TODO: great success requires a 6-ships-fleet, which means the minimum cost
+-- is not precise enough
 
 -- this module serves as a database about the resource
 -- running an expedition would get.
@@ -19,6 +23,8 @@ newtype Income = Income
   , ammo :: Int
   , steel :: Int
   , bauxite :: Int
+  , greatSuccess :: Boolean
+  , landingCrafts :: Int -- number of landing crafts
   }
 
 -- | unwrap `Income` to expose its members
@@ -27,13 +33,24 @@ getIncome :: Income -> { fuel :: Int
                        , steel :: Int
                        , bauxite :: Int
                        }
-getIncome (Income i) = i
+getIncome (Income i) =
+    { fuel: i.fuel
+    , ammo: i.ammo
+    , steel: i.steel
+    , bauxite: i.bauxite
+    }
+
+mkIncome :: { fuel :: Int, ammo :: Int, steel :: Int, bauxite :: Int } -> Income
+mkIncome i = income i.fuel i.ammo i.steel i.bauxite
 
 income :: Int -> Int -> Int -> Int -> Income
 income f a s b = Income { fuel: f
                         , ammo: a
                         , steel: s
-                        , bauxite: b }
+                        , bauxite: b
+                        , greatSuccess: false
+                        , landingCrafts: 0
+                        }
 
 withGreatSuccess :: Income -> Income
 withGreatSuccess (Income i) =

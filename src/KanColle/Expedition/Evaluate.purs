@@ -25,13 +25,14 @@ nToFloor :: Number -> Int
 nToFloor = floor
 
 incomeDiff :: Cost -> Income -> ECost -> Income
-incomeDiff cost (Income i) (ECost e) = Income
+incomeDiff cost iv (ECost e) = mkIncome
     { fuel: i.fuel - sum fuelCosts
     , ammo: i.ammo - sum ammoCosts
     , steel: i.steel
     , bauxite: i.bauxite
     }
   where
+    i = getIncome iv
     sc = e.shipCost
 
     fuelCostPercent = cost.fuel
@@ -87,21 +88,20 @@ sortWithAfkTime evalCost timePenalty afkMinutes = sortBy (flip compareScore) exp
         score = scoreNoPenalty - timeDiffPenalty
 
 showEvalResult :: EvalResult -> String
-showEvalResult er = case er.netIncome of
-    Income inc ->
-      "Expedition #" <> show er.eId <> ": "
-                     <> showHourly inc.fuel <> " | "
-                     <> showHourly inc.ammo <> " | "
-                     <> showHourly inc.steel <> " | "
-                     <> showHourly inc.bauxite <> " | "
-                     <> show er.score
+showEvalResult er =
+    "Expedition #" <> show er.eId <> ": "
+                   <> showHourly inc.fuel <> " | "
+                   <> showHourly inc.ammo <> " | "
+                   <> showHourly inc.steel <> " | "
+                   <> showHourly inc.bauxite <> " | "
+                   <> show er.score
   where
     -- TODO
+    inc = getIncome er.netIncome
     showHourly v = show (toNumber v / (toNumber (getExpeditionCost er.eId).time / 60.0))
 
 evalResultToJS :: EvalResult -> {eId :: Int, result :: Array Number}
-evalResultToJS er = case er.netIncome of
-    Income inc ->
+evalResultToJS er =
       { eId: er.eId
       , result: [ hourly inc.fuel
                 , hourly inc.ammo
@@ -110,10 +110,13 @@ evalResultToJS er = case er.netIncome of
                 , er.score
                 ] }
   where
+    inc = getIncome er.netIncome
     hourly v = (toNumber v / minToHour er.time)
 
 simpleEvalCost :: (Int -> Int -> Int -> Int -> Int) -> Income -> Int
-simpleEvalCost f (Income i) = f i.fuel i.ammo i.steel i.bauxite
+simpleEvalCost f income = f i.fuel i.ammo i.steel i.bauxite
+  where
+    i = getIncome income
 
 evalNetIncomeHourlyJS :: (Fn4 Int Int Int Int Int) -> Array {eId:: Int, result :: Array Number}
 evalNetIncomeHourlyJS sEvalCost = map evalResultToJS $
