@@ -1,6 +1,5 @@
 module KanColle.Expedition.Income
   ( IncomeBase()
-  , ResourceRows(..)
   , mkIncomeBase
   , getIncomeBase
   , getExpeditionIncomeBase
@@ -16,15 +15,7 @@ module KanColle.Expedition.Income
 import Prelude
 import Data.Monoid
 import qualified Data.Int as DI
-
--- | `ResourceRows a` represents attributes of 4 resources.
--- | All of the attributes have to be of the same type, namely `a`.
-type ResourceRows a =
-  { fuel :: a
-  , ammo :: a
-  , steel :: a
-  , bauxite :: a
-  }
+import KanColle.Expedition.Base
 
 -- | `IncomeBase` corresponses to resource income found
 -- | on many KanColle wikis, neither great success nor
@@ -60,13 +51,10 @@ toGS = DI.toNumber >>> (* 1.5) >>> DI.floor
 
 instance incomeSemigroup :: Semigroup IncomeBase where
     append (IncomeBase i1) (IncomeBase i2) =
-        income (i1.fuel + i2.fuel)
-               (i1.ammo + i2.ammo)
-               (i1.steel + i2.steel)
-               (i1.bauxite + i2.bauxite)
+        IncomeBase (i1 `resourceRowsLiftOp (+)` i2)
 
 instance incomeMonoid :: Monoid IncomeBase where
-    mempty = income 0 0 0 0
+    mempty = IncomeBase (resourceRowsFill 0)
 
 -- | input a valid expedition id and get expedition income.
 getExpeditionIncomeBase :: Int -> IncomeBase
