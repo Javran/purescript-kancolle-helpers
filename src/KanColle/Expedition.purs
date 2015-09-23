@@ -29,7 +29,7 @@ checkExpedition eId fleet = validExpeditionId eId
 type Expedition =
   { id :: Int
   , req :: ExpeditionRequirement
-  , income :: Income
+  , income :: IncomeBase
   , cost :: Cost
   }
 
@@ -38,5 +38,5 @@ allExpeditions = map mkEntry allExpeditionIds
   where
     mkEntry eId = { id: eId
                   , req: getExpeditionRequirement eId
-                  , income: getExpeditionIncome eId
+                  , income: getExpeditionIncomeBase eId
                   , cost: getExpeditionCost eId }

@@ -1,8 +1,8 @@
 module KanColle.Expedition.Income
-  ( Income()
-  , mkIncome
-  , getIncome
-  , getExpeditionIncome
+  ( IncomeBase()
+  , mkIncomeBase
+  , getIncomeBase
+  , getExpeditionIncomeBase
   , withGreatSuccess
   ) where
 
@@ -17,43 +17,39 @@ import Prelude
 import Data.Monoid
 import qualified Data.Int as DI
 
--- | `Income` includes `fuel`, `ammo` `steel` and `bauxite` resource income.
-newtype Income = Income
+-- | `IncomeBase` includes `fuel`, `ammo` `steel` and `bauxite` resource income.
+newtype IncomeBase = IncomeBase
   { fuel :: Int
   , ammo :: Int
   , steel :: Int
   , bauxite :: Int
-  , greatSuccess :: Boolean
-  , landingCrafts :: Int -- number of landing crafts
   }
 
--- | unwrap `Income` to expose its members
-getIncome :: Income -> { fuel :: Int
+-- | unwrap `IncomeBase` to expose its members
+getIncomeBase :: IncomeBase -> { fuel :: Int
                        , ammo :: Int
                        , steel :: Int
                        , bauxite :: Int
                        }
-getIncome (Income i) =
+getIncomeBase (IncomeBase i) =
     { fuel: i.fuel
     , ammo: i.ammo
     , steel: i.steel
     , bauxite: i.bauxite
     }
 
-mkIncome :: { fuel :: Int, ammo :: Int, steel :: Int, bauxite :: Int } -> Income
-mkIncome i = income i.fuel i.ammo i.steel i.bauxite
+mkIncomeBase :: { fuel :: Int, ammo :: Int, steel :: Int, bauxite :: Int } -> IncomeBase
+mkIncomeBase i = income i.fuel i.ammo i.steel i.bauxite
 
-income :: Int -> Int -> Int -> Int -> Income
-income f a s b = Income { fuel: f
+income :: Int -> Int -> Int -> Int -> IncomeBase
+income f a s b = IncomeBase { fuel: f
                         , ammo: a
                         , steel: s
                         , bauxite: b
-                        , greatSuccess: false
-                        , landingCrafts: 0
                         }
 
-withGreatSuccess :: Income -> Income
-withGreatSuccess (Income i) =
+withGreatSuccess :: IncomeBase -> IncomeBase
+withGreatSuccess (IncomeBase i) =
     income
       (toGS i.fuel)
       (toGS i.ammo)
@@ -63,19 +59,19 @@ withGreatSuccess (Income i) =
 toGS :: Int -> Int
 toGS = DI.toNumber >>> (* 1.5) >>> DI.floor
 
-instance incomeSemigroup :: Semigroup Income where
-    append (Income i1) (Income i2) =
+instance incomeSemigroup :: Semigroup IncomeBase where
+    append (IncomeBase i1) (IncomeBase i2) =
         income (i1.fuel + i2.fuel)
                (i1.ammo + i2.ammo)
                (i1.steel + i2.steel)
                (i1.bauxite + i2.bauxite)
 
-instance incomeMonoid :: Monoid Income where
+instance incomeMonoid :: Monoid IncomeBase where
     mempty = income 0 0 0 0
 
 -- | input a valid expedition id and get expedition income.
-getExpeditionIncome :: Int -> Income
-getExpeditionIncome eId = case eId of
+getExpeditionIncomeBase :: Int -> IncomeBase
+getExpeditionIncomeBase eId = case eId of
     1 ->  i   0  30   0   0
     2 ->  i   0 100  30   0
     3 ->  i  30  30  40   0

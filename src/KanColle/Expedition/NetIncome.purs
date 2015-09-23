@@ -16,7 +16,7 @@ import Data.Foldable
 
 type NetIncome =
   { eId :: Int
-  , netIncome :: Income
+  , netIncome :: IncomeBase
   }
 
 type HourlyIncome =
@@ -52,13 +52,13 @@ netIncomeTable = map collectInfo allExpeditionIds
       where
         cost = getExpeditionCost eId
         minCost = getExpeditionMinCost eId
-        eIncome = getExpeditionIncome eId
+        eIncome = getExpeditionIncomeBase eId
         netIncome = eIncome `incomeDiff cost` minCost
 
 showNetIncome :: NetIncome -> String
 showNetIncome ni = joinWith " | " [show ni.eId, s i.fuel, s i.ammo, s i.steel, s i.bauxite]
   where
-    i = getIncome ni.netIncome
+    i = getIncomeBase ni.netIncome
     s = show
 
 netIncomeWithAfkTime :: Int -> Array ExpeNetIncomeHourly
@@ -70,7 +70,7 @@ netIncomeWithAfkTime atime = map transform netIncomeTable
                              , steel: t i.steel
                              , bauxite: t i.bauxite } }
       where
-        i = getIncome ni.netIncome
+        i = getIncomeBase ni.netIncome
         t resource = toNumber resource / (toNumber totalTime / 60.0)
         totalTime = ordMax (getExpeditionCost ni.eId).time atime
 

@@ -16,7 +16,7 @@ import KanColle.Expedition.Cost
 
 type EvalResult =
   { eId :: Int
-  , netIncome :: Income
+  , netIncome :: IncomeBase
   , score :: Number
   , time :: Int
   }
@@ -24,15 +24,15 @@ type EvalResult =
 nToFloor :: Number -> Int
 nToFloor = floor
 
-incomeDiff :: Cost -> Income -> ECost -> Income
-incomeDiff cost iv (ECost e) = mkIncome
+incomeDiff :: Cost -> IncomeBase -> ECost -> IncomeBase
+incomeDiff cost iv (ECost e) = mkIncomeBase
     { fuel: i.fuel - sum fuelCosts
     , ammo: i.ammo - sum ammoCosts
     , steel: i.steel
     , bauxite: i.bauxite
     }
   where
-    i = getIncome iv
+    i = getIncomeBase iv
     sc = e.shipCost
 
     fuelCostPercent = cost.fuel
@@ -52,7 +52,7 @@ minToHour m = toNumber m / 60.0
 comparing :: forall a b. (Ord a) => (b -> a) -> b -> b -> Ordering
 comparing prj x y = prj x `compare` prj y
 
-sortByHourlyGain :: (Income -> Int) -> Array EvalResult
+sortByHourlyGain :: (IncomeBase -> Int) -> Array EvalResult
 sortByHourlyGain evalCost = sortBy (flip compareScore) expeditions
   where
     compareScore = comparing (\x -> x.score)
@@ -63,11 +63,11 @@ sortByHourlyGain evalCost = sortBy (flip compareScore) expeditions
                       , time: cost.time
                       , score: score }
       where
-        netIncome = getExpeditionIncome eId `incomeDiff cost` getExpeditionMinCost eId
+        netIncome = getExpeditionIncomeBase eId `incomeDiff cost` getExpeditionMinCost eId
         cost = getExpeditionCost eId
         score = toNumber (evalCost netIncome) / minToHour cost.time
 
-sortWithAfkTime :: (Income -> Int) -> Number -> Int -> Array EvalResult
+sortWithAfkTime :: (IncomeBase -> Int) -> Number -> Int -> Array EvalResult
 sortWithAfkTime evalCost timePenalty afkMinutes = sortBy (flip compareScore) expeditions
   where
     compareScore = comparing (\x -> x.score)
@@ -80,7 +80,7 @@ sortWithAfkTime evalCost timePenalty afkMinutes = sortBy (flip compareScore) exp
       where
         cost = getExpeditionCost eId
         costMinutes = cost.time
-        netIncome = getExpeditionIncome eId `incomeDiff cost` getExpeditionMinCost eId
+        netIncome = getExpeditionIncomeBase eId `incomeDiff cost` getExpeditionMinCost eId
         totalExpTime = ordMax costMinutes afkMinutes
         scoreNoPenalty = toNumber (evalCost netIncome) / minToHour totalExpTime
         timeDiffPenalty :: Number
@@ -97,7 +97,7 @@ showEvalResult er =
                    <> show er.score
   where
     -- TODO
-    inc = getIncome er.netIncome
+    inc = getIncomeBase er.netIncome
     showHourly v = show (toNumber v / (toNumber (getExpeditionCost er.eId).time / 60.0))
 
 evalResultToJS :: EvalResult -> {eId :: Int, result :: Array Number}
@@ -110,13 +110,13 @@ evalResultToJS er =
                 , er.score
                 ] }
   where
-    inc = getIncome er.netIncome
+    inc = getIncomeBase er.netIncome
     hourly v = (toNumber v / minToHour er.time)
 
-simpleEvalCost :: (Int -> Int -> Int -> Int -> Int) -> Income -> Int
+simpleEvalCost :: (Int -> Int -> Int -> Int -> Int) -> IncomeBase -> Int
 simpleEvalCost f income = f i.fuel i.ammo i.steel i.bauxite
   where
-    i = getIncome income
+    i = getIncomeBase income
 
 evalNetIncomeHourlyJS :: (Fn4 Int Int Int Int Int) -> Array {eId:: Int, result :: Array Number}
 evalNetIncomeHourlyJS sEvalCost = map evalResultToJS $
