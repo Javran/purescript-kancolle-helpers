@@ -2,7 +2,6 @@ module KanColle.Expedition.Plan where
 
 import Prelude
 import KanColle.Expedition.Evaluate
-import KanColle.Expedition.Income
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Minimal
 import KanColle.Expedition.NetIncome

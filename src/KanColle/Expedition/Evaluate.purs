@@ -10,7 +10,7 @@ import Data.Function
 import Data.Foldable
 
 import KanColle.Expedition.Base
-import KanColle.Expedition.Income
+import KanColle.Expedition.IncomeBase
 import KanColle.Expedition.Minimal
 import KanColle.Expedition.Cost
 

@@ -8,7 +8,7 @@ import Data.Monoid.Endo
 import qualified Data.Map as M
 
 import KanColle.Expedition.Requirement
-import KanColle.Expedition.Income
+import KanColle.Expedition.IncomeBase
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Base
 

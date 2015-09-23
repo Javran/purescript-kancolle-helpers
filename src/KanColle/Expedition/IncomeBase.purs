@@ -1,4 +1,4 @@
-module KanColle.Expedition.Income
+module KanColle.Expedition.IncomeBase
   ( IncomeBase()
   , mkIncomeBase
   , getIncomeBase
