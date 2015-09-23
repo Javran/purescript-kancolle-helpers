@@ -1,9 +1,9 @@
 module KanColle.Expedition.Income
   ( IncomeBase()
+  , ResourceRows(..)
   , mkIncomeBase
   , getIncomeBase
   , getExpeditionIncomeBase
-  , withGreatSuccess
   ) where
 
 -- TODO: great success requires a 6-ships-fleet, which means the minimum cost
@@ -17,37 +17,35 @@ import Prelude
 import Data.Monoid
 import qualified Data.Int as DI
 
--- | `IncomeBase` includes `fuel`, `ammo` `steel` and `bauxite` resource income.
-newtype IncomeBase = IncomeBase
-  { fuel :: Int
-  , ammo :: Int
-  , steel :: Int
-  , bauxite :: Int
+-- | `ResourceRows a` represents attributes of 4 resources.
+-- | All of the attributes have to be of the same type, namely `a`.
+type ResourceRows a =
+  { fuel :: a
+  , ammo :: a
+  , steel :: a
+  , bauxite :: a
   }
 
--- | unwrap `IncomeBase` to expose its members
-getIncomeBase :: IncomeBase -> { fuel :: Int
-                       , ammo :: Int
-                       , steel :: Int
-                       , bauxite :: Int
-                       }
-getIncomeBase (IncomeBase i) =
-    { fuel: i.fuel
-    , ammo: i.ammo
-    , steel: i.steel
-    , bauxite: i.bauxite
-    }
+-- | `IncomeBase` corresponses to resource income found
+-- | on many KanColle wikis, neither great success nor
+-- | numbers of landing craft is taken into account.
+newtype IncomeBase = IncomeBase (ResourceRows Int)
 
-mkIncomeBase :: { fuel :: Int, ammo :: Int, steel :: Int, bauxite :: Int } -> IncomeBase
-mkIncomeBase i = income i.fuel i.ammo i.steel i.bauxite
+-- | unwrap `IncomeBase` to expose its members
+getIncomeBase :: IncomeBase -> ResourceRows Int
+getIncomeBase (IncomeBase i) = i
+
+mkIncomeBase :: ResourceRows Int -> IncomeBase
+mkIncomeBase = IncomeBase
 
 income :: Int -> Int -> Int -> Int -> IncomeBase
 income f a s b = IncomeBase { fuel: f
-                        , ammo: a
-                        , steel: s
-                        , bauxite: b
-                        }
+                            , ammo: a
+                            , steel: s
+                            , bauxite: b
+                            }
 
+{-
 withGreatSuccess :: IncomeBase -> IncomeBase
 withGreatSuccess (IncomeBase i) =
     income
@@ -58,6 +56,7 @@ withGreatSuccess (IncomeBase i) =
 
 toGS :: Int -> Int
 toGS = DI.toNumber >>> (* 1.5) >>> DI.floor
+-}
 
 instance incomeSemigroup :: Semigroup IncomeBase where
     append (IncomeBase i1) (IncomeBase i2) =
