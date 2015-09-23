@@ -2,6 +2,7 @@ module KanColle.Expedition.Base
   ( ResourceRows(..)
   , resourceRowsFill
   , resourceRowsLiftOp
+  , mapResourceRows
   , allExpeditionIds
   ) where
 
@@ -43,4 +44,15 @@ resourceRowsLiftOp app x y =
     , ammo: app x.ammo y.ammo
     , steel: app x.steel y.steel
     , bauxite: app x.bauxite y.bauxite
+    }
+
+mapResourceRows :: forall a b.
+                   (a -> b)
+                -> ResourceRows a
+                -> ResourceRows b
+mapResourceRows f r =
+    { fuel: f r.fuel
+    , ammo: f r.ammo
+    , steel: f r.steel
+    , bauxite: f r.bauxite
     }
