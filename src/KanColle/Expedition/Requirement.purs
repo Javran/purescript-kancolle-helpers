@@ -66,7 +66,7 @@ fromRawFleet = map fromRawShip
 checkShip :: forall a. ShipRequirement -> Ship a -> Boolean
 checkShip req s = case req of
   ShipLevel n -> s.level >= n
-  ShipTypeOneOf stype -> any ((==) s.stype) stype
+  ShipTypeOneOf stype -> any (eqSType s.stype) stype
 
 checkFleet :: forall a. FleetRequirement -> Fleet a -> Boolean
 checkFleet req fleet = case uncons fleet of
