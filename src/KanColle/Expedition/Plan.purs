@@ -66,7 +66,7 @@ calcNetIncomeWithFleetCount fltCnt alp pF pA pS pB afkMins = A.sortBy (flip comp
                       -> { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
     calcResourceScore x = { eIds: x.eIds, hourly: x.hourly, resourceScore: score - rPenalty * alp }
       where
-        rPenalty = ratioPenalty [pF,pA,pS,pB] [x.hourly.fuel, x.hourly.ammo, x.hourly.steel, x.hourly.bauxite]
+        rPenalty = 0.0
         score = x.hourly.fuel * pF
               + x.hourly.ammo * pA
               + x.hourly.steel * pS
@@ -105,16 +105,6 @@ quickCalc pF pA pS pB atime = A.take 50 $ calcNetIncome 0.0 pF pA pS pB atime
 quickCalcJS :: Fn5 Number Number Number Number Int (Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number })
 quickCalcJS = mkFn5 quickCalc
 
-
-ratioPenalty :: Array Number -> Array Number -> Number
-ratioPenalty expect actual = scoresSq
-  where
-    expectSum = sum expect
-    expectR = map (/ expectSum) expect
-    actualSum = sum (A.filter (>= 0.0) actual)
-    actualR = map (/ actualSum) actual
-    scoresSq = sqrt $ sum $ A.zipWith (\x y -> (x-y)*(x-y)) expectR actualR
-
 calcWithExpeditionIds :: Number
                       -> Number
                       -> Number
@@ -143,7 +133,7 @@ calcWithExpeditionIdsFleetCount fltCnt pF pA pS pB afkTime availableEIds = A.sor
                       -> { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }
     calcResourceScore x = { eIds: x.eIds, hourly: x.hourly, resourceScore: score - rPenalty * alp }
       where
-        rPenalty = ratioPenalty [pF,pA,pS,pB] [x.hourly.fuel, x.hourly.ammo, x.hourly.steel, x.hourly.bauxite]
+        rPenalty = 0.0
         score = x.hourly.fuel * pF
               + x.hourly.ammo * pA
               + x.hourly.steel * pS
