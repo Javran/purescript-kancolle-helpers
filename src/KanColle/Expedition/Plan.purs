@@ -17,28 +17,10 @@ import Number.Format
 import Data.Maybe
 import Math (sqrt)
 import Data.Function
+import KanColle.Util
 
 import Control.Monad.Eff.Console
 import Control.Monad.Eff
-
-tails :: forall a. L.List a -> L.List (L.List a)
-tails xs = case xs of
-    L.Nil -> L.Cons L.Nil L.Nil
-    L.Cons _ tl -> L.Cons xs (tails tl)
-
--- only valid values are 0,1,2,3
-chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (L.List a)
-chooseN xs = L.fromList <<< pickFrom xsL
-  where
-    xsL = L.toList xs
-    pickFrom _ 0 = L.Cons L.Nil L.Nil
-    pickFrom remaining i = do
-      ys <- tails remaining
-      case ys of
-        L.Nil -> empty
-        L.Cons hd tl -> do
-          rs <- pickFrom tl (i-1)
-          return (L.Cons hd rs)
 
 -- with resource priority and afktime
 calcNetIncome :: Number

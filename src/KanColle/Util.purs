@@ -14,6 +14,10 @@ import Data.Array
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
 import Data.Monoid
 import Data.Maybe
+import qualified Data.List as L
+import Data.Foldable
+import Data.Monoid
+import Control.Plus
 
 times1p :: forall m. (Semigroup m) => Int -> m -> m
 times1p y0 x0 = f x0 (y0 + 1)
@@ -30,6 +34,26 @@ times1p y0 x0 = f x0 (y0 + 1)
 times :: forall m. (Monoid m) => Int -> m -> m
 times 0 _ = mempty
 times n m = times1p (n-1) m
+
+tails :: forall a. L.List a -> L.List (L.List a)
+tails xs = case xs of
+    L.Nil -> L.Cons L.Nil L.Nil
+    L.Cons _ tl -> L.Cons xs (tails tl)
+
+-- only valid values are 0,1,2,3
+-- TODO: change doc
+chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (L.List a)
+chooseN xs = L.fromList <<< pickFrom xsL
+  where
+    xsL = L.toList xs
+    pickFrom _ 0 = L.Cons L.Nil L.Nil
+    pickFrom remaining i = do
+      ys <- tails remaining
+      case ys of
+        L.Nil -> empty
+        L.Cons hd tl -> do
+          rs <- pickFrom tl (i-1)
+          return (L.Cons hd rs)
 
 foreign import peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
 foreign import pokeSTArrayUnsafe :: forall a h r. STArray h a -> Int -> a -> Eff (st :: ST h | r) Unit
