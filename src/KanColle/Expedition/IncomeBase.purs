@@ -95,6 +95,8 @@ getExpeditionIncomeBase eId = case eId of
     31 -> i   0  30   0   0
     32 -> i  50  50  50  50
 
+    33 -> mempty
+    34 -> mempty
     35 -> i   0   0 240 280
     36 -> i 480   0 200 200
     37 -> i   0 380 270   0

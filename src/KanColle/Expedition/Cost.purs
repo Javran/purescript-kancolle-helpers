@@ -70,6 +70,8 @@ getExpeditionCost eId = case eId of
     31 -> c 5 0 $ hr 2
     32 -> c 9 3 $ hr 24
 
+    33 -> c 5 8   15
+    34 -> c 5 8   30
     35 -> c 8 8 $ hr 7
     36 -> c 8 8 $ hr 9
     37 -> c 8 8 $ hm 2 45

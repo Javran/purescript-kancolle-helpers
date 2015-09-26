@@ -182,6 +182,8 @@ getExpeditionMinCost v = case v of
     31 -> ssCost 4
     32 -> katori <> ddCost 2
 
+    33 -> ddCost 2
+    34 -> ddCost 2
     35 -> fillSS 6 (cvlCost 2 <> caCost 1 <> ddCost 1)
     36 -> fillSS 6 (avCost 2 <> clCost 1 <> ddCost 1)
     37 -> clCost 1 <> ddCost 5

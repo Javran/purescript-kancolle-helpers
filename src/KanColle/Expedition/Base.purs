@@ -15,7 +15,7 @@ import Data.Array
 import Data.Monoid
 
 allExpeditionIds :: Array Int
-allExpeditionIds = (1..32) <> (35..40)
+allExpeditionIds = 1..40
 
 -- | `ResourceRows a` represents attributes of 4 resources.
 -- | All of the attributes have to be of the same type, namely `a`.

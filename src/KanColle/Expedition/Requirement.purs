@@ -124,6 +124,8 @@ getExpeditionRequirement v = case v of
     32 -> fslAndSc 5 3 <> sty 1 CT <> sty 2 DD
        <> [Flagship (ShipTypeOneOf [CT])]
 
+    33 -> fslAndSc 1 2 <> sty 2 DD
+    34 -> fslAndSc 1 2 <> sty 2 DD
     35 -> fslAndSc 40 6 <> carrier 2 <> sty 1 CA <> sty 1 DD
     36 -> fslAndSc 30 6 <> sty 2 AV <> sty 1 CL <> sty 1 DD
     37 -> fslAndSc 50 6 <> lvlCnt 200 <> sty 1 CL <> sty 5 DD
