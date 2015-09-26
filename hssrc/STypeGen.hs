@@ -14,7 +14,8 @@ sourceContents =
     dataDef ++ [""] ++
     showDefs ++ [""] ++
     readDefs ++ [""] ++
-    fromIntDefs
+    fromIntDefs ++ [""] ++
+    toIntDefs
   where
     dataDef = ["data SType = " ++ intercalate " | "  alts ++ " | Unknown String"]
     showDefs = "showSType :: SType -> String"
@@ -28,6 +29,11 @@ sourceContents =
                           [1 :: Int ..]
                           alts
                ++ ["fromInt v = Unknown (\"num \" ++ show v)"]
+    toIntDefs = "toInt :: SType -> Int"
+              : zipWith (\st n -> "toInt " ++ st ++ " = " ++ show n)
+                          alts
+                          [1 :: Int ..]
+               ++ ["toInt (Unknown _) = -1"]
     alts = words "DDE DD  CL  CLT \
                  \CA  CAV CVL FBB \
                  \BB  BBV CV  XBB \

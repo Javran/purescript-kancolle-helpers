@@ -15,9 +15,6 @@ import KanColle.Expedition.Base
 validExpeditionId :: Int -> Boolean
 validExpeditionId = getExpeditionRequirement >>> null >>> not
 
--- expeditionIds :: Array Int
--- expeditionIds = (1..32) <> (35..40)
-
 getAvailableExpeditions :: forall a. Fleet a -> Array Int
 getAvailableExpeditions fleet =
   filter (\eId -> checkExpedition eId fleet) allExpeditionIds
