@@ -33,10 +33,12 @@ type Expedition =
   , cost :: Cost
   }
 
+getExpeditionInfo :: Int -> Expedition
+getExpeditionInfo eId =
+    { id: eId
+    , req: getExpeditionRequirement eId
+    , income: getExpeditionIncomeBase eId
+    , cost: getExpeditionCost eId }
+
 allExpeditions :: Array Expedition
-allExpeditions = map mkEntry allExpeditionIds
-  where
-    mkEntry eId = { id: eId
-                  , req: getExpeditionRequirement eId
-                  , income: getExpeditionIncomeBase eId
-                  , cost: getExpeditionCost eId }
+allExpeditions = map getExpeditionInfo allExpeditionIds
