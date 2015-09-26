@@ -21,6 +21,8 @@ data FleetRequirement
   | FleetSTypeCount Int (Array SType)
   | FleetShipCount Int
 
+-- INVARIANT: all requirements are constructed from unique alternatives
+-- in FleetRequirement + ShipRequirement, the only exception is FleetSTypeCount
 type ExpeditionRequirement = Array FleetRequirement
 
 explainShipRequirement :: ShipRequirement -> String
