@@ -88,11 +88,11 @@ testExpeditionHelper =
       assert "fleet test 2" $
         getAvailableExpeditions testFleet1 == [1,2,3,6,27]
       assert "fleet test 3" $
-        getAvailableExpeditions testFleet2 == [1,2,3,6,11,12]
+        getAvailableExpeditions testFleet2 == [1,2,3,6,11,12,33,34]
       assert "fleet test 3" $
-        getAvailableExpeditions testFleet3 == [1,2,3,4,5,6,9,11,12,21]
+        getAvailableExpeditions testFleet3 == [1,2,3,4,5,6,9,11,12,21,33,34]
       assert "fleet test 4" $
-        getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,37]
+        getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,33,34,37]
       assert "Expedition #32, 3 ships should also do" $
         unsatisfiedRequirements 32 testFleet5 == []
 
