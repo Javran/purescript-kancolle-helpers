@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cabal exec -- runghc MkRelease.hs
+stack exec -- runghc MkRelease.hs
