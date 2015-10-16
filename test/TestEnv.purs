@@ -35,8 +35,10 @@ import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 import KanColle.Expedition.Plan
 import KanColle.Expedition.Minimal
+import KanColle.Generated.SType
 import KanColle.SType
 import KanColle.RepairTime
+
 
 import BattleData
 import DamageVectorTests

@@ -26,8 +26,9 @@ import BattleData
 import Base
 import qualified Test.QuickCheck as QC
 
-instance eqFleetRequirementForTest :: Eq FleetRequirement where
-    eq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2
+
+eqFleetReq :: FleetRequirement -> FleetRequirement -> Boolean
+eqFleetReq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2
 
 mkShip :: SType -> Int -> Int -> Ship ()
 mkShip st l d =
@@ -84,7 +85,7 @@ testExpeditionHelper :: forall e. MyTest e
 testExpeditionHelper =
     test "ExpeditionHelper" do
       assert "fleet test 1" $
-        unsatisfiedRequirements 2 testFleet1 == []
+        null (unsatisfiedRequirements 2 testFleet1)
       assert "fleet test 2" $
         getAvailableExpeditions testFleet1 == [1,2,3,6,27]
       assert "fleet test 3" $
@@ -94,7 +95,7 @@ testExpeditionHelper =
       assert "fleet test 4" $
         getAvailableExpeditions testFleet4 == [1,2,3,4,5,6,7,8,9,11,12,13,14,16,17,21,33,34,37]
       assert "Expedition #32, 3 ships should also do" $
-        unsatisfiedRequirements 32 testFleet5 == []
+        null (unsatisfiedRequirements 32 testFleet5)
 
 -- TODO: break into stages
 testDamageAnalyzer :: forall e. MyTest e
