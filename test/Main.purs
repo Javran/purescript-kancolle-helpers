@@ -122,6 +122,10 @@ testDamageAnalyzer =
         trimInfo (analyzeBattle (unsafeFromForeign aerialBattle1)) ==
           map toMaybeInt [9999
                          ,37,31,31,32,32,44-6,96,70,60,20,20,20]
+      assert "ld aerial battle sample 1" $
+        trimInfo (analyzeBattle (unsafeFromForeign ldAerialBattle1)) ==
+          map toMaybeInt [9999
+                         ,31,56,56,42,33,29,500,9999,9999,9999,9999,9999]
   where
     toMaybeInt x = if x == 9999 then Nothing else Just x
     trimInfo :: forall a. Array (Maybe { currentHp:: Int | a}) -> Array (Maybe Int)

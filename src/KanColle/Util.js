@@ -20,3 +20,7 @@ exports.pokeSTArrayUnsafe = function (xs) {
     };
   };
 };
+
+exports.jsonStringify = function (x) {
+    return JSON.stringify(x);
+}

@@ -25,6 +25,9 @@ foreign import combinedFleetNightBattle1 :: Foreign
 
 foreign import surfaceTaskForceBattleWithSupport1 :: Foreign
 
+foreign import ldAerialBattle1 :: Foreign
+foreign import ldAerialBattle2 :: Foreign        
+
 battle1Result :: String
 battle1Result = pprFleetDamageTookInfo $ analyzeRawBattle battle1
 

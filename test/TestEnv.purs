@@ -13,6 +13,9 @@ module TestEnv
   , module KanColle.Generated.SType
   , module KanColle.RepairTime
   , module Control.Monad.Eff.Console
+  , module MasterData
+  , module KanColle.Remodel
+  , module Debug.Trace
   , module TestEnv
   )
 where
@@ -38,14 +41,22 @@ import KanColle.Expedition.Minimal
 import KanColle.Generated.SType
 import KanColle.SType
 import KanColle.RepairTime
-
+import KanColle.Remodel
+import Debug.Trace
 
 import BattleData
+import MasterData
 import DamageVectorTests
-
 
 import Control.Monad.Eff
 import KanColle.Util
 
-testArr :: Array Int
-testArr = heapSort compare [1,9,2,8,3,7,4,6,5]
+testResult :: RemodelInfoMap
+testResult = collectRemodelInfo (unsafeFromForeign masterData)
+
+testResult2 :: RemodelGroupMap
+testResult2 = generateRemodelGroups testResult
+
+testResult3 :: OriginMap
+testResult3 = generateOriginMap testResult2
+

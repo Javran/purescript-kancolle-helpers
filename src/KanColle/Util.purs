@@ -19,6 +19,8 @@ import Data.Foldable
 import Data.Monoid
 import Control.Plus
 
+foreign import jsonStringify :: forall a. a -> String
+
 times1p :: forall m. (Semigroup m) => Int -> m -> m
 times1p y0 x0 = f x0 (y0 + 1)
   where
