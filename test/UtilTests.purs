@@ -6,6 +6,7 @@ import Test.QuickCheck.Gen
 import Prelude
 import Data.Array
 import KanColle.Util
+import qualified DamageProto as DProto
 
 prop_HeapSortCorrectness :: Array Int -> Result
 prop_HeapSortCorrectness xs = sort xs === heapSortSafe compare xs
@@ -20,3 +21,5 @@ qcTestUtils = do
     quickCheck (prop_SortByThenTake (\xs -> length xs / 2))
     quickCheck (prop_SortByThenTake (\xs -> length xs / 3))
     quickCheck (prop_SortByThenTake (\xs -> length xs / 5))
+    quickCheck DProto.prop_DamageResultAgree1
+    quickCheck DProto.prop_DamageResultAgree2
