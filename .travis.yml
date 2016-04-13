@@ -11,6 +11,7 @@ install:
   - chmod a+x $HOME/purescript
   - npm install pulp
   - npm install uglify-js
+  - npm install bower
   - bower install
 script:
   - pulp test
