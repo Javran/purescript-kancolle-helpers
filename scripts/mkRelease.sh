@@ -1,3 +1,3 @@
 #!/bin/bash
 
-stack exec -- runghc MkRelease.hs
+stack exec -- ghc -O2 MkRelease.hs -main-is MkRelease && ./MkRelease

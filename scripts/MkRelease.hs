@@ -5,7 +5,7 @@ import Prelude hiding (FilePath)
 import Control.Arrow
 import Data.Maybe
 import Turtle
-import Filesystem.Path.CurrentOS
+import Filesystem.Path.CurrentOS hiding (empty)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Control.Foldl as Fold
@@ -29,12 +29,11 @@ main = do
     cwd <- pwd
     prjHome <- guessProjectHome cwd
     putStrLn $ "Project home in: " <> encodeString prjHome
-    (ExitSuccess, npmBin) <- second T.strip <$> shellStrict "npm bin" ""
+    (ExitSuccess, npmBin) <- second T.strip <$> shellStrict "npm bin" empty
     let uglifyJsBin = fromText npmBin </> "uglifyjs"
     True <- testfile uglifyJsBin
     putStrLn $ "Found uglifyjs in: " <> encodeString uglifyJsBin
     let buildDir = prjHome
-        -- srcDir = prjHome </> "src"
         srcDir' = prjHome </> "src/" -- for stripping prefix
     cd buildDir
     -- search "purs" files
@@ -59,11 +58,14 @@ main = do
     mapM_ (putStrLn . ("* " ++)) pursModules
     putStrLn "=== End of list ===="
     -- build and optimize
-    (ExitSuccess, _) <- shellStrict "pulp build" ""
+    -- (ExitSuccess, ccc) <- shellStrict "which psa" ""
+    -- liftIO (print ccc)
+    (ExitSuccess, _) <- shellStrict "pulp build" empty
     let pscBundleArgs = "output/*/*.js" : concatMap pmConvert pursModules
         pmConvert pm = ["-m", pm]
-    (ExitSuccess, jsContent) <- procStrict "psc-bundle" (map T.pack pscBundleArgs) ""
-    (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (return jsContent)
+        bundleCmd = unwords ("psc-bundle" : pscBundleArgs)
+    (ExitSuccess, jsContent) <- shellStrict (T.pack bundleCmd) empty
+    (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (pure jsContent)
     cd cwd
     let targetFile = "KanColleHelpers.js"
         targetFileNode = "KanColleHelpersN.js"
