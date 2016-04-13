@@ -20,6 +20,11 @@ import Data.Monoid
 import Control.Plus
 
 foreign import jsonStringify :: forall a. a -> String
+foreign import consoleMessage :: forall a b. Int -> a -> (Unit -> b) -> b
+foreign import throwWith :: forall a b. a -> b
+
+todo :: forall a b . b -> a
+todo _ = throwWith "TODO"
 
 times1p :: forall m. (Semigroup m) => Int -> m -> m
 times1p y0 x0 = f x0 (y0 + 1)
@@ -134,3 +139,9 @@ sortByThenTakeQuick cmp n xs =
   where
     fcmp = flip cmp
     l = length xs
+
+traceLog :: forall a b. a -> (Unit -> b) -> b
+traceLog = consoleMessage 0
+
+traceWarn :: forall a b. a -> (Unit -> b) -> b
+traceWarn = consoleMessage 1

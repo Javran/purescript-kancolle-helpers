@@ -58,8 +58,6 @@ main = do
     mapM_ (putStrLn . ("* " ++)) pursModules
     putStrLn "=== End of list ===="
     -- build and optimize
-    -- (ExitSuccess, ccc) <- shellStrict "which psa" ""
-    -- liftIO (print ccc)
     (ExitSuccess, _) <- shellStrict "pulp build" empty
     let pscBundleArgs = "output/*/*.js" : concatMap pmConvert pursModules
         pmConvert pm = ["-m", pm]

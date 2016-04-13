@@ -58,7 +58,7 @@ modifyDamage f (DV s) = DV (f s)
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: forall a.
                 { api_fdam :: Array Number
-                , api_edam :: Array Number} -> DamageVector
+                , api_edam :: Array Number | a} -> DamageVector
 fromFDamAndEDam v = DV ([0] <> damageNormalize (AU.tail v.api_fdam)
                             <> damageNormalize (AU.tail v.api_edam))
 

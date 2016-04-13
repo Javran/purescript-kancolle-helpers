@@ -1,0 +1,3 @@
+#!/bin/sh
+
+pulp --watch build  --censor-codes=ImplicitImport --censor-lib

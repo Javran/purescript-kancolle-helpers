@@ -21,6 +21,7 @@ import Data.Foreign
 import Data.Maybe
 
 import DamageVectorTests
+import DamageVector2Tests
 import UtilTests
 import BattleData
 import Base
@@ -173,6 +174,7 @@ unitTests ::  forall e. TestUnit e
 unitTests = do
     testExpeditionHelper
     testDamageVector
+    testDamageVector2    
     testDamageAnalyzer
     testExpeditionMinimal
     testRepairTime

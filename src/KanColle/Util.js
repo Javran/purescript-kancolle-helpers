@@ -23,4 +23,25 @@ exports.pokeSTArrayUnsafe = function (xs) {
 
 exports.jsonStringify = function (x) {
     return JSON.stringify(x);
-}
+};
+
+// level = 0 or 1
+exports.consoleMessage = function(level) {
+    return function (x) {
+        return function (k) {
+            if (level === 0) {
+                console.log(x);
+            } else if (level === 1) {
+                console.warn(x);
+            } else {
+                console.warn("Unknown level: " +level);
+                console.warn(x);
+            }
+            return k({});
+        };
+    };
+};
+
+exports.throwWith = function(o) {
+    throw o;
+};

@@ -6,11 +6,13 @@ module KanColle.DamageAnalysis.Damage
   , mergeDamage
   , addDamage
   , applyDamage
+  , damageToInt
   )
 where
 
 import Prelude
 import Data.Maybe
+import Data.Monoid
 import Data.Int as Int
 
 data DameCon
@@ -26,6 +28,18 @@ type Ship =
 
 -- a Damage modifies a ship's state properly
 newtype Damage = Damage (Ship -> Ship)
+
+damageToInt :: Damage -> Int
+damageToInt dmg = dummyShip.hp - afterShip.hp
+  where
+    dummyShip =
+      { hp: 10000
+      , fullHp: 10000
+      , sunk: false
+      , dameCon: Nothing
+      }
+      
+    afterShip = applyDamage dmg dummyShip
 
 -- apply DameCon to a Ship, regardless of ship's own DameCon setting
 applyDameCon :: DameCon -> Ship -> Ship
@@ -64,3 +78,9 @@ addDamage dmg v = dmg `mergeDamage` mkDamage v
 -- apply Damage to a Ship, DameCon will be used if applicable.
 applyDamage :: Damage -> Ship -> Ship
 applyDamage (Damage f) = f
+
+instance semigroupDamage :: Semigroup Damage where
+   append = mergeDamage
+
+instance monoidDamage :: Monoid Damage where
+   mempty = Damage id
