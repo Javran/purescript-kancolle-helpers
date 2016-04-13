@@ -11,6 +11,7 @@ import Data.Monoid
 
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
+import Test.Unit.Assert as Assert
 
 import Base
 import BattleData
@@ -23,25 +24,25 @@ dvToStr (DV dv) = Str.joinWith "," (map show fD) <> " -- "
     fD = slice 1 7 dv
     eD = slice 7 13 dv
 
-testDamageVector :: forall e. MyTest e
+testDamageVector :: forall e. TestUnit e
 testDamageVector = do
     test "DamageVector: first aerial battle stage" do
-      assert "sample battle1" $
+      Assert.assert "sample battle1" $
           "0,0,0,4,0,0 -- 0,0,21,0,164,0" == dvToStr (koukuDV (unsafeFromForeign battle1))
-      assert "sample battle2" $
+      Assert.assert "sample battle2" $
           dvToStr mempty == dvToStr (koukuDV (unsafeFromForeign battle2))
-      assert "sample aerialBattle1" $
+      Assert.assert "sample aerialBattle1" $
           dvToStr mempty == dvToStr (koukuDV (unsafeFromForeign aerialBattle1))
-      assert "sample withSupportExpedition1" $
+      Assert.assert "sample withSupportExpedition1" $
           "15,0,0,7,8,0 -- 55,0,0,0,0,0"
               == dvToStr (koukuDV (unsafeFromForeign withSupportExpedition1))
     test "DamageVector: support fleet attack stage" do
       let dvF = supportAirAttackDV <> supportHouraiDV
-      assert "sample battle1" $
+      Assert.assert "sample battle1" $
           dvToStr mempty == dvToStr (dvF (unsafeFromForeign battle1))
-      assert "sample withSupportExpedition1" $
+      Assert.assert "sample withSupportExpedition1" $
           "0,0,0,0,0,0 -- 0,29,0,0,101,0"
               == dvToStr (dvF (unsafeFromForeign withSupportExpedition1))
-      assert "sample withSupportExpedition2" $
+      Assert.assert "sample withSupportExpedition2" $
           "0,0,0,0,0,0 -- 0,70,20,132,40,0"
               == dvToStr (dvF (unsafeFromForeign withSupportExpedition2))

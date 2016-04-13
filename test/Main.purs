@@ -3,7 +3,7 @@ module Test.Main where
 import Prelude
 import Control.Monad.Eff.Console
 import Test.Unit
-import Test.Unit.Console (TestOutput(..))
+import Test.Unit.Console (TESTOUTPUT(..))
 import Data.Array
 import Data.Foldable
 import Control.Monad.Eff
@@ -25,6 +25,7 @@ import UtilTests
 import BattleData
 import Base
 import qualified Test.QuickCheck as QC
+import Test.Unit.Assert
 
 
 eqFleetReq :: FleetRequirement -> FleetRequirement -> Boolean
@@ -167,18 +168,17 @@ testRepairTime = do
       assert "sample 5" $ facilityInSec CV 79 73 79 == hhmmss 2 0 0
       assert "sample with full HP" $ facilityInSec AR 46 45 45 == 0
 
-unitTests ::  forall e. Eff (testOutput :: TestOutput | e) Unit
-unitTests =
-    runTest $ do
-        testExpeditionHelper
-        testDamageVector
-        testDamageAnalyzer
-        testExpeditionMinimal
-        testRepairTime
+unitTests ::  forall e. TestUnit e
+unitTests = do
+    testExpeditionHelper
+    testDamageVector
+    testDamageAnalyzer
+    testExpeditionMinimal
+    testRepairTime
 
 main = do
   qcTestUtils
   -- NOTE: make sure to run "unitTests" after every other
   -- tests are done, for now everything after it doesn't
   -- seem to be executed
-  unitTests
+  runTest unitTests

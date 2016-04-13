@@ -5,4 +5,4 @@ import Test.Unit.Console hiding (print)
 
 -- basic test facilities
 
-type MyTest e = Test (testOutput :: TestOutput | e)
+type MyTest e = TestUnit e
