@@ -12,6 +12,7 @@ install:
   - npm install pulp
   - npm install uglify-js
   - npm install bower
+  - npm install benchmark
   - npm install purescript-psa
   - bower install
 script:
