@@ -10,6 +10,9 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Control.Foldl as Fold
 import qualified Data.List as L
+import Text.Printf
+import Data.List hiding (find, stripPrefix)
+import Data.Function
 
 -- | guess project home directory
 --   make sure to run this somewhere under the project home
@@ -24,6 +27,12 @@ guessProjectHome fPath = do
 toText' :: FilePath -> T.Text
 toText' = either id id . toText
 
+showEnv :: IO ()
+showEnv = do
+    xs <- env
+    let ys = sortBy (compare `on` fst) xs
+    mapM_ (\(k,v) -> Text.Printf.printf "%s=%s\n" (T.unpack k) (T.unpack v)) ys
+
 main :: IO ()
 main = do
     cwd <- pwd
@@ -33,6 +42,13 @@ main = do
     let uglifyJsBin = fromText npmBin </> "uglifyjs"
     True <- testfile uglifyJsBin
     putStrLn $ "Found uglifyjs in: " <> encodeString uglifyJsBin
+
+    (ExitSuccess,pscLoc) <- shellStrict "which psc" empty
+    (ExitSuccess,pscVer) <- shellStrict "psc --version" empty
+    liftIO $ do
+        putStrLn $ "psc location: " ++ T.unpack pscLoc
+        putStrLn $ "psc version: " ++ T.unpack pscVer
+
     let buildDir = prjHome
         srcDir' = prjHome </> "src/" -- for stripping prefix
     cd buildDir
