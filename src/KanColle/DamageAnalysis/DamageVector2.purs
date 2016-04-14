@@ -16,7 +16,7 @@ import Data.Foreign
 import Data.Foldable
 import KanColle.KCAPI.Battle
 import Data.Maybe
-
+import Data.String (joinWith)
 -- when flagship protection happens
 -- and extra 0.1 will be added to that value
 -- for our purpose we don't need to deal with that
@@ -24,6 +24,7 @@ import Data.Maybe
 normalizeDamage :: Number -> Int
 normalizeDamage x
   | x >= 0.0 = Int.floor x
+  | x == (-1.0) = 0
   | otherwise =
     let warning = "invalid damage number: " <> show x
     in traceWarn warning (\_ -> 0)
@@ -40,6 +41,10 @@ instance semigroupDamageVector2 :: Semigroup DamageVector2 where
 
 instance monoidDamageVector2 :: Monoid DamageVector2 where
   mempty = DV2 (A.replicate 12 mempty)
+
+
+debugShowDV :: DamageVector2 -> String
+debugShowDV (DV2 xs) = joinWith "," (map (show <<< damageToInt) xs)
 
 -- | get `DamageVector2` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: forall a.
@@ -95,7 +100,7 @@ calcHougekiDamage h =
         toOne :: Array Int -> Int
         toOne xs = case A.uncons xs of
           Just {head: y, tail: ys} ->
-            if all (\v -> v == y) ys
+            if all (\v -> v == y) ys || all (\v -> v == -1) ys
               then y - 1
               else throwWith "invalid: elements are different in api_df_list"
           Nothing -> throwWith "invalid: empty api_df_list element"
@@ -121,7 +126,7 @@ calcHougekiDamage h =
         pure unit
     resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
     resultDV = do
-        arr <- STA.thaw mempty
+        arr <- STA.thaw (A.replicate 12 mempty)
         A.zipWithA (accumulateDamage arr) eventTargets eventDamages
         pure arr
         

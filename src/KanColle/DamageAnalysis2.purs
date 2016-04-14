@@ -30,7 +30,7 @@ type CombinedFleetInfo a =
   , escort :: FleetInfo a
   , enemy :: FleetInfo a
   }
-
+  
 getShipResult :: Ship -> Ship -> ShipResult
 getShipResult sBefore sAfter =
   { hp: sAfter.hp
@@ -165,3 +165,40 @@ applyCombinedDamageVector (CDV cdv) xs =
     fleetInfo3 = {main: replicate 6 Nothing, enemy: phaseResult2Enemy}
     phaseResult3 = applyDamageVector cdv.support fleetInfo3
     phaseResult3Enemy = phaseResult3.enemy
+    
+analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector2)
+                -> Array (Maybe DameCon) 
+                -> Battle
+                -> CombinedFleetInfo ShipResult
+analyzeCombinedBattleBy getDV ds battle =
+    { main: zipWith getShipResult' initFleet.main finalFleet.main
+    , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
+    , escort: zipWith getShipResult' initFleet.escort finalFleet.escort
+    }
+  where
+    initFleet = getInitFleetCombined ds battle
+    finalFleet = applyCombinedDamageVector (getDV battle) initFleet
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+
+analyzeSTFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
+analyzeSTFBattle = analyzeCombinedBattleBy battleSurfaceTaskForceDV
+
+analyzeCTFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
+analyzeCTFBattle = analyzeCombinedBattleBy battleCarrierTaskForceDV
+
+analyzeTECFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
+analyzeTECFBattle = analyzeCTFBattle
+
+analyzeCombinedNightBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipResult
+analyzeCombinedNightBattle ds b =
+    { main: zipWith getShipResult' initFleet.main finalFleet.main
+    , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
+    }
+  where
+    nightBattleInfo = getInitFleetCombined (replicate 6 Nothing <> ds) b
+    initFleet = 
+      { main: nightBattleInfo.escort
+      , enemy: nightBattleInfo.enemy
+      }
+    finalFleet = applyDamageVector (nightBattleDV b) initFleet
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2

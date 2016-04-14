@@ -176,6 +176,7 @@ unitTests = do
     testDamageVector
     testDamageVector2    
     testDamageAnalyzer
+    testDamageAnalyzer2
     testExpeditionMinimal
     testRepairTime
 
