@@ -19,6 +19,13 @@ import KanColle.Util
 data DameCon
   = RepairTeam
   | RepairGoddess
+  
+derive instance eqDameCon :: Eq DameCon
+
+instance showDameCon :: Show DameCon where
+  show c = case c of
+      RepairTeam -> "RepairTeam"
+      RepairGoddess -> "RepairGoddess"
 
 type Ship =
   { hp :: Int

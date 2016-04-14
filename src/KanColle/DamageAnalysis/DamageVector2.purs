@@ -140,6 +140,10 @@ calcSupportHouraiDamage info = DV2 $
     
 data FleetRole = FRMain | FREscort | FRSupport
 
+-- current format:
+-- * main: main vs enemy
+-- * escort: escort vs enemy
+-- * support: support vs enemy
 newtype CombinedDamageVector2 = CDV
   { main    :: DamageVector2
   , escort  :: DamageVector2

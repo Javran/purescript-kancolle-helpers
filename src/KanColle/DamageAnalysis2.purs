@@ -149,6 +149,9 @@ applyCombinedDamageVector (CDV cdv) xs =
     , enemy: phaseResult3Enemy
     }
   where
+    -- TODO: damages are not applied to enemy ships in the correct order
+    -- but for our purpose this doesn't matter for now..
+
     -- phase 1: main fleet & enemy
     fleetInfo1 = {main: xs.main, enemy: xs.enemy}
     phaseResult1 = applyDamageVector cdv.main fleetInfo1
