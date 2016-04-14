@@ -17,6 +17,8 @@ import qualified Data.Array.Unsafe as AU
 type Battle =
   { api_nowhps :: Array Int
   , api_nowhps_combined :: Array Int
+  , api_maxhps :: Array Int
+  , api_maxhps_combined :: Array Int
   , api_stage_flag :: Array Int
   , api_stage_flag2 :: Array Int
   , api_kouku :: Kouku
@@ -64,18 +66,22 @@ type SupportInfo =
   { api_support_airatack :: SupportAirInfo
   , api_support_hourai :: SupportHouraiInfo
   }
+  
+fromRawHp :: Int -> Maybe Int
+fromRawHp -1 = Nothing
+fromRawHp v = Just v
 
 getInitHps :: Battle -> Array (Maybe Int)
 getInitHps b = map fromRawHp b.api_nowhps
-  where
-    fromRawHp -1 = Nothing
-    fromRawHp v = Just v
 
 getInitHpsCombined :: Battle -> Array (Maybe Int)
 getInitHpsCombined b = map fromRawHp b.api_nowhps_combined
-  where
-    fromRawHp -1 = Nothing
-    fromRawHp v = Just v
+
+getMaxHps :: Battle -> Array (Maybe Int)
+getMaxHps b = map fromRawHp b.api_maxhps
+
+getMaxHpsCombined :: Battle -> Array (Maybe Int)
+getMaxHpsCombined b = map fromRawHp b.api_maxhps_combined
 
 hasField :: String -> Battle -> Boolean
 hasField s = hasOwnProperty s <<< toForeign
