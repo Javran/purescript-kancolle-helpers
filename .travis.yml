@@ -12,6 +12,8 @@ install:
   - npm install pulp
   - npm install uglify-js
   - npm install bower
+  - npm install purescript-psa
   - bower install
 script:
+  - pulp build  --censor-codes=ImplicitImport --censor-lib
   - pulp test
