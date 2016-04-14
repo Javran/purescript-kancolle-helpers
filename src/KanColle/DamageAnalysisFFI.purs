@@ -17,7 +17,7 @@ readDameCon = map convert
     convert :: Int -> Maybe DameCon
     convert 0 = Nothing
     convert 1 = Just RepairTeam
-    convert 2 = Just RepairGodness
+    convert 2 = Just RepairGoddess
     convert x = throwWith ("readDameCon: invalid input: " <> show x)
 
 dc6 :: Array (Maybe DameCon)

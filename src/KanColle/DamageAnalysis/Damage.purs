@@ -18,7 +18,7 @@ import KanColle.Util
 
 data DameCon
   = RepairTeam
-  | RepairGodness
+  | RepairGoddess
 
 type Ship =
   { hp :: Int
@@ -46,7 +46,7 @@ damageToInt dmg = dummyShip.hp - afterShip.hp
 applyDameCon :: DameCon -> Ship -> Ship
 applyDameCon dc s = case dc of
     RepairTeam -> s1 {hp = Int.floor (0.2 * Int.toNumber s.fullHp)}
-    RepairGodness -> s1 {hp = s.fullHp}
+    RepairGoddess -> s1 {hp = s.fullHp}
   where
     s1 = s {sunk = false, dameCon = Nothing}
 
