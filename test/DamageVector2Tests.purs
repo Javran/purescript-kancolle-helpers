@@ -10,12 +10,14 @@ import Data.Array
 import Data.Monoid
 import Data.Maybe
 import Data.Function
+import KanColle.Util
 import KanColle.DamageAnalysisFFI
 import KanColle.DamageAnalysis2
 import KanColle.DamageAnalysis.DamageVector2
 import KanColle.DamageAnalysis.Stages2
 import KanColle.DamageAnalysis.Damage
 import Test.Unit.Assert as Assert
+import Data.Foldable
 
 import Base
 import BattleData
@@ -27,6 +29,27 @@ dvToStr (DV2 dv) = Str.joinWith "," (map (damageToInt >>> show) fD) <> " -- "
   where
     fD = slice 0 6 dv
     eD = slice 6 12 dv
+
+testDameCon :: forall e. TestUnit e
+testDameCon = do
+   test "Damage: without damecon" do
+      Assert.equal (1-20) (applyDamage (mkDamage 20) (mkShip 1 21 Nothing)).hp
+   test "Damage: with repair team" do
+      let ship = (applyDamage (mkDamage 20) (mkShip 1 21 $ Just RepairTeam))
+      Assert.equal 4 ship.hp
+      Assert.equal Nothing ship.dameCon
+   test "Damage: with repair goddess" do
+      Assert.equal 21 (applyDamage (mkDamage 20) (mkShip 1 21 $ Just RepairGoddess)).hp
+   test "Damage: chained damage" do
+      -- 21/21 -> -20 -> 1/21 -> -30 -> -29/21 (sinking) -> damecon consumed 21/21 -> -20 -> 1/21
+      Assert.equal 1 (applyDamage (foldMap mkDamage [20,30,20]) (mkShip 21 21 $ Just RepairGoddess)).hp
+  where
+    mkShip hp fullHp dc =
+        { fullHp: fullHp
+        , hp: hp
+        , sunk: hp <= 0
+        , dameCon: dc
+        }
 
 testDamageVector2 :: forall e. TestUnit e
 testDamageVector2 = do
@@ -74,7 +97,11 @@ testDamageAnalyzer2 =
       Assert.assert "ld aerial battle sample 1" $
         (merge >>> trimInfo) (analyzeBattle dc6 (unsafeFromForeign ldAerialBattle1)) ==
           map toMaybeInt [31,56,56,42,33,29,500,9999,9999,9999,9999,9999]
+      Assert.assert "night battle repair team sample 1" $
+        (merge >>> trimInfo) (analyzeNightBattle repairTeam (unsafeFromForeign nightBattleWithDameCon1)) ==
+          map toMaybeInt [90,25, 13{- sinking: 22-22 = 0 -},35-27-6,26,12, 133,0,146-45-64,0,0,34]
   where
+    repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
     merge x = x.main <> x.enemy
     trimInfo :: forall a. Array (Maybe { hp :: Int | a}) -> Array (Maybe Int)

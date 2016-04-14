@@ -173,6 +173,7 @@ testRepairTime = do
 unitTests ::  forall e. TestUnit e
 unitTests = do
     testExpeditionHelper
+    testDameCon
     testDamageVector
     testDamageVector2    
     testDamageAnalyzer

@@ -23,7 +23,7 @@ dvToStr (DV dv) = Str.joinWith "," (map show fD) <> " -- "
   where
     fD = slice 1 7 dv
     eD = slice 7 13 dv
-
+    
 testDamageVector :: forall e. TestUnit e
 testDamageVector = do
     test "DamageVector: first aerial battle stage" do
