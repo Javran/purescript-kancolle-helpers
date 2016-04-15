@@ -1,5 +1,22 @@
 module KanColle.DamageAnalysis.DamageVector
-where
+  ( DamageVector, getDV, mkDV
+
+  , NormalDamageVector, CombinedDamageVector
+  , FleetRole(..)
+
+  , calcKoukuDamage
+  , calcKoukuDamageCombined
+  , calcSupportAirAttackDamage
+  , calcSupportHouraiDamage
+  , calcHougekiDamage
+  , calcRaigekiDamage
+
+  , toCombined
+  
+  , applyDamageVector
+  , applyNormalDamageVector
+  , applyCombinedDamageVector
+  ) where
 
 import Prelude
 import Data.Monoid
@@ -10,6 +27,7 @@ import Control.Monad.Eff
 import Control.Monad.ST as ST
 import Data.Array.Unsafe as AU
 import KanColle.Util
+import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Damage
 
 import Data.Foreign
@@ -32,57 +50,37 @@ normalizeDamage x
 -- | `DamageVector` is an array of Damages
 -- |  satisfies the following properties
 -- | * `length x == 6`
-newtype DamageVector = DV2 (Array Damage)
+newtype DamageVector = DV (Array Damage)
+
+getDV :: DamageVector -> Array Damage
+getDV (DV v) = v
+
+mkDV :: Array Damage -> DamageVector
+mkDV xs = if check 
+    then DV xs
+    else throwWith "mkDV: array size should be 6"
+  where
+    check = A.length xs == 6
 
 instance semigroupDamageVector :: Semigroup DamageVector where
-  append (DV2 a) (DV2 b) = DV2 (A.zipWith (<>) a b)
+  append (DV a) (DV b) = DV (A.zipWith (<>) a b)
 
 instance monoidDamageVector :: Monoid DamageVector where
-  mempty = DV2 (A.replicate 6 mempty)
-
-type NormalBattle a =
-  { main :: a, enemy :: a }
-
-type CombinedBattle a =
-  { main :: a, escort :: a, enemy :: a}
- 
--- pure
-dupAsNormalBattle :: forall a. a -> NormalBattle a
-dupAsNormalBattle v = { main: v, enemy: v }
-
--- applicative
-appNormalBattle :: forall a b. NormalBattle (a -> b) -> NormalBattle a -> NormalBattle b
-appNormalBattle f a = { main: f.main a.main, enemy: f.enemy a.enemy }
-
--- pure
-dupAsCombinedBattle :: forall a. a -> CombinedBattle a
-dupAsCombinedBattle v = { main: v, escort: v, enemy: v }
-
--- applicative
-appCombinedBattle :: forall a b. CombinedBattle (a -> b) -> CombinedBattle a -> CombinedBattle b
-appCombinedBattle f a = { main: f.main a.main
-                        , escort: f.escort a.escort
-                        , enemy: f.enemy a.enemy }
-
-normalBattleMap :: forall a b. (a -> b) -> NormalBattle a -> NormalBattle b
-normalBattleMap f x = { main: f x.main, enemy: f x.enemy }
-
-combinedBattleMap :: forall a b. (a -> b) -> CombinedBattle a -> CombinedBattle b
-combinedBattleMap f x = { main: f x.main, escort: f x.escort, enemy: f x.enemy }
+  mempty = DV (A.replicate 6 mempty)
 
 type NormalDamageVector = NormalBattle DamageVector
 type CombinedDamageVector = CombinedBattle DamageVector
 
 debugShowDV :: DamageVector -> String
-debugShowDV (DV2 xs) = joinWith "," (map (show <<< damageToInt) xs)
+debugShowDV (DV xs) = joinWith "," (map (show <<< damageToInt) xs)
 
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: forall a.
                 { api_fdam :: Array Number
                 , api_edam :: Array Number | a} -> LR DamageVector
 fromFDamAndEDam v =
-    { left: DV2 (convertFEDam v.api_fdam)
-    , right: DV2 (convertFEDam v.api_edam) }
+    { left: DV (convertFEDam v.api_fdam)
+    , right: DV (convertFEDam v.api_edam) }
 
 -- (internal)
 -- an "-1" is put in front of both api_fdam and api_edam
@@ -98,7 +96,7 @@ calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 -- | calculate damage from kouku (aerial) stages (combined fleet)
 -- | note that only escort fleet is taking damage. so we just need DamageVector
 calcKoukuDamageCombined :: Kouku -> DamageVector
-calcKoukuDamageCombined kk = DV2 (convertFEDam (kk.api_stage3_combined.api_fdam))
+calcKoukuDamageCombined kk = DV (convertFEDam (kk.api_stage3_combined.api_fdam))
 
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> LR DamageVector
@@ -108,7 +106,7 @@ calcHougekiDamage :: Hougeki -> LR DamageVector
 calcHougekiDamage h =
     if lengthCheck
       then let resultArr = runPure (STA.runSTArray resultDV)
-           in lrMap DV2 (fleetSplit false resultArr)
+           in lrMap DV (fleetSplit false resultArr)
       else throwWith "invalid: api_df_list and api_damage length mismatch"
   where
     cAI :: Foreign -> Array Int
@@ -162,11 +160,11 @@ calcHougekiDamage h =
 
 -- only on enemy
 calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
-calcSupportAirAttackDamage info = DV2 $ convertFEDam info.api_stage3.api_edam
+calcSupportAirAttackDamage info = DV $ convertFEDam info.api_stage3.api_edam
 
 -- only on enemy
 calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
-calcSupportHouraiDamage info = DV2 $ convertFEDam info.api_damage
+calcSupportHouraiDamage info = DV $ convertFEDam info.api_damage
 
 data FleetRole = FRMain | FREscort | FRSupport
 
@@ -175,3 +173,21 @@ toCombined r dv = case r of
     FRMain    -> { main: dv.left, escort: mempty, enemy: dv.right }
     FREscort  -> { main: mempty, escort: dv.left, enemy: dv.right }
     FRSupport -> { main: mempty, escort: mempty, enemy: dv.right }
+
+applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
+applyDamageVector dv fleet = A.zipWith combine (getDV dv) fleet
+  where
+    combine :: Damage -> Maybe Ship -> Maybe Ship
+    combine dmg ms = applyDamage dmg <$> ms
+
+applyNormalDamageVector :: NormalDamageVector -> NormalFleetInfo Ship -> NormalFleetInfo Ship
+applyNormalDamageVector ndv fleet =
+    dupAsNormalBattle applyDamageVector
+      `appNormalBattle` ndv 
+      `appNormalBattle` fleet
+      
+applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo Ship -> CombinedFleetInfo Ship
+applyCombinedDamageVector ndv fleet =
+    dupAsCombinedBattle applyDamageVector
+      `appCombinedBattle` ndv 
+      `appCombinedBattle` fleet

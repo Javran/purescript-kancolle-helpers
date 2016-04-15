@@ -10,61 +10,13 @@ import KanColle.Util
 import KanColle.DamageAnalysis.Damage
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
+import KanColle.DamageAnalysis.Types
 
-type ShipResult =
-  { hp :: Int
-  , sunk :: Boolean
-  , dameConConsumed :: Boolean
-  }
-
--- invariant: the length is always 6
-type FleetInfo a = Array (Maybe a)
-
-type NormalFleetInfo a = NormalBattle (FleetInfo a)
-  
-type CombinedFleetInfo a = CombinedBattle (FleetInfo a)
-  
-applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
-applyDamageVector (DV2 dv) fleet = zipWith combine dv fleet
-  where
-    combine :: Damage -> Maybe Ship -> Maybe Ship
-    combine dmg ms = applyDamage dmg <$> ms
-
-applyNormalDamageVector :: NormalDamageVector -> NormalFleetInfo Ship -> NormalFleetInfo Ship
-applyNormalDamageVector ndv fleet =
-    dupAsNormalBattle applyDamageVector
-      `appNormalBattle` ndv 
-      `appNormalBattle` fleet
-      
-applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo Ship -> CombinedFleetInfo Ship
-applyCombinedDamageVector ndv fleet =
-    dupAsCombinedBattle applyDamageVector
-      `appCombinedBattle` ndv 
-      `appCombinedBattle` fleet
-
-getShipResult :: Ship -> Ship -> ShipResult
-getShipResult sBefore sAfter =
-  { hp: sAfter.hp
-  , sunk: sAfter.sunk
-  , dameConConsumed: 
-      isJust sBefore.dameCon && isNothing sAfter.dameCon
-  }
-  
 rawSplit :: forall a. Array a -> {left :: Array a, right :: Array a}
-rawSplit raws = if check
-    then { left: slice 1 7 raws
-         , right: slice 7 13 raws }
-    else throwWith "rawSplit: input array length should be 13"
-  where
-    check = length raws == 13
+rawSplit = fleetSplit true
     
 normalSplit :: forall a. Array a -> {left :: Array a, right :: Array a}
-normalSplit raws = if check
-    then { left: slice 0 6 raws
-         , right: slice 6 12 raws }
-    else throwWith "normalSplit: input array length should be 12"
-  where
-    check = length raws == 12
+normalSplit = fleetSplit false
 
 -- get initial fleet info
 getInitFleet :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo Ship
@@ -125,28 +77,28 @@ analyzeBattleBy :: (Battle -> NormalDamageVector)
                 -> Array (Maybe DameCon) 
                 -> Battle
                 -> NormalFleetInfo ShipResult
-analyzeBattleBy getDV ds battle =
+analyzeBattleBy getDVFromBattle ds battle =
     { main: zipWith getShipResult' initFleet.main finalFleet.main
     , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
     }
   where
     initFleet = getInitFleet ds battle
     finalFleet :: NormalFleetInfo Ship
-    finalFleet = applyNormalDamageVector (getDV battle) initFleet
+    finalFleet = applyNormalDamageVector (getDVFromBattle battle) initFleet
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
 
 analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector)
                 -> Array (Maybe DameCon) 
                 -> Battle
                 -> CombinedFleetInfo ShipResult
-analyzeCombinedBattleBy getDV ds battle =
+analyzeCombinedBattleBy getDVFromBattle ds battle =
     { main: zipWith getShipResult' initFleet.main finalFleet.main
     , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
     , escort: zipWith getShipResult' initFleet.escort finalFleet.escort
     }
   where
     initFleet = getInitFleetCombined ds battle
-    finalFleet = applyCombinedDamageVector (getDV battle) initFleet
+    finalFleet = applyCombinedDamageVector (getDVFromBattle battle) initFleet
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
 
 analyzeSTFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult

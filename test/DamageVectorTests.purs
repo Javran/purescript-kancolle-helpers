@@ -16,6 +16,7 @@ import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 import KanColle.DamageAnalysis.Damage
+import KanColle.DamageAnalysis.Types
 import Test.Unit.Assert as Assert
 import Data.Foldable
 
@@ -23,7 +24,7 @@ import Base
 import BattleData
 
 dvToStr :: DamageVector -> String
-dvToStr (DV2 dv) = Str.joinWith "," $ map (damageToInt >>> show) dv
+dvToStr dv = Str.joinWith "," $ map (damageToInt >>> show) (getDV dv)
 
 ndvToStr :: LR DamageVector -> String
 ndvToStr ndv = dvToStr ndv.left <> " -- " <> dvToStr ndv.right

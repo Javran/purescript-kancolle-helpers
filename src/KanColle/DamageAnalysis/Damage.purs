@@ -1,7 +1,5 @@
 module KanColle.DamageAnalysis.Damage
-  ( DameCon(..)
-  , Ship
-  , Damage
+  ( Damage
   , mkDamage
   , mergeDamage 
   , addDamage
@@ -14,24 +12,7 @@ import Prelude
 import Data.Maybe
 import Data.Monoid
 import Data.Int as Int
-
-data DameCon
-  = RepairTeam
-  | RepairGoddess
-  
-derive instance eqDameCon :: Eq DameCon
-
-instance showDameCon :: Show DameCon where
-  show c = case c of
-      RepairTeam -> "RepairTeam"
-      RepairGoddess -> "RepairGoddess"
-
-type Ship =
-  { hp :: Int
-  , fullHp :: Int
-  , sunk :: Boolean
-  , dameCon :: Maybe DameCon
-  }
+import KanColle.DamageAnalysis.Types
 
 -- a Damage modifies a ship's state properly
 newtype Damage = Damage (Ship -> Ship)

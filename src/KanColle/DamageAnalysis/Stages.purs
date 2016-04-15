@@ -1,4 +1,15 @@
-module KanColle.DamageAnalysis.Stages where
+module KanColle.DamageAnalysis.Stages
+  ( koukuDV
+  , koukuCombinedDV
+  , battleDV
+  , nightBattleDV
+  , supportAirAttackDV
+  , supportHouraiDV
+  
+  , battleCarrierTaskForceDV
+  , battleSurfaceTaskForceDV
+  
+  ) where
 
 import Prelude
 import Data.Maybe
@@ -8,76 +19,63 @@ import Data.Foldable
 import KanColle.KCAPI.Battle
 import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
+import KanColle.DamageAnalysis.Types
 
-mkDV :: forall a b. (Battle -> Maybe a) -> b -> (a -> b) -> Battle -> b
-mkDV getData z calc b = maybe z calc (getData b)
+connectDV :: forall a b. (Battle -> Maybe a) -> b -> (a -> b) -> Battle -> b
+connectDV getData z calc b = maybe z calc (getData b)
 
-memptyLR :: forall m. Monoid m => LR m
-memptyLR = {left: mempty, right: mempty}
-
-lrAppend :: forall m. Monoid m => LR m -> LR m -> LR m
-lrAppend a b = { left: a.left <> b.left, right: a.right <> b.right }
-
-lrOnlyLeft :: forall m. Monoid m => m -> LR m
-lrOnlyLeft l = { left: l, right: mempty }
-
-lrOnlyRight :: forall m. Monoid m => m -> LR m
-lrOnlyRight r = { left: mempty, right: r }
 
 -- | get `DamageVector` of kouku stage from battle data
 -- | all the names in this module are kept consistent with functions in
 -- | `KanColle.DamageAnalysis.DamageVector`.
 koukuDV :: Battle -> LR DamageVector
-koukuDV = mkDV getKouku memptyLR calcKoukuDamage
+koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 
 koukuCombinedDV :: Battle -> DamageVector
-koukuCombinedDV = mkDV getKouku mempty calcKoukuDamageCombined
+koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
 
 kouku2CombinedDV :: Battle -> DamageVector
-kouku2CombinedDV = mkDV getKouku2 mempty calcKoukuDamageCombined
+kouku2CombinedDV = connectDV getKouku2 mempty calcKoukuDamageCombined
 
 supportAirAttackDV :: Battle -> DamageVector
-supportAirAttackDV = mkDV getSupportAirInfo mempty calcSupportAirAttackDamage
+supportAirAttackDV = connectDV getSupportAirInfo mempty calcSupportAirAttackDamage
 
 supportHouraiDV :: Battle -> DamageVector
-supportHouraiDV = mkDV getSupportHouraiInfo mempty calcSupportHouraiDamage
+supportHouraiDV = connectDV getSupportHouraiInfo mempty calcSupportHouraiDamage
 
 kouku2DV :: Battle -> LR DamageVector
-kouku2DV = mkDV getKouku2 memptyLR calcKoukuDamage
+kouku2DV = connectDV getKouku2 memptyLR calcKoukuDamage
 
 openingDV :: Battle -> LR DamageVector
-openingDV = mkDV getOpeningAttack memptyLR calcRaigekiDamage
+openingDV = connectDV getOpeningAttack memptyLR calcRaigekiDamage
 
 hougeki1DV :: Battle -> LR DamageVector
-hougeki1DV = mkDV getHougeki1 memptyLR calcHougekiDamage
+hougeki1DV = connectDV getHougeki1 memptyLR calcHougekiDamage
 
 hougeki2DV :: Battle -> LR DamageVector
-hougeki2DV = mkDV getHougeki2 memptyLR calcHougekiDamage
+hougeki2DV = connectDV getHougeki2 memptyLR calcHougekiDamage
 
 hougeki3DV :: Battle -> LR DamageVector
-hougeki3DV = mkDV getHougeki3 memptyLR calcHougekiDamage
+hougeki3DV = connectDV getHougeki3 memptyLR calcHougekiDamage
 
 raigekiDV :: Battle -> LR DamageVector
-raigekiDV = mkDV getRaigeki memptyLR calcRaigekiDamage
+raigekiDV = connectDV getRaigeki memptyLR calcRaigekiDamage
 
 -- specalized for Carrier Task Force
 hougeki1CTDV :: Battle -> LR DamageVector
-hougeki1CTDV = mkDV getHougeki1CT memptyLR calcHougekiDamage
+hougeki1CTDV = connectDV getHougeki1CT memptyLR calcHougekiDamage
 
 raigekiCTDV :: Battle -> LR DamageVector
-raigekiCTDV = mkDV getRaigekiCT memptyLR calcRaigekiDamage
+raigekiCTDV = connectDV getRaigekiCT memptyLR calcRaigekiDamage
 
 hougeki2CTDV :: Battle -> LR DamageVector
-hougeki2CTDV = mkDV getHougeki2CT memptyLR calcHougekiDamage
+hougeki2CTDV = connectDV getHougeki2CT memptyLR calcHougekiDamage
 
 hougeki3CTDV :: Battle -> LR DamageVector
-hougeki3CTDV = mkDV getHougeki3CT memptyLR calcHougekiDamage
+hougeki3CTDV = connectDV getHougeki3CT memptyLR calcHougekiDamage
 
 hougekiDV :: Battle -> LR DamageVector
-hougekiDV = mkDV getHougeki memptyLR calcHougekiDamage
-
-lrToNormal :: forall a. LR a -> NormalBattle a
-lrToNormal x = { main: x.left, enemy: x.right }
+hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
 
 -- | get `DamageVector` of a regular / aerial battle from battle data
 -- | a regular battle consists of the following stages:

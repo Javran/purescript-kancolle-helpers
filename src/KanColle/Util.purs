@@ -160,3 +160,15 @@ fleetSplit cutHead xs = if check
 
 lrMap :: forall a b. (a -> b) -> LR a -> LR b
 lrMap f x = { left: f x.left, right: f x.right }
+
+memptyLR :: forall m. Monoid m => LR m
+memptyLR = {left: mempty, right: mempty}
+
+lrAppend :: forall m. Monoid m => LR m -> LR m -> LR m
+lrAppend a b = { left: a.left <> b.left, right: a.right <> b.right }
+
+lrOnlyLeft :: forall m. Monoid m => m -> LR m
+lrOnlyLeft l = { left: l, right: mempty }
+
+lrOnlyRight :: forall m. Monoid m => m -> LR m
+lrOnlyRight r = { left: mempty, right: r }

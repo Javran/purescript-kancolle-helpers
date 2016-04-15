@@ -1,9 +1,19 @@
-module KanColle.DamageAnalysisFFI where
+module KanColle.DamageAnalysisFFI
+  ( analyzeBattleJS
+  , analyzeNightBattleJS
+  
+  , analyzeSTFBattleJS
+  , analyzeCTFBattleJS
+  , analyzeTECFBattleJS
+  , analyzeCombinedNightBattleJS
+  ) where
 
 import Prelude
 import KanColle.Util
 import KanColle.DamageAnalysis.Damage
 import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.Types
+import KanColle.DamageAnalysis.DamageVector
 import KanColle.KCAPI.Battle
 import Data.Maybe
 import Data.Array
@@ -19,24 +29,9 @@ readDameCon = map convert
     convert 2 = Just RepairGoddess
     convert x = throwWith ("readDameCon: invalid input: " <> show x)
 
-dc6 :: Array (Maybe DameCon)
-dc6 = replicate 6 Nothing
-
-dc12 :: Array (Maybe DameCon)
-dc12 = replicate 12 Nothing
-
 type FleetResult f = Array (f ShipResult)
-
-type BattleResult f =
-  { main :: FleetResult f
-  , enemy :: FleetResult f
-  }
-  
-type CombinedBattleResult f =
-  { main :: FleetResult f
-  , enemy :: FleetResult f
-  , escort :: FleetResult f
-  }
+type BattleResult f = NormalBattle (FleetResult f)
+type CombinedBattleResult f = CombinedBattle (FleetResult f)
   
 liftToFFI :: (Array (Maybe DameCon) -> Battle -> BattleResult Maybe)
           -> Fn2 (Array Int) Battle (BattleResult Nullable)
@@ -70,4 +65,3 @@ analyzeTECFBattleJS = liftToFFICombined analyzeTECFBattle
 
 analyzeCombinedNightBattleJS :: Fn2 (Array Int) Battle (BattleResult Nullable)
 analyzeCombinedNightBattleJS = liftToFFI analyzeCombinedNightBattle
-
