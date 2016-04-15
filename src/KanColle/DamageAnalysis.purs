@@ -7,7 +7,6 @@ import Data.Maybe
 import KanColle.KCAPI.Battle
 import KanColle.Util
 
-import KanColle.DamageAnalysis.Damage
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 import KanColle.DamageAnalysis.Types

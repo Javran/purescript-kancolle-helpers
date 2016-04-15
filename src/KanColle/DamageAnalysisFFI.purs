@@ -10,13 +10,10 @@ module KanColle.DamageAnalysisFFI
 
 import Prelude
 import KanColle.Util
-import KanColle.DamageAnalysis.Damage
 import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.Types
-import KanColle.DamageAnalysis.DamageVector
 import KanColle.KCAPI.Battle
 import Data.Maybe
-import Data.Array
 import Data.Function
 import Data.Nullable
 
