@@ -46,7 +46,7 @@ import Control.Monad.Eff
 import KanColle.Util
 
 testResult :: RemodelInfoMap
-testResult = collectRemodelInfo (unsafeFromForeign masterData)
+testResult = collectRemodelInfo masterData
 
 testResult2 :: RemodelGroupMap
 testResult2 = generateRemodelGroups testResult

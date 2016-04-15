@@ -2,29 +2,30 @@ module BattleData where
 
 import Prelude
 import Data.Foreign
+import KanColle.KCAPI.Battle
 
-foreign import battle1 :: Foreign
-foreign import battle2 :: Foreign
+foreign import battle1 :: Battle
+foreign import battle2 :: Battle
 
-foreign import nightBattle1 :: Foreign
-foreign import nightBattle2 :: Foreign
+foreign import nightBattle1 :: Battle
+foreign import nightBattle2 :: Battle
 
-foreign import aerialBattle1 :: Foreign
+foreign import aerialBattle1 :: Battle
 
-foreign import withSupportExpedition1 :: Foreign
-foreign import withSupportExpedition2 :: Foreign
+foreign import withSupportExpedition1 :: Battle
+foreign import withSupportExpedition2 :: Battle
 
-foreign import surfaceTaskForceBattle1 :: Foreign
-foreign import carrierTaskForceBattle1 :: Foreign
-foreign import carrierTaskForceBattle2 :: Foreign
-foreign import carrierTaskForceAirBattle1 :: Foreign
+foreign import surfaceTaskForceBattle1 :: Battle
+foreign import carrierTaskForceBattle1 :: Battle
+foreign import carrierTaskForceBattle2 :: Battle
+foreign import carrierTaskForceAirBattle1 :: Battle
 
-foreign import combinedFleetNightBattle1 :: Foreign
+foreign import combinedFleetNightBattle1 :: Battle
 
-foreign import surfaceTaskForceBattleWithSupport1 :: Foreign
+foreign import surfaceTaskForceBattleWithSupport1 :: Battle
 
-foreign import ldAerialBattle1 :: Foreign
-foreign import ldAerialBattle2 :: Foreign
+foreign import ldAerialBattle1 :: Battle
+foreign import ldAerialBattle2 :: Battle
 
-foreign import nightBattleWithDameCon1 :: Foreign
-foreign import normBattleWithDameCon1 :: Foreign
+foreign import nightBattleWithDameCon1 :: Battle
+foreign import normBattleWithDameCon1 :: Battle

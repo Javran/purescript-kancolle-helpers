@@ -1,5 +1,5 @@
 module MasterData where
 
-import Data.Foreign
+import KanColle.KCAPI.Master
 
-foreign import masterData :: Foreign
+foreign import masterData :: Master
