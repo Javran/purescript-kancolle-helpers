@@ -11,6 +11,7 @@ import Data.Traversable
 
 import Data.Maybe.Unsafe
 import Data.Array
+import Data.Array.Unsafe as AU
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
 import Data.Monoid
 import Data.Maybe
@@ -145,3 +146,22 @@ traceLog = consoleMessage 0
 
 traceWarn :: forall a b. a -> (Unit -> b) -> b
 traceWarn = consoleMessage 1
+
+type LR a =
+  { left :: a
+  , right :: a
+  }
+
+fleetSplit :: forall a. Boolean -> Array a -> LR (Array a)
+fleetSplit cutHead xs = if check
+    then { left: slice 0 6 ys
+         , right: slice 6 12 ys }
+    else throwWith "fleetSplit: array length need to be 12 (or 13 on raw)"
+  where
+    ys = if cutHead
+           then AU.tail xs
+           else xs
+    check = length ys == 12
+
+lrMap :: forall a b. (a -> b) -> LR a -> LR b
+lrMap f x = { left: f x.left, right: f x.right }

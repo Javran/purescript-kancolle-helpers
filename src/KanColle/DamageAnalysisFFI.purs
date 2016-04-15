@@ -71,3 +71,4 @@ analyzeTECFBattleJS = liftToFFICombined analyzeTECFBattle
 
 analyzeCombinedNightBattleJS :: Fn2 (Array Int) Battle (BattleResult Nullable)
 analyzeCombinedNightBattleJS = liftToFFI analyzeCombinedNightBattle
+

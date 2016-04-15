@@ -20,17 +20,28 @@ type ShipResult =
 -- invariant: the length is always 6
 type FleetInfo a = Array (Maybe a)
 
-type NormalFleetInfo a =
-  { main :: FleetInfo a
-  , enemy :: FleetInfo a
-  }
+type NormalFleetInfo a = NormalBattle (FleetInfo a)
   
-type CombinedFleetInfo a =
-  { main :: FleetInfo a
-  , escort :: FleetInfo a
-  , enemy :: FleetInfo a
-  }
+type CombinedFleetInfo a = CombinedBattle (FleetInfo a)
   
+applyDamageVector :: DamageVector2 -> FleetInfo Ship -> FleetInfo Ship
+applyDamageVector (DV2 dv) fleet = zipWith combine dv fleet
+  where
+    combine :: Damage -> Maybe Ship -> Maybe Ship
+    combine dmg ms = applyDamage dmg <$> ms
+
+applyNormalDamageVector :: NormalDamageVector -> NormalFleetInfo Ship -> NormalFleetInfo Ship
+applyNormalDamageVector ndv fleet =
+    dupAsNormalBattle applyDamageVector
+      `appNormalBattle` ndv 
+      `appNormalBattle` fleet
+      
+applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo Ship -> CombinedFleetInfo Ship
+applyCombinedDamageVector ndv fleet =
+    dupAsCombinedBattle applyDamageVector
+      `appCombinedBattle` ndv 
+      `appCombinedBattle` fleet
+
 getShipResult :: Ship -> Ship -> ShipResult
 getShipResult sBefore sAfter =
   { hp: sAfter.hp
@@ -110,7 +121,7 @@ analyzeBattle = analyzeBattleBy battleDV
 analyzeNightBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipResult
 analyzeNightBattle = analyzeBattleBy nightBattleDV
 
-analyzeBattleBy :: (Battle -> DamageVector2)
+analyzeBattleBy :: (Battle -> NormalDamageVector)
                 -> Array (Maybe DameCon) 
                 -> Battle
                 -> NormalFleetInfo ShipResult
@@ -120,56 +131,11 @@ analyzeBattleBy getDV ds battle =
     }
   where
     initFleet = getInitFleet ds battle
-    finalFleet = applyDamageVector (getDV battle) initFleet
+    finalFleet :: NormalFleetInfo Ship
+    finalFleet = applyNormalDamageVector (getDV battle) initFleet
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
 
-applyDamageVector :: DamageVector2
-                  -> NormalFleetInfo Ship
-                  -> NormalFleetInfo Ship
-applyDamageVector (DV2 dv) xs =
-    { main: applyDV xs.main allyDv
-    , enemy: applyDV xs.enemy enemyDv
-    }
-  where
-    splitted = normalSplit dv
-    allyDv = splitted.left
-    enemyDv = splitted.right
-
-    applyDV fleet dv = zipWith combine fleet dv
-      where
-        combine :: Maybe Ship -> Damage -> Maybe Ship
-        combine ms dmg = applyDamage dmg <$> ms
-        
-applyCombinedDamageVector :: CombinedDamageVector2
-                          -> CombinedFleetInfo Ship
-                          -> CombinedFleetInfo Ship
-applyCombinedDamageVector (CDV cdv) xs =
-    { main: phaseResult1Main
-    , escort: phaseResult2Escort
-    , enemy: phaseResult3Enemy
-    }
-  where
-    -- TODO: damages are not applied to enemy ships in the correct order
-    -- but for our purpose this doesn't matter for now..
-
-    -- phase 1: main fleet & enemy
-    fleetInfo1 = {main: xs.main, enemy: xs.enemy}
-    phaseResult1 = applyDamageVector cdv.main fleetInfo1
-    phaseResult1Main = phaseResult1.main
-    phaseResult1Enemy = phaseResult1.enemy
-    
-    -- phase 2: escort fleet & enemy
-    fleetInfo2 = {main: xs.escort, enemy: phaseResult1Enemy}
-    phaseResult2 = applyDamageVector cdv.escort fleetInfo2
-    phaseResult2Escort = phaseResult2.main
-    phaseResult2Enemy = phaseResult2.enemy
-    
-    -- phase 3: support fleet & enemy
-    fleetInfo3 = {main: replicate 6 Nothing, enemy: phaseResult2Enemy}
-    phaseResult3 = applyDamageVector cdv.support fleetInfo3
-    phaseResult3Enemy = phaseResult3.enemy
-    
-analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector2)
+analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector)
                 -> Array (Maybe DameCon) 
                 -> Battle
                 -> CombinedFleetInfo ShipResult
@@ -203,5 +169,6 @@ analyzeCombinedNightBattle ds b =
       { main: nightBattleInfo.escort
       , enemy: nightBattleInfo.enemy
       }
-    finalFleet = applyDamageVector (nightBattleDV b) initFleet
+    finalFleet :: NormalFleetInfo Ship
+    finalFleet = applyNormalDamageVector (nightBattleDV b) initFleet
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2

@@ -6,59 +6,78 @@ import Data.Monoid
 import Data.Foldable
 
 import KanColle.KCAPI.Battle
+import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector2
+
+mkDV :: forall a b. (Battle -> Maybe a) -> b -> (a -> b) -> Battle -> b
+mkDV getData z calc b = maybe z calc (getData b)
+
+memptyLR :: forall m. Monoid m => LR m
+memptyLR = {left: mempty, right: mempty}
+
+lrAppend :: forall m. Monoid m => LR m -> LR m -> LR m
+lrAppend a b = { left: a.left <> b.left, right: a.right <> b.right }
+
+lrOnlyLeft :: forall m. Monoid m => m -> LR m
+lrOnlyLeft l = { left: l, right: mempty }
+
+lrOnlyRight :: forall m. Monoid m => m -> LR m
+lrOnlyRight r = { left: mempty, right: r }
 
 -- | get `DamageVector` of kouku stage from battle data
 -- | all the names in this module are kept consistent with functions in
 -- | `KanColle.DamageAnalysis.DamageVector`.
-koukuDV :: Battle -> DamageVector2
-koukuDV = foldMap calcKoukuDamage <<< getKouku
+koukuDV :: Battle -> LR DamageVector2
+koukuDV = mkDV getKouku memptyLR calcKoukuDamage
 
 koukuCombinedDV :: Battle -> DamageVector2
-koukuCombinedDV = foldMap calcKoukuDamageCombined <<< getKouku
+koukuCombinedDV = mkDV getKouku mempty calcKoukuDamageCombined
 
 kouku2CombinedDV :: Battle -> DamageVector2
-kouku2CombinedDV = foldMap calcKoukuDamageCombined <<< getKouku2
+kouku2CombinedDV = mkDV getKouku2 mempty calcKoukuDamageCombined
 
 supportAirAttackDV :: Battle -> DamageVector2
-supportAirAttackDV = foldMap calcSupportAirAttackDamage <<< getSupportAirInfo
+supportAirAttackDV = mkDV getSupportAirInfo mempty calcSupportAirAttackDamage
 
 supportHouraiDV :: Battle -> DamageVector2
-supportHouraiDV = foldMap calcSupportHouraiDamage <<< getSupportHouraiInfo
+supportHouraiDV = mkDV getSupportHouraiInfo mempty calcSupportHouraiDamage
 
-kouku2DV :: Battle -> DamageVector2
-kouku2DV = foldMap calcKoukuDamage <<< getKouku2
+kouku2DV :: Battle -> LR DamageVector2
+kouku2DV = mkDV getKouku2 memptyLR calcKoukuDamage
 
-openingDV :: Battle -> DamageVector2
-openingDV = foldMap calcRaigekiDamage <<< getOpeningAttack
+openingDV :: Battle -> LR DamageVector2
+openingDV = mkDV getOpeningAttack memptyLR calcRaigekiDamage
 
-hougeki1DV :: Battle -> DamageVector2
-hougeki1DV = foldMap calcHougekiDamage <<< getHougeki1
+hougeki1DV :: Battle -> LR DamageVector2
+hougeki1DV = mkDV getHougeki1 memptyLR calcHougekiDamage
 
-hougeki2DV :: Battle -> DamageVector2
-hougeki2DV = foldMap calcHougekiDamage <<< getHougeki2
+hougeki2DV :: Battle -> LR DamageVector2
+hougeki2DV = mkDV getHougeki2 memptyLR calcHougekiDamage
 
-hougeki3DV :: Battle -> DamageVector2
-hougeki3DV = foldMap calcHougekiDamage <<< getHougeki3
+hougeki3DV :: Battle -> LR DamageVector2
+hougeki3DV = mkDV getHougeki3 memptyLR calcHougekiDamage
 
-raigekiDV :: Battle -> DamageVector2
-raigekiDV = foldMap calcRaigekiDamage <<< getRaigeki
+raigekiDV :: Battle -> LR DamageVector2
+raigekiDV = mkDV getRaigeki memptyLR calcRaigekiDamage
 
 -- specalized for Carrier Task Force
-hougeki1CTDV :: Battle -> DamageVector2
-hougeki1CTDV = foldMap calcHougekiDamage <<< getHougeki1CT
+hougeki1CTDV :: Battle -> LR DamageVector2
+hougeki1CTDV = mkDV getHougeki1CT memptyLR calcHougekiDamage
 
-raigekiCTDV :: Battle -> DamageVector2
-raigekiCTDV = foldMap calcRaigekiDamage <<< getRaigekiCT
+raigekiCTDV :: Battle -> LR DamageVector2
+raigekiCTDV = mkDV getRaigekiCT memptyLR calcRaigekiDamage
 
-hougeki2CTDV :: Battle -> DamageVector2
-hougeki2CTDV = foldMap calcHougekiDamage <<< getHougeki2CT
+hougeki2CTDV :: Battle -> LR DamageVector2
+hougeki2CTDV = mkDV getHougeki2CT memptyLR calcHougekiDamage
 
-hougeki3CTDV :: Battle -> DamageVector2
-hougeki3CTDV = foldMap calcHougekiDamage <<< getHougeki3CT
+hougeki3CTDV :: Battle -> LR DamageVector2
+hougeki3CTDV = mkDV getHougeki3CT memptyLR calcHougekiDamage
 
-hougekiDV :: Battle -> DamageVector2
-hougekiDV = foldMap calcHougekiDamage <<< getHougeki
+hougekiDV :: Battle -> LR DamageVector2
+hougekiDV = mkDV getHougeki memptyLR calcHougekiDamage
+
+lrToNormal :: forall a. LR a -> NormalBattle a
+lrToNormal x = { main: x.left, enemy: x.right }
 
 -- | get `DamageVector2` of a regular / aerial battle from battle data
 -- | a regular battle consists of the following stages:
@@ -70,49 +89,65 @@ hougekiDV = foldMap calcHougekiDamage <<< getHougeki
 -- | * `hougeki2` (second shelling stage)
 -- | * `hougeki3` (third shelling stage, always empty for now)
 -- | * `raigeki` (closing torpedo attack)
-battleDV :: Battle -> DamageVector2
-battleDV = mconcat [ koukuDV, kouku2DV
-                   , supportAirAttackDV, supportHouraiDV
+battleDV :: Battle -> NormalDamageVector
+battleDV = fconcat [ koukuDV, kouku2DV
+                   , supportAirAttackDV >>> lrOnlyRight
+                   , supportHouraiDV >>> lrOnlyRight
                    , openingDV
                    , hougeki1DV, hougeki2DV, hougeki3DV
                    , raigekiDV
-                   ]
+                   ] >>> lrToNormal
+                   
+fconcat :: Array (Battle -> LR DamageVector2) -> Battle -> LR DamageVector2
+fconcat xs b = foldl lrAppend memptyLR ((\f -> f b) <$> xs)
 
 -- | get `DamageVector2` of a night battle
 -- | a night battle involves only `hougeki` (shelling stage)
-nightBattleDV :: Battle -> DamageVector2
-nightBattleDV = hougekiDV
+nightBattleDV :: Battle -> NormalDamageVector
+nightBattleDV = hougekiDV >>> lrToNormal
 
-battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector2
-battleSurfaceTaskForceDV = mconcat
-    [ toCombined FRMain    <<< koukuDV
-    , toCombined FREscort  <<< koukuCombinedDV
-    , toCombined FRSupport <<< supportAirAttackDV
-    , toCombined FRSupport <<< supportHouraiDV
+memptyCombined :: forall m. Monoid m => CombinedBattle m
+memptyCombined = { main: mempty, escort: mempty, enemy: mempty }
+
+combinedAppend :: forall m. Monoid m => CombinedBattle m -> CombinedBattle m -> CombinedBattle m
+combinedAppend a b = { main: a.main <> b.main
+                     , escort: a.escort <> b.escort
+                     , enemy: a.enemy <> b.enemy
+                     }
+
+fconcat2 :: Array (Battle -> CombinedDamageVector) -> Battle -> CombinedDamageVector
+fconcat2 xs b = foldl combinedAppend memptyCombined ((\f -> f b) <$> xs)
+
+battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
+battleSurfaceTaskForceDV = fconcat2
+    [ koukuDV >>> toCombined FRMain
+    , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort
+    , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport
+    , supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport
     -- the following 2 for aerial battles
-    , toCombined FRMain    <<< kouku2DV
-    , toCombined FREscort  <<< kouku2CombinedDV
+    , kouku2DV >>> toCombined FRMain
+    , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
     -- the followings are for reguler battles
-    , toCombined FREscort  <<< openingDV
-    , toCombined FRMain    <<< hougeki1DV
-    , toCombined FRMain    <<< hougeki2DV
-    , toCombined FREscort  <<< hougeki3DV
-    , toCombined FREscort  <<< raigekiDV
+    , openingDV >>> toCombined FREscort
+    , hougeki1DV >>> toCombined FRMain
+    , hougeki2DV >>> toCombined FRMain
+    , hougeki3DV >>> toCombined FREscort
+    , raigekiDV >>> toCombined FREscort
     ]
 
-battleCarrierTaskForceDV :: Battle -> CombinedDamageVector2
-battleCarrierTaskForceDV = mconcat
-    [ toCombined FRMain    <<< koukuDV
-    , toCombined FREscort  <<< koukuCombinedDV
-    , toCombined FRSupport <<< supportAirAttackDV
-    , toCombined FRSupport <<< supportHouraiDV
+battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
+battleCarrierTaskForceDV = fconcat2
+    [  koukuDV >>> toCombined FRMain    
+    ,  koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
+    ,  supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport 
+    ,  supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport 
     -- the following 2 for aerial battles
-    , toCombined FRMain    <<< kouku2DV
-    , toCombined FREscort  <<< kouku2CombinedDV
+    ,  kouku2DV >>> toCombined FRMain    
+    ,  kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
     -- the followings are for regular battles
-    , toCombined FREscort  <<< openingDV
-    , toCombined FREscort  <<< hougeki1CTDV
-    , toCombined FREscort  <<< raigekiCTDV
-    , toCombined FRMain    <<< hougeki2CTDV
-    , toCombined FRMain    <<< hougeki3CTDV
+    ,  openingDV >>> toCombined FREscort  
+    ,  hougeki1CTDV >>> toCombined FREscort  
+    ,  raigekiCTDV >>> toCombined FREscort  
+    ,  hougeki2CTDV >>> toCombined FRMain    
+    ,  hougeki3CTDV >>>  toCombined FRMain    
     ]
