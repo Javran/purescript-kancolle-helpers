@@ -3,7 +3,7 @@ module KanColle.DamageAnalysisFFI where
 import Prelude
 import KanColle.Util
 import KanColle.DamageAnalysis.Damage
-import KanColle.DamageAnalysis2
+import KanColle.DamageAnalysis
 import KanColle.KCAPI.Battle
 import Data.Foreign
 import Data.Maybe

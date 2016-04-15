@@ -1,4 +1,4 @@
-module KanColle.DamageAnalysis.DamageVector2
+module KanColle.DamageAnalysis.DamageVector
 where
 
 import Prelude
@@ -32,12 +32,12 @@ normalizeDamage x
 -- | `DamageVector` is an array of Damages
 -- |  satisfies the following properties
 -- | * `length x == 6`
-newtype DamageVector2 = DV2 (Array Damage)
+newtype DamageVector = DV2 (Array Damage)
 
-instance semigroupDamageVector2 :: Semigroup DamageVector2 where
+instance semigroupDamageVector :: Semigroup DamageVector where
   append (DV2 a) (DV2 b) = DV2 (A.zipWith (<>) a b)
 
-instance monoidDamageVector2 :: Monoid DamageVector2 where
+instance monoidDamageVector :: Monoid DamageVector where
   mempty = DV2 (A.replicate 6 mempty)
 
 type NormalBattle a =
@@ -70,16 +70,16 @@ normalBattleMap f x = { main: f x.main, enemy: f x.enemy }
 combinedBattleMap :: forall a b. (a -> b) -> CombinedBattle a -> CombinedBattle b
 combinedBattleMap f x = { main: f x.main, escort: f x.escort, enemy: f x.enemy }
 
-type NormalDamageVector = NormalBattle DamageVector2
-type CombinedDamageVector = CombinedBattle DamageVector2
+type NormalDamageVector = NormalBattle DamageVector
+type CombinedDamageVector = CombinedBattle DamageVector
 
-debugShowDV :: DamageVector2 -> String
+debugShowDV :: DamageVector -> String
 debugShowDV (DV2 xs) = joinWith "," (map (show <<< damageToInt) xs)
 
--- | get `DamageVector2` from raw `fDam` and `eDam` fields
+-- | get `DamageVector` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: forall a.
                 { api_fdam :: Array Number
-                , api_edam :: Array Number | a} -> LR DamageVector2
+                , api_edam :: Array Number | a} -> LR DamageVector
 fromFDamAndEDam v =
     { left: DV2 (convertFEDam v.api_fdam)
     , right: DV2 (convertFEDam v.api_edam) }
@@ -92,19 +92,19 @@ convertFEDam :: Array Number -> Array Damage
 convertFEDam = AU.tail >>> map (normalizeDamage >>> mkDamage)
 
 -- | calculate damage from kouku (aerial) stages
-calcKoukuDamage :: Kouku -> LR DamageVector2
+calcKoukuDamage :: Kouku -> LR DamageVector
 calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
 -- | calculate damage from kouku (aerial) stages (combined fleet)
--- | note that only escort fleet is taking damage. so we just need DamageVector2
-calcKoukuDamageCombined :: Kouku -> DamageVector2
+-- | note that only escort fleet is taking damage. so we just need DamageVector
+calcKoukuDamageCombined :: Kouku -> DamageVector
 calcKoukuDamageCombined kk = DV2 (convertFEDam (kk.api_stage3_combined.api_fdam))
 
 -- | calculate damage from raigeki (torpedo) stages
-calcRaigekiDamage :: Raigeki -> LR DamageVector2
+calcRaigekiDamage :: Raigeki -> LR DamageVector
 calcRaigekiDamage = fromFDamAndEDam
 
-calcHougekiDamage :: Hougeki -> LR DamageVector2
+calcHougekiDamage :: Hougeki -> LR DamageVector
 calcHougekiDamage h =
     if lengthCheck
       then let resultArr = runPure (STA.runSTArray resultDV)
@@ -161,44 +161,17 @@ calcHougekiDamage h =
         pure arr
 
 -- only on enemy
-calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector2
+calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
 calcSupportAirAttackDamage info = DV2 $ convertFEDam info.api_stage3.api_edam
 
 -- only on enemy
-calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector2
+calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV2 $ convertFEDam info.api_damage
 
 data FleetRole = FRMain | FREscort | FRSupport
 
-toCombined :: FleetRole -> LR DamageVector2 -> CombinedDamageVector
+toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = case r of
     FRMain    -> { main: dv.left, escort: mempty, enemy: dv.right }
     FREscort  -> { main: mempty, escort: dv.left, enemy: dv.right }
     FRSupport -> { main: mempty, escort: mempty, enemy: dv.right }
-
-{-
--- current format:
--- * main: main vs enemy
--- * escort: escort vs enemy
--- * support: support vs enemy
-newtype CombinedDamageVector2 = CDV
-  { main    :: DamageVector2
-  , escort  :: DamageVector2
-  , support :: DamageVector2 }
-
-instance combinedDamageVectorSemigroup :: Semigroup CombinedDamageVector2 where
-  append (CDV a) (CDV b) = CDV
-      { main:    a.main    <> b.main
-      , escort:  a.escort  <> b.escort
-      , support: a.support <> b.support
-      }
-
-instance combinedDamageVectorMonoid :: Monoid CombinedDamageVector2 where
-  mempty = CDV { main: mempty, escort: mempty, support: mempty }
-
-toCombined :: FleetRole -> DamageVector2 -> CombinedDamageVector2
-toCombined r dv = case r of
-    FRMain    -> CDV { main: dv, escort: mempty, support: mempty }
-    FREscort  -> CDV { main: mempty, escort: dv, support: mempty }
-    FRSupport -> CDV { main: mempty, escort: mempty, support: dv }
--}

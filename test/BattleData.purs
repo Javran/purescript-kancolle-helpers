@@ -2,7 +2,6 @@ module BattleData where
 
 import Prelude
 import Data.Foreign
-import KanColle.DamageAnalysis.Stages2
 
 foreign import battle1 :: Foreign
 foreign import battle2 :: Foreign

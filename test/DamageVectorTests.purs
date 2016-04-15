@@ -1,4 +1,4 @@
-module DamageVector2Tests where
+module DamageVectorTests where
 
 import Prelude
 import Test.Unit
@@ -12,9 +12,9 @@ import Data.Maybe
 import Data.Function
 import KanColle.Util
 import KanColle.DamageAnalysisFFI
-import KanColle.DamageAnalysis2
-import KanColle.DamageAnalysis.DamageVector2
-import KanColle.DamageAnalysis.Stages2
+import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.DamageVector
+import KanColle.DamageAnalysis.Stages
 import KanColle.DamageAnalysis.Damage
 import Test.Unit.Assert as Assert
 import Data.Foldable
@@ -22,10 +22,10 @@ import Data.Foldable
 import Base
 import BattleData
 
-dvToStr :: DamageVector2 -> String
+dvToStr :: DamageVector -> String
 dvToStr (DV2 dv) = Str.joinWith "," $ map (damageToInt >>> show) dv
 
-ndvToStr :: LR DamageVector2 -> String
+ndvToStr :: LR DamageVector -> String
 ndvToStr ndv = dvToStr ndv.left <> " -- " <> dvToStr ndv.right
 
 testDameCon :: forall e. TestUnit e
@@ -49,9 +49,9 @@ testDameCon = do
         , dameCon: dc
         }
 
-testDamageVector2 :: forall e. TestUnit e
-testDamageVector2 = do
-    test "DamageVector2: first aerial battle stage" do
+testDamageVector :: forall e. TestUnit e
+testDamageVector = do
+    test "DamageVector: first aerial battle stage" do
       Assert.assert "sample battle1" $
           "0,0,0,4,0,0 -- 0,0,21,0,164,0" == ndvToStr (koukuDV (unsafeFromForeign battle1))
       Assert.assert "sample battle2" $
@@ -61,7 +61,7 @@ testDamageVector2 = do
       Assert.assert "sample withSupportExpedition1" $
           "15,0,0,7,8,0 -- 55,0,0,0,0,0"
               == ndvToStr (koukuDV (unsafeFromForeign withSupportExpedition1))
-    test "DamageVector2: support fleet attack stage" do
+    test "DamageVector: support fleet attack stage" do
       let dvF b = supportAirAttackDV b <> supportHouraiDV b
       Assert.assert "sample battle1" $
           dvToStr mempty == dvToStr (dvF (unsafeFromForeign battle1))
@@ -72,9 +72,9 @@ testDamageVector2 = do
           "0,70,20,132,40,0"
               == dvToStr (dvF (unsafeFromForeign withSupportExpedition2))
 
-testDamageAnalyzer2 :: forall e. MyTest e
-testDamageAnalyzer2 =
-    test "DamageAnalyzer2" do
+testDamageAnalyzer :: forall e. MyTest e
+testDamageAnalyzer =
+    test "DamageAnalyzer" do
       Assert.assert "battle sample 1" $
         (merge >>> trimInfo) (analyzeBattle dc6 (unsafeFromForeign battle1)) ==
           map Just [75,75,75,75-4,77,79-9

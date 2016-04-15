@@ -1,4 +1,4 @@
-module KanColle.DamageAnalysis.Stages2 where
+module KanColle.DamageAnalysis.Stages where
 
 import Prelude
 import Data.Maybe
@@ -7,7 +7,7 @@ import Data.Foldable
 
 import KanColle.KCAPI.Battle
 import KanColle.Util
-import KanColle.DamageAnalysis.DamageVector2
+import KanColle.DamageAnalysis.DamageVector
 
 mkDV :: forall a b. (Battle -> Maybe a) -> b -> (a -> b) -> Battle -> b
 mkDV getData z calc b = maybe z calc (getData b)
@@ -27,59 +27,59 @@ lrOnlyRight r = { left: mempty, right: r }
 -- | get `DamageVector` of kouku stage from battle data
 -- | all the names in this module are kept consistent with functions in
 -- | `KanColle.DamageAnalysis.DamageVector`.
-koukuDV :: Battle -> LR DamageVector2
+koukuDV :: Battle -> LR DamageVector
 koukuDV = mkDV getKouku memptyLR calcKoukuDamage
 
-koukuCombinedDV :: Battle -> DamageVector2
+koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = mkDV getKouku mempty calcKoukuDamageCombined
 
-kouku2CombinedDV :: Battle -> DamageVector2
+kouku2CombinedDV :: Battle -> DamageVector
 kouku2CombinedDV = mkDV getKouku2 mempty calcKoukuDamageCombined
 
-supportAirAttackDV :: Battle -> DamageVector2
+supportAirAttackDV :: Battle -> DamageVector
 supportAirAttackDV = mkDV getSupportAirInfo mempty calcSupportAirAttackDamage
 
-supportHouraiDV :: Battle -> DamageVector2
+supportHouraiDV :: Battle -> DamageVector
 supportHouraiDV = mkDV getSupportHouraiInfo mempty calcSupportHouraiDamage
 
-kouku2DV :: Battle -> LR DamageVector2
+kouku2DV :: Battle -> LR DamageVector
 kouku2DV = mkDV getKouku2 memptyLR calcKoukuDamage
 
-openingDV :: Battle -> LR DamageVector2
+openingDV :: Battle -> LR DamageVector
 openingDV = mkDV getOpeningAttack memptyLR calcRaigekiDamage
 
-hougeki1DV :: Battle -> LR DamageVector2
+hougeki1DV :: Battle -> LR DamageVector
 hougeki1DV = mkDV getHougeki1 memptyLR calcHougekiDamage
 
-hougeki2DV :: Battle -> LR DamageVector2
+hougeki2DV :: Battle -> LR DamageVector
 hougeki2DV = mkDV getHougeki2 memptyLR calcHougekiDamage
 
-hougeki3DV :: Battle -> LR DamageVector2
+hougeki3DV :: Battle -> LR DamageVector
 hougeki3DV = mkDV getHougeki3 memptyLR calcHougekiDamage
 
-raigekiDV :: Battle -> LR DamageVector2
+raigekiDV :: Battle -> LR DamageVector
 raigekiDV = mkDV getRaigeki memptyLR calcRaigekiDamage
 
 -- specalized for Carrier Task Force
-hougeki1CTDV :: Battle -> LR DamageVector2
+hougeki1CTDV :: Battle -> LR DamageVector
 hougeki1CTDV = mkDV getHougeki1CT memptyLR calcHougekiDamage
 
-raigekiCTDV :: Battle -> LR DamageVector2
+raigekiCTDV :: Battle -> LR DamageVector
 raigekiCTDV = mkDV getRaigekiCT memptyLR calcRaigekiDamage
 
-hougeki2CTDV :: Battle -> LR DamageVector2
+hougeki2CTDV :: Battle -> LR DamageVector
 hougeki2CTDV = mkDV getHougeki2CT memptyLR calcHougekiDamage
 
-hougeki3CTDV :: Battle -> LR DamageVector2
+hougeki3CTDV :: Battle -> LR DamageVector
 hougeki3CTDV = mkDV getHougeki3CT memptyLR calcHougekiDamage
 
-hougekiDV :: Battle -> LR DamageVector2
+hougekiDV :: Battle -> LR DamageVector
 hougekiDV = mkDV getHougeki memptyLR calcHougekiDamage
 
 lrToNormal :: forall a. LR a -> NormalBattle a
 lrToNormal x = { main: x.left, enemy: x.right }
 
--- | get `DamageVector2` of a regular / aerial battle from battle data
+-- | get `DamageVector` of a regular / aerial battle from battle data
 -- | a regular battle consists of the following stages:
 -- |
 -- | * `kouku`  (aerial battle)
@@ -98,10 +98,10 @@ battleDV = fconcat [ koukuDV, kouku2DV
                    , raigekiDV
                    ] >>> lrToNormal
                    
-fconcat :: Array (Battle -> LR DamageVector2) -> Battle -> LR DamageVector2
+fconcat :: Array (Battle -> LR DamageVector) -> Battle -> LR DamageVector
 fconcat xs b = foldl lrAppend memptyLR ((\f -> f b) <$> xs)
 
--- | get `DamageVector2` of a night battle
+-- | get `DamageVector` of a night battle
 -- | a night battle involves only `hougeki` (shelling stage)
 nightBattleDV :: Battle -> NormalDamageVector
 nightBattleDV = hougekiDV >>> lrToNormal

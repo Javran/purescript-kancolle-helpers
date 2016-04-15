@@ -18,7 +18,7 @@ import KanColle.RepairTime
 import Data.Foreign
 import Data.Maybe
 
-import DamageVector2Tests
+import DamageVectorTests
 import UtilTests
 import BattleData
 import Base
@@ -137,8 +137,8 @@ unitTests ::  forall e. TestUnit e
 unitTests = do
     testExpeditionHelper
     testDameCon
-    testDamageVector2    
-    testDamageAnalyzer2
+    testDamageVector  
+    testDamageAnalyzer
     testExpeditionMinimal
     testRepairTime
 

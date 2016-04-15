@@ -1,4 +1,4 @@
-module KanColle.DamageAnalysis2 where
+module KanColle.DamageAnalysis where
 
 import Prelude
 import Data.Array
@@ -8,8 +8,8 @@ import KanColle.KCAPI.Battle
 import KanColle.Util
 
 import KanColle.DamageAnalysis.Damage
-import KanColle.DamageAnalysis.DamageVector2
-import KanColle.DamageAnalysis.Stages2
+import KanColle.DamageAnalysis.DamageVector
+import KanColle.DamageAnalysis.Stages
 
 type ShipResult =
   { hp :: Int
@@ -24,7 +24,7 @@ type NormalFleetInfo a = NormalBattle (FleetInfo a)
   
 type CombinedFleetInfo a = CombinedBattle (FleetInfo a)
   
-applyDamageVector :: DamageVector2 -> FleetInfo Ship -> FleetInfo Ship
+applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
 applyDamageVector (DV2 dv) fleet = zipWith combine dv fleet
   where
     combine :: Damage -> Maybe Ship -> Maybe Ship
