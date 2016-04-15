@@ -35,27 +35,38 @@ Currently implemented features are:
 
 ## JavaScript interfaces
 
-* `KanColle.DamageAnalysis`
+* `KanColle.DamageAnalysis.FFI`
 
-    * `analyzeRawBattleJS(data)`
+    * `analyzeBattleJS(dc6,data)`
 
         Analyze regular battle data
 
-    * `analyzeRawNightBattleJS(data)`
+    * `analyzeNightBattleJS(dc6,data)`
 
-        Analyze regular night battle data (for combined fleet)
+        Analyze regular night battle data
 
-    * `analyzeRawCarrierTaskForceBattleJS(data)`
+    * `analyzeCTFBattleJS(dc12,data)`
 
         Analyze battle with Combined Fleet, specialized for Carrier Task Force
 
-    * `analyzeRawSurfaceTaskForceBattleJS(data)`
+    * `analyzeSTFBattleJS(dc12,data)`
 
         Analyze battle with Combined Fleet, specialized for Surface Task Force
 
-    * `analyzeRawNightBattleCombinedJS(data)`
+    * `analyzeTECFBattleJS(dc12,data)`
+
+        Analyze battle with Combined Fleet, specialized for Transport Escort
+
+    * `analyzeCombinedNightBattleJS(dc6,data)`
 
         Analyze night battle data (for combined fleet)
+
+    `dc6` is an array of 6-elements (similarly `dc12` is an array of 12-elements for the same purpose).
+
+    Each element takes value `0`,`1` or `2`:
+    - `0`: no DameCon on this ship
+    - `1`: this fleet will be using Repair Team when sinking
+    - `2`: this fleet will be using Repair Goddess when sinking
 
 * `KanColle.RepairTime`
 
