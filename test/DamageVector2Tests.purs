@@ -98,6 +98,10 @@ testDamageAnalyzer2 =
       Assert.assert "night battle repair team sample 1" $
         (merge >>> trimInfo) (analyzeNightBattle repairTeam (unsafeFromForeign nightBattleWithDameCon1)) ==
           map toMaybeInt [90,25, 13{- sinking: 22-22 = 0 -},35-27-6,26,12, 133,0,146-45-64,0,0,34]
+      Assert.assert "battle with repair team sample 1" $
+        (merge >>> trimInfo) (analyzeBattle repairTeam (unsafeFromForeign normBattleWithDameCon1)) ==
+          map toMaybeInt [36-28,72-5-35,50-28-11-4,8,{- sinking 5-103 -}7-3,59-34,
+                          480-47-37,130,130-22-7-10-128,130-10-16-44,600-33-47,130-10]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
