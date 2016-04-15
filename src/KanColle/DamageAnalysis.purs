@@ -77,9 +77,9 @@ analyzeBattleBy :: (Battle -> NormalDamageVector)
                 -> Battle
                 -> NormalFleetInfo ShipResult
 analyzeBattleBy getDVFromBattle ds battle =
-    { main: zipWith getShipResult' initFleet.main finalFleet.main
-    , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
-    }
+    dupAsNormalBattle (zipWith getShipResult')
+      `appNormalBattle` initFleet
+      `appNormalBattle` finalFleet
   where
     initFleet = getInitFleet ds battle
     finalFleet :: NormalFleetInfo Ship
@@ -91,10 +91,9 @@ analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector)
                 -> Battle
                 -> CombinedFleetInfo ShipResult
 analyzeCombinedBattleBy getDVFromBattle ds battle =
-    { main: zipWith getShipResult' initFleet.main finalFleet.main
-    , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
-    , escort: zipWith getShipResult' initFleet.escort finalFleet.escort
-    }
+    dupAsCombinedBattle (zipWith getShipResult')
+      `appCombinedBattle` initFleet
+      `appCombinedBattle` finalFleet
   where
     initFleet = getInitFleetCombined ds battle
     finalFleet = applyCombinedDamageVector (getDVFromBattle battle) initFleet
@@ -111,9 +110,9 @@ analyzeTECFBattle = analyzeCTFBattle
 
 analyzeCombinedNightBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipResult
 analyzeCombinedNightBattle ds b =
-    { main: zipWith getShipResult' initFleet.main finalFleet.main
-    , enemy: zipWith getShipResult' initFleet.enemy finalFleet.enemy
-    }
+    dupAsNormalBattle (zipWith getShipResult')
+      `appNormalBattle` initFleet
+      `appNormalBattle` finalFleet
   where
     nightBattleInfo = getInitFleetCombined (replicate 6 Nothing <> ds) b
     initFleet = 
