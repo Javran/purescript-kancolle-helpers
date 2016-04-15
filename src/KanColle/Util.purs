@@ -1,24 +1,51 @@
-module KanColle.Util where
+{- | This module stores utility functions
+ -}
+module KanColle.Util
+  ( todo
+  , throwWith
+  , traceLog
+  , traceWarn
+  
+  , jsonStringify
+  
+  , peekSTArrayUnsafe
+  , pokeSTArrayUnsafe
+  
+  , times
+  , chooseN
+  
+  , LR
+  , lrMap
+  , memptyLR
+  , lrOnlyLeft
+  , lrOnlyRight
+  , lrAppend
+  
+  , fleetSplit
+  ) where
 
 import Prelude
 import Data.Monoid
 import Data.Int
 import Control.Monad.Eff
 import Control.Monad.ST
-import Data.Traversable
 
 import Data.Array
 import Data.Array.Unsafe as AU
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
-import Data.Maybe
 import Data.List as L
 import Data.Foldable
 import Control.Plus
 
+-- | `JSON.stringify`
 foreign import jsonStringify :: forall a. a -> String
+
 foreign import consoleMessage :: forall a b. Int -> a -> (Unit -> b) -> b
+
+-- | throw anything, raise exceptions from pure code
 foreign import throwWith :: forall a b. a -> b
 
+-- | use it as a placeholder for any not yet implemented
 todo :: forall a b . b -> a
 todo _ = throwWith "TODO"
 
@@ -34,17 +61,20 @@ times1p y0 x0 = f x0 (y0 + 1)
       | y == 1 = x <> z
       | otherwise = g (x <> x) ((y - 1) / 2) (x <> z)
 
+-- | replicate a `Monoid` for a given number of times and `mconcat` the result
 times :: forall m. (Monoid m) => Int -> m -> m
 times 0 _ = mempty
 times n m = times1p (n-1) m
 
+-- | similar to Haskell's `Data.List.tails`
+-- | e.g. `tails [1,2,3] = [[1,2,3],[2,3],[3],[]]`
 tails :: forall a. L.List a -> L.List (L.List a)
 tails xs = case xs of
     L.Nil -> L.Cons L.Nil L.Nil
     L.Cons _ tl -> L.Cons xs (tails tl)
 
--- only valid values are 0,1,2,3
--- TODO: change doc
+-- | `chooseN xs n` non-deterministically chooses `n` values from `xs`.
+-- | It is recommended to use only small values on `n` (0,1,2,3).
 chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (L.List a)
 chooseN xs = L.fromList <<< pickFrom xsL
   where
@@ -58,20 +88,28 @@ chooseN xs = L.fromList <<< pickFrom xsL
           rs <- pickFrom tl (i-1)
           return (L.Cons hd rs)
 
+-- | `peekSTArray` without array bound checks
 foreign import peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
+-- | `pokeSTArray` without array bound checks
 foreign import pokeSTArrayUnsafe :: forall a h r. STArray h a -> Int -> a -> Eff (st :: ST h | r) Unit
 
+-- | `console.log` anything
 traceLog :: forall a b. a -> (Unit -> b) -> b
 traceLog = consoleMessage 0
 
+-- | `console.warn` anything
 traceWarn :: forall a b. a -> (Unit -> b) -> b
 traceWarn = consoleMessage 1
 
+-- | something that has both "left" part and "right" part
 type LR a =
   { left :: a
   , right :: a
   }
 
+-- | `fleetSplit cutHead xs` cuts `xs` into two 6-element arrays.
+-- | `xs` has to be of length 12 (or 13 when `cutHead` is true)
+-- | if `cutHead` is true, the first value of `xs` is dropped before cutting.
 fleetSplit :: forall a. Boolean -> Array a -> LR (Array a)
 fleetSplit cutHead xs = if check
     then { left: slice 0 6 ys
@@ -83,17 +121,22 @@ fleetSplit cutHead xs = if check
            else xs
     check = length ys == 12
 
+-- | apply a function to both parts of an `LR`
 lrMap :: forall a b. (a -> b) -> LR a -> LR b
 lrMap f x = { left: f x.left, right: f x.right }
 
+-- | `mempty` for `LR`
 memptyLR :: forall m. Monoid m => LR m
 memptyLR = {left: mempty, right: mempty}
 
+-- | `append` for `LR`
 lrAppend :: forall m. Monoid m => LR m -> LR m -> LR m
 lrAppend a b = { left: a.left <> b.left, right: a.right <> b.right }
 
+-- | lift some Monoid that has only left part into `LR`
 lrOnlyLeft :: forall m. Monoid m => m -> LR m
 lrOnlyLeft l = { left: l, right: mempty }
 
+-- | lift some Monoid that has only right part into `LR`
 lrOnlyRight :: forall m. Monoid m => m -> LR m
 lrOnlyRight r = { left: mempty, right: r }

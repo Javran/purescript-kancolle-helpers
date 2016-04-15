@@ -1,7 +1,7 @@
 module KanColle.DamageAnalysis.Types
   ( DameCon(..)
-  , dc6, dc12
   , Ship
+  , mkShip
   , ShipResult
   , getShipResult
 
@@ -37,17 +37,19 @@ instance showDameCon :: Show DameCon where
       RepairTeam -> "RepairTeam"
       RepairGoddess -> "RepairGoddess"
 
-dc6 :: Array (Maybe DameCon)
-dc6 = replicate 6 Nothing
-
-dc12 :: Array (Maybe DameCon)
-dc12 = replicate 12 Nothing
-
 type Ship =
   { hp :: Int
   , fullHp :: Int
   , sunk :: Boolean
   , dameCon :: Maybe DameCon
+  }
+
+mkShip :: Int -> Int -> Maybe DameCon -> Ship
+mkShip hp fullHp dc =
+  { fullHp: fullHp
+  , hp: hp
+  , sunk: hp <= 0
+  , dameCon: dc
   }
 
 type NormalBattle a =

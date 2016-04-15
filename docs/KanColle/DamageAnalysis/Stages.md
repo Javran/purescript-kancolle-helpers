@@ -1,9 +1,14 @@
 ## Module KanColle.DamageAnalysis.Stages
 
+This module implements attacking stages of battles
+which accumulates damages values in the correct order
+to construct `DamageVector`s for all damage-taking fleets involved in
+the battle.
+
 #### `koukuDV`
 
 ``` purescript
-koukuDV :: Battle -> DamageVector
+koukuDV :: Battle -> LR DamageVector
 ```
 
 get `DamageVector` of kouku stage from battle data
@@ -14,12 +19,6 @@ all the names in this module are kept consistent with functions in
 
 ``` purescript
 koukuCombinedDV :: Battle -> DamageVector
-```
-
-#### `kouku2CombinedDV`
-
-``` purescript
-kouku2CombinedDV :: Battle -> DamageVector
 ```
 
 #### `supportAirAttackDV`
@@ -34,96 +33,32 @@ supportAirAttackDV :: Battle -> DamageVector
 supportHouraiDV :: Battle -> DamageVector
 ```
 
-#### `kouku2DV`
-
-``` purescript
-kouku2DV :: Battle -> DamageVector
-```
-
-#### `openingDV`
-
-``` purescript
-openingDV :: Battle -> DamageVector
-```
-
-#### `hougeki1DV`
-
-``` purescript
-hougeki1DV :: Battle -> DamageVector
-```
-
-#### `hougeki2DV`
-
-``` purescript
-hougeki2DV :: Battle -> DamageVector
-```
-
-#### `hougeki3DV`
-
-``` purescript
-hougeki3DV :: Battle -> DamageVector
-```
-
-#### `raigekiDV`
-
-``` purescript
-raigekiDV :: Battle -> DamageVector
-```
-
-#### `hougeki1CTDV`
-
-``` purescript
-hougeki1CTDV :: Battle -> DamageVector
-```
-
-#### `raigekiCTDV`
-
-``` purescript
-raigekiCTDV :: Battle -> DamageVector
-```
-
-#### `hougeki2CTDV`
-
-``` purescript
-hougeki2CTDV :: Battle -> DamageVector
-```
-
-#### `hougeki3CTDV`
-
-``` purescript
-hougeki3CTDV :: Battle -> DamageVector
-```
-
-#### `hougekiDV`
-
-``` purescript
-hougekiDV :: Battle -> DamageVector
-```
-
 #### `battleDV`
 
 ``` purescript
-battleDV :: Battle -> DamageVector
+battleDV :: Battle -> NormalDamageVector
 ```
 
-get `DamageVector` of a regular / aerial battle from battle data
+get `NormalDamageVector` of a regular / aerial battle from battle data
 a regular battle consists of the following stages:
 
 * `kouku`  (aerial battle)
 * `kouku2` (aerial battle)
+* `supportAirInfo` (airstrike from support expedition)
+* `supportHouraiInfo` (shelling attack from support expedition)
 * `opening` (openning torpedo attack)
 * `hougeki1` (first shelling stage)
 * `hougeki2` (second shelling stage)
-* `hougeki3` (third shelling stage, always empty for now)
+* `hougeki3` (third shelling stage, always empty for regular battles)
 * `raigeki` (closing torpedo attack)
 
 #### `nightBattleDV`
 
 ``` purescript
-nightBattleDV :: Battle -> DamageVector
+nightBattleDV :: Battle -> NormalDamageVector
 ```
 
-get `DamageVector` of a night battle
+get `NormalDamageVector` of a night battle
 a night battle involves only `hougeki` (shelling stage)
 
 #### `battleSurfaceTaskForceDV`
@@ -132,10 +67,15 @@ a night battle involves only `hougeki` (shelling stage)
 battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
 ```
 
+get `CombinedDamageVector` of a surface task force battle
+
 #### `battleCarrierTaskForceDV`
 
 ``` purescript
 battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
 ```
+
+get `CombinedDamageVector` of a carrier task force battle
+note that transport escort battle uses this `CombinedDamageVector` as well
 
 

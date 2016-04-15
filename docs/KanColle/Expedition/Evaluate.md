@@ -3,7 +3,7 @@
 #### `EvalResult`
 
 ``` purescript
-type EvalResult = { eId :: Int, netIncome :: Income, score :: Number, time :: Int }
+type EvalResult = { eId :: Int, netIncome :: IncomeBase, score :: Number, time :: Int }
 ```
 
 #### `nToFloor`
@@ -15,7 +15,7 @@ nToFloor :: Number -> Int
 #### `incomeDiff`
 
 ``` purescript
-incomeDiff :: Cost -> Income -> ECost -> Income
+incomeDiff :: Cost -> IncomeBase -> ECost -> IncomeBase
 ```
 
 #### `ordMax`
@@ -39,13 +39,13 @@ comparing :: forall a b. (Ord a) => (b -> a) -> b -> b -> Ordering
 #### `sortByHourlyGain`
 
 ``` purescript
-sortByHourlyGain :: (Income -> Int) -> Array EvalResult
+sortByHourlyGain :: (IncomeBase -> Int) -> Array EvalResult
 ```
 
 #### `sortWithAfkTime`
 
 ``` purescript
-sortWithAfkTime :: (Income -> Int) -> Number -> Int -> Array EvalResult
+sortWithAfkTime :: (IncomeBase -> Int) -> Number -> Int -> Array EvalResult
 ```
 
 #### `showEvalResult`
@@ -63,7 +63,7 @@ evalResultToJS :: EvalResult -> { eId :: Int, result :: Array Number }
 #### `simpleEvalCost`
 
 ``` purescript
-simpleEvalCost :: (Int -> Int -> Int -> Int -> Int) -> Income -> Int
+simpleEvalCost :: (Int -> Int -> Int -> Int -> Int) -> IncomeBase -> Int
 ```
 
 #### `evalNetIncomeHourlyJS`

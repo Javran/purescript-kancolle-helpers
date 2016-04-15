@@ -21,8 +21,8 @@ or you have not yet obtained the ship)
 
 ##### Instances
 ``` purescript
-instance eCostSemigroup :: Semigroup ECost
-instance eCostMonoid :: Monoid ECost
+Semigroup ECost
+Monoid ECost
 ```
 
 #### `getECost`

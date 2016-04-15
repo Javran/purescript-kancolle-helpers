@@ -41,4 +41,16 @@ showSType :: SType -> String
 readSType :: String -> SType
 ```
 
+#### `fromInt`
+
+``` purescript
+fromInt :: Int -> SType
+```
+
+#### `toInt`
+
+``` purescript
+toInt :: SType -> Int
+```
+
 

@@ -3,7 +3,7 @@
 #### `NetIncome`
 
 ``` purescript
-type NetIncome = { eId :: Int, netIncome :: Income }
+type NetIncome = { eId :: Int, netIncome :: IncomeBase }
 ```
 
 #### `HourlyIncome`

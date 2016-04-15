@@ -1,17 +1,5 @@
 ## Module KanColle.Expedition.Plan
 
-#### `tails`
-
-``` purescript
-tails :: forall a. List a -> List (List a)
-```
-
-#### `chooseN`
-
-``` purescript
-chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (List a)
-```
-
 #### `calcNetIncome`
 
 ``` purescript
@@ -52,12 +40,6 @@ quickCalc :: Number -> Number -> Number -> Number -> Int -> Array { eIds :: Arra
 
 ``` purescript
 quickCalcJS :: Fn5 Number Number Number Number Int (Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number })
-```
-
-#### `ratioPenalty`
-
-``` purescript
-ratioPenalty :: Array Number -> Array Number -> Number
 ```
 
 #### `calcWithExpeditionIds`

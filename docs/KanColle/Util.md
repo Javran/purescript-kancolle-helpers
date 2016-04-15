@@ -1,10 +1,30 @@
 ## Module KanColle.Util
 
-#### `times1p`
+This module stores utility functions
+
+#### `jsonStringify`
 
 ``` purescript
-times1p :: forall m. (Semigroup m) => Int -> m -> m
+jsonStringify :: forall a. a -> String
 ```
+
+`JSON.stringify`
+
+#### `throwWith`
+
+``` purescript
+throwWith :: forall a b. a -> b
+```
+
+throw anything, raise exceptions from pure code
+
+#### `todo`
+
+``` purescript
+todo :: forall a b. b -> a
+```
+
+use it as a placeholder for any not yet implemented
 
 #### `times`
 
@@ -12,11 +32,24 @@ times1p :: forall m. (Semigroup m) => Int -> m -> m
 times :: forall m. (Monoid m) => Int -> m -> m
 ```
 
+replicate a `Monoid` for a given number of times and `mconcat` the result
+
+#### `chooseN`
+
+``` purescript
+chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (List a)
+```
+
+`chooseN xs n` non-deterministically chooses `n` values from `xs`.
+It is recommended to use only small values on `n` (0,1,2,3).
+
 #### `peekSTArrayUnsafe`
 
 ``` purescript
 peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
 ```
+
+`peekSTArray` without array bound checks
 
 #### `pokeSTArrayUnsafe`
 
@@ -24,52 +57,80 @@ peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
 pokeSTArrayUnsafe :: forall a h r. STArray h a -> Int -> a -> Eff (st :: ST h | r) Unit
 ```
 
-#### `heapify`
+`pokeSTArray` without array bound checks
+
+#### `traceLog`
 
 ``` purescript
-heapify :: forall a h r. (a -> a -> Ordering) -> Array a -> Eff (st :: ST h | r) (STArray h a)
+traceLog :: forall a b. a -> (Unit -> b) -> b
 ```
 
-#### `startHeapifyDown`
+`console.log` anything
+
+#### `traceWarn`
 
 ``` purescript
-startHeapifyDown :: forall a h r. (a -> a -> Ordering) -> STArray h a -> Int -> Int -> Eff (st :: ST h | r) Unit
+traceWarn :: forall a b. a -> (Unit -> b) -> b
 ```
 
-#### `heapifyDown`
+`console.warn` anything
+
+#### `LR`
 
 ``` purescript
-heapifyDown :: forall a h r. (a -> a -> Ordering) -> STArray h a -> Int -> Int -> a -> Eff (st :: ST h | r) Unit
+type LR a = { left :: a, right :: a }
 ```
 
-#### `deleteMax`
+something that has both "left" part and "right" part
+
+#### `fleetSplit`
 
 ``` purescript
-deleteMax :: forall a h r. (a -> a -> Ordering) -> STArray h a -> Int -> Eff (st :: ST h | r) a
+fleetSplit :: forall a. Boolean -> Array a -> LR (Array a)
 ```
 
-#### `heapSort`
+`fleetSplit cutHead xs` cuts `xs` into two 6-element arrays.
+`xs` has to be of length 12 (or 13 when `cutHead` is true)
+if `cutHead` is true, the first value of `xs` is dropped before cutting.
+
+#### `lrMap`
 
 ``` purescript
-heapSort :: forall a. (a -> a -> Ordering) -> Array a -> Array a
+lrMap :: forall a b. (a -> b) -> LR a -> LR b
 ```
 
-#### `heapSortSafe`
+apply a function to both parts of an `LR`
+
+#### `memptyLR`
 
 ``` purescript
-heapSortSafe :: forall a. (a -> a -> Ordering) -> Array a -> Array a
+memptyLR :: forall m. (Monoid m) => LR m
 ```
 
-#### `sortByThenTake`
+`mempty` for `LR`
+
+#### `lrAppend`
 
 ``` purescript
-sortByThenTake :: forall a. (a -> a -> Ordering) -> Int -> Array a -> Array a
+lrAppend :: forall m. (Monoid m) => LR m -> LR m -> LR m
 ```
 
-#### `sortByThenTakeQuick`
+`append` for `LR`
+
+#### `lrOnlyLeft`
 
 ``` purescript
-sortByThenTakeQuick :: forall a. (a -> a -> Ordering) -> Int -> Array a -> Array a
+lrOnlyLeft :: forall m. (Monoid m) => m -> LR m
 ```
+
+lift some Monoid that has only left part into `LR`
+
+#### `lrOnlyRight`
+
+``` purescript
+lrOnlyRight :: forall m. (Monoid m) => m -> LR m
+```
+
+lift some Monoid that has only right part into `LR`
 
 

@@ -1,3 +1,8 @@
+{- | This module implements attacking stages of battles
+   | which accumulates damages values in the correct order
+   | to construct `DamageVector`s for all damage-taking fleets involved in
+   | the battle.
+ -}
 module KanColle.DamageAnalysis.Stages
   ( koukuDV
   , koukuCombinedDV
@@ -23,7 +28,6 @@ import KanColle.DamageAnalysis.Types
 
 connectDV :: forall a b. (Battle -> Maybe a) -> b -> (a -> b) -> Battle -> b
 connectDV getData z calc b = maybe z calc (getData b)
-
 
 -- | get `DamageVector` of kouku stage from battle data
 -- | all the names in this module are kept consistent with functions in
@@ -77,15 +81,17 @@ hougeki3CTDV = connectDV getHougeki3CT memptyLR calcHougekiDamage
 hougekiDV :: Battle -> LR DamageVector
 hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
 
--- | get `DamageVector` of a regular / aerial battle from battle data
+-- | get `NormalDamageVector` of a regular / aerial battle from battle data
 -- | a regular battle consists of the following stages:
 -- |
 -- | * `kouku`  (aerial battle)
 -- | * `kouku2` (aerial battle)
+-- | * `supportAirInfo` (airstrike from support expedition)
+-- | * `supportHouraiInfo` (shelling attack from support expedition)
 -- | * `opening` (openning torpedo attack)
 -- | * `hougeki1` (first shelling stage)
 -- | * `hougeki2` (second shelling stage)
--- | * `hougeki3` (third shelling stage, always empty for now)
+-- | * `hougeki3` (third shelling stage, always empty for regular battles)
 -- | * `raigeki` (closing torpedo attack)
 battleDV :: Battle -> NormalDamageVector
 battleDV = fconcat [ koukuDV, kouku2DV
@@ -99,7 +105,7 @@ battleDV = fconcat [ koukuDV, kouku2DV
 fconcat :: Array (Battle -> LR DamageVector) -> Battle -> LR DamageVector
 fconcat xs b = foldl lrAppend memptyLR ((\f -> f b) <$> xs)
 
--- | get `DamageVector` of a night battle
+-- | get `NormalDamageVector` of a night battle
 -- | a night battle involves only `hougeki` (shelling stage)
 nightBattleDV :: Battle -> NormalDamageVector
 nightBattleDV = hougekiDV >>> lrToNormal
@@ -116,6 +122,7 @@ combinedAppend a b = { main: a.main <> b.main
 fconcat2 :: Array (Battle -> CombinedDamageVector) -> Battle -> CombinedDamageVector
 fconcat2 xs b = foldl combinedAppend memptyCombined ((\f -> f b) <$> xs)
 
+-- | get `CombinedDamageVector` of a surface task force battle
 battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
 battleSurfaceTaskForceDV = fconcat2
     [ koukuDV >>> toCombined FRMain
@@ -133,6 +140,8 @@ battleSurfaceTaskForceDV = fconcat2
     , raigekiDV >>> toCombined FREscort
     ]
 
+-- | get `CombinedDamageVector` of a carrier task force battle
+-- | note that transport escort battle uses this `CombinedDamageVector` as well
 battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
 battleCarrierTaskForceDV = fconcat2
     [  koukuDV >>> toCombined FRMain    

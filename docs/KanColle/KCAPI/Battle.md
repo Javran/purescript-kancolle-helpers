@@ -3,7 +3,7 @@
 #### `Battle`
 
 ``` purescript
-type Battle = { api_nowhps :: Array Int, api_nowhps_combined :: Array Int, api_stage_flag :: Array Int, api_stage_flag2 :: Array Int, api_kouku :: Kouku, api_kouku2 :: Kouku, api_opening_flag :: Int, api_opening_atack :: Raigeki, api_hourai_flag :: Array Int, api_hougeki1 :: Hougeki, api_hougeki2 :: Hougeki, api_hougeki3 :: Hougeki, api_raigeki :: Raigeki, api_hougeki :: Hougeki, api_support_flag :: Int, api_support_info :: SupportInfo }
+type Battle = { api_nowhps :: Array Int, api_nowhps_combined :: Array Int, api_maxhps :: Array Int, api_maxhps_combined :: Array Int, api_stage_flag :: Array Int, api_stage_flag2 :: Array Int, api_kouku :: Kouku, api_kouku2 :: Kouku, api_opening_flag :: Int, api_opening_atack :: Raigeki, api_hourai_flag :: Array Int, api_hougeki1 :: Hougeki, api_hougeki2 :: Hougeki, api_hougeki3 :: Hougeki, api_raigeki :: Raigeki, api_hougeki :: Hougeki, api_support_flag :: Int, api_support_info :: SupportInfo }
 ```
 
 #### `Kouku`
@@ -48,6 +48,12 @@ type SupportHouraiInfo = { api_damage :: Array Number }
 type SupportInfo = { api_support_airatack :: SupportAirInfo, api_support_hourai :: SupportHouraiInfo }
 ```
 
+#### `fromRawHp`
+
+``` purescript
+fromRawHp :: Int -> Maybe Int
+```
+
 #### `getInitHps`
 
 ``` purescript
@@ -58,6 +64,18 @@ getInitHps :: Battle -> Array (Maybe Int)
 
 ``` purescript
 getInitHpsCombined :: Battle -> Array (Maybe Int)
+```
+
+#### `getMaxHps`
+
+``` purescript
+getMaxHps :: Battle -> Array (Maybe Int)
+```
+
+#### `getMaxHpsCombined`
+
+``` purescript
+getMaxHpsCombined :: Battle -> Array (Maybe Int)
 ```
 
 #### `hasField`

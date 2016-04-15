@@ -1,3 +1,10 @@
+{- | This module implements `DamageVector`:
+   | an array of `Damage`s that can be applied to one fleet of `Ship`s.
+   | most functions prefixed with `calc` in this module
+   | produces either `LR DamageVector` or a single `DamageVector`.
+   | which can then be converted `NormalDamageVector` or `CombinedDamageVector`
+   | depending on what the corresponding data is standing for.
+ -}
 module KanColle.DamageAnalysis.DamageVector
   ( DamageVector, getDV, mkDV
 
@@ -35,6 +42,7 @@ import Data.Foldable
 import KanColle.KCAPI.Battle
 import Data.Maybe
 import Data.String (joinWith)
+
 -- when flagship protection happens
 -- and extra 0.1 will be added to that value
 -- for our purpose we don't need to deal with that
@@ -47,14 +55,15 @@ normalizeDamage x
     let warning = "invalid damage number: " <> show x
     in traceWarn warning (\_ -> 0)
 
--- | `DamageVector` is an array of Damages
--- |  satisfies the following properties
--- | * `length x == 6`
+-- | `DamageVector` is a 6-element array of `Damage`s
 newtype DamageVector = DV (Array Damage)
 
+-- | fetches the array inside `DamageVector`
 getDV :: DamageVector -> Array Damage
 getDV (DV v) = v
 
+-- | creates `DamageVector` from arrays.
+-- | array has to be of length 6
 mkDV :: Array Damage -> DamageVector
 mkDV xs = if check 
     then DV xs
@@ -68,7 +77,10 @@ instance semigroupDamageVector :: Semigroup DamageVector where
 instance monoidDamageVector :: Monoid DamageVector where
   mempty = DV (A.replicate 6 mempty)
 
+-- | `DamageVector` for normal battles
 type NormalDamageVector = NormalBattle DamageVector
+
+-- | `DamageVector` for battles involving comined fleets
 type CombinedDamageVector = CombinedBattle DamageVector
 
 debugShowDV :: DamageVector -> String
@@ -82,7 +94,7 @@ fromFDamAndEDam v =
     { left: DV (convertFEDam v.api_fdam)
     , right: DV (convertFEDam v.api_edam) }
 
--- (internal)
+-- (internal use only)
 -- an "-1" is put in front of both api_fdam and api_edam
 -- we first drop that element and then convert
 -- integers intos Damages
@@ -102,6 +114,7 @@ calcKoukuDamageCombined kk = DV (convertFEDam (kk.api_stage3_combined.api_fdam))
 calcRaigekiDamage :: Raigeki -> LR DamageVector
 calcRaigekiDamage = fromFDamAndEDam
 
+-- | calculate damage from hougeki (shelling) stages
 calcHougekiDamage :: Hougeki -> LR DamageVector
 calcHougekiDamage h =
     if lengthCheck
@@ -158,34 +171,44 @@ calcHougekiDamage h =
         A.zipWithA (accumulateDamage arr) eventTargets eventDamages
         pure arr
 
--- only on enemy
+-- | calculate damage from support airstrike stages.
+-- | note that only enemy is taking damage so this results in
+-- | a single `DamageVector`.
 calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
 calcSupportAirAttackDamage info = DV $ convertFEDam info.api_stage3.api_edam
 
--- only on enemy
+-- | calculate damage from support shelling stages.
+-- | note that only enemy is taking damage so this results in
+-- | a single `DamageVector`.
 calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV $ convertFEDam info.api_damage
 
+-- | ally fleet's role in this battle
 data FleetRole = FRMain | FREscort | FRSupport
 
+-- | `toCombined role dv` converts a `LR DamageVector` whose left part
+-- | is playing role `role` into `CombinedDamageVector`
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = case r of
     FRMain    -> { main: dv.left, escort: mempty, enemy: dv.right }
     FREscort  -> { main: mempty, escort: dv.left, enemy: dv.right }
     FRSupport -> { main: mempty, escort: mempty, enemy: dv.right }
 
+-- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
 applyDamageVector dv fleet = A.zipWith combine (getDV dv) fleet
   where
     combine :: Damage -> Maybe Ship -> Maybe Ship
     combine dmg ms = applyDamage dmg <$> ms
 
+-- | apply `NormalDamageVector` on a normal fleet of ships (including enemy ships)
 applyNormalDamageVector :: NormalDamageVector -> NormalFleetInfo Ship -> NormalFleetInfo Ship
 applyNormalDamageVector ndv fleet =
     dupAsNormalBattle applyDamageVector
       `appNormalBattle` ndv 
       `appNormalBattle` fleet
-      
+
+-- | apply `CombinedDamageVector` on a combined fleet of ships (including enemy ships)
 applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo Ship -> CombinedFleetInfo Ship
 applyCombinedDamageVector ndv fleet =
     dupAsCombinedBattle applyDamageVector

@@ -16,8 +16,13 @@ import KanColle.DamageAnalysis.FFI
 import Test.Unit.Assert as Assert
 import Data.Foldable
 
-import Base
 import BattleData
+
+dc6 :: Array (Maybe DameCon)
+dc6 = replicate 6 Nothing
+
+dc12 :: Array (Maybe DameCon)
+dc12 = replicate 12 Nothing
 
 dvToStr :: DamageVector -> String
 dvToStr dv = Str.joinWith "," $ map (damageToInt >>> show) (getDV dv)
@@ -38,13 +43,6 @@ testDameCon = do
    test "Damage: chained damage" do
       -- 21/21 -> -20 -> 1/21 -> -30 -> -29/21 (sinking) -> damecon consumed 21/21 -> -20 -> 1/21
       Assert.equal 1 (applyDamage (foldMap mkDamage [20,30,20]) (mkShip 21 21 $ Just RepairGoddess)).hp
-  where
-    mkShip hp fullHp dc =
-        { fullHp: fullHp
-        , hp: hp
-        , sunk: hp <= 0
-        , dameCon: dc
-        }
 
 testDamageVector :: forall e. TestUnit e
 testDamageVector = do
@@ -69,7 +67,7 @@ testDamageVector = do
           "0,70,20,132,40,0"
               == dvToStr (dvF withSupportExpedition2)
 
-testDamageAnalyzer :: forall e. MyTest e
+testDamageAnalyzer :: forall e. TestUnit e
 testDamageAnalyzer =
     test "DamageAnalyzer" do
       Assert.assert "battle sample 1" $
