@@ -6,9 +6,7 @@ import KanColle.Expedition.IncomeBase
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Minimal
 import KanColle.Expedition.Base
-import Data.Array
 import Data.Maybe
-import Data.Monoid
 import Number.Format
 import Data.String (joinWith)
 import Data.Int

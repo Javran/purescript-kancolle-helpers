@@ -1,9 +1,5 @@
 module KanColle.KCAPI.Master where
 
-import Prelude
-import Data.Foreign
-import Data.String
-
 -- support for api_start2
 type Master =
   { api_mst_ship :: Array MstShip
@@ -25,4 +21,3 @@ type MstShipUpgrade =
   , api_catapult_count :: Int
   , api_drawing_count :: Int
   }
-

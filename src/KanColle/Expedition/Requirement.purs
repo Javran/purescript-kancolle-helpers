@@ -4,8 +4,7 @@ import Prelude
 import Data.Array
 import Data.Foldable
 import Data.Maybe
-import Data.Monoid
-import qualified Data.String as Str
+import Data.String as Str
 
 import KanColle.SType
 

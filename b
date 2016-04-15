@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pulp build  --censor-codes=ImplicitImport --censor-lib
+pulp build  --censor-codes=ImplicitImport,HidingImport --censor-lib

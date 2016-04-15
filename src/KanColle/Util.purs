@@ -5,19 +5,14 @@ import Data.Monoid
 import Data.Int
 import Control.Monad.Eff
 import Control.Monad.ST
-import Control.MonadPlus
-import Control.Apply
 import Data.Traversable
 
-import Data.Maybe.Unsafe
 import Data.Array
 import Data.Array.Unsafe as AU
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
-import Data.Monoid
 import Data.Maybe
-import qualified Data.List as L
+import Data.List as L
 import Data.Foldable
-import Data.Monoid
 import Control.Plus
 
 foreign import jsonStringify :: forall a. a -> String

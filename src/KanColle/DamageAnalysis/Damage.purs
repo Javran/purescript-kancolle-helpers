@@ -14,7 +14,6 @@ import Prelude
 import Data.Maybe
 import Data.Monoid
 import Data.Int as Int
-import KanColle.Util
 
 data DameCon
   = RepairTeam

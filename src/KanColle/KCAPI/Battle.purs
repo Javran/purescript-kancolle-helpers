@@ -3,10 +3,9 @@ module KanColle.KCAPI.Battle where
 import Prelude
 import Data.Maybe
 import Data.Foreign
-import Data.Nullable
 import Data.Foreign.Index
 import Control.MonadPlus
-import qualified Data.Array.Unsafe as AU
+import Data.Array.Unsafe as AU
 
 -- things might actually be "null" or even "undefined"
 -- we choose to:

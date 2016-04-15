@@ -8,7 +8,6 @@ module KanColle.Expedition.Cost
 
 import Prelude
 import Data.Int
-import Data.Maybe
 
 -- | Expedition cost. `fuel` and `ammo` are floating numbers
 -- | (valid values are taken from `0.0` to `1.0`) representing
@@ -80,7 +79,7 @@ getExpeditionCost eId = case eId of
     40 -> c 8 7 $ hm 6 50
     _ -> noCost
   where
-    hr = (* 60)
+    hr = (_ * 60)
     hm h m = h*60 + m
     c f a t = { fuel: percent f, ammo: percent a, time: t }
     percent v = toNumber (v * 10) / 100.0

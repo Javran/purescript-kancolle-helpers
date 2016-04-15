@@ -5,7 +5,6 @@ import KanColle.Util
 import KanColle.DamageAnalysis.Damage
 import KanColle.DamageAnalysis
 import KanColle.KCAPI.Battle
-import Data.Foreign
 import Data.Maybe
 import Data.Array
 import Data.Function

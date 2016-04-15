@@ -4,8 +4,8 @@ import Prelude
 import Test.Unit
 import Data.Foreign
 
-import qualified Data.String as Str
-import qualified Data.Array.Unsafe as AU
+import Data.String as Str
+import Data.Array.Unsafe as AU
 import Data.Array
 import Data.Monoid
 import Data.Maybe

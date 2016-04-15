@@ -1,22 +1,13 @@
 module KanColle.Expedition.Plan where
 
 import Prelude
-import KanColle.Expedition.Evaluate
-import KanColle.Expedition.Cost
-import KanColle.Expedition.Minimal
 import KanColle.Expedition.NetIncome
-import KanColle.Expedition
-import Control.Plus
-import qualified Data.Array as A
-import qualified Data.List as L
-import Data.Foldable
+import Data.Array as A
 import Data.Traversable
 import Data.Function
 import Data.String (joinWith)
 import Number.Format
 import Data.Maybe
-import Math (sqrt)
-import Data.Function
 import KanColle.Util
 
 import Control.Monad.Eff.Console

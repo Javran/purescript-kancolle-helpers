@@ -23,9 +23,9 @@ import UtilTests
 import BattleData
 import Base
 
-import qualified Test.QuickCheck as QC
+import Test.QuickCheck as QC
 import Test.Unit.Assert
-import qualified DamageProto as DProto
+import DamageProto as DProto
 
 eqFleetReq :: FleetRequirement -> FleetRequirement -> Boolean
 eqFleetReq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2

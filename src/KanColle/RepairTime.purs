@@ -4,7 +4,6 @@ import Prelude
 import Math hiding (round,floor,ceil)
 import Data.Int
 import KanColle.SType
-import Data.Maybe
 import Data.Function
 
 dockingInSec :: SType -> Int -> Int -> Int -> Int

@@ -2,10 +2,7 @@ module KanColle.Expedition.Evaluate where
 
 import Prelude
 import Data.Array
-import qualified Data.String as S
 import Data.Int
-import Data.Maybe
-import Math hiding (ceil,floor,round)
 import Data.Function
 import Data.Foldable
 

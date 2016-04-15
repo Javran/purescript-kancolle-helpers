@@ -6,7 +6,7 @@ import Test.QuickCheck.Gen
 import Prelude
 import Data.Array
 import KanColle.Util
-import qualified DamageProto as DProto
+import DamageProto as DProto
 
 prop_HeapSortCorrectness :: Array Int -> Result
 prop_HeapSortCorrectness xs = sort xs === heapSortSafe compare xs

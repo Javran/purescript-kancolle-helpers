@@ -4,13 +4,13 @@ import Prelude
 import Data.Maybe
 import Data.Array
 import Data.Maybe.Unsafe
-import qualified Data.Int as I
+import Data.Int as I
 import Data.Foldable
 import KanColle.KCAPI.Master
-import qualified Data.StrMap as SM
-import qualified Data.List as L
-import qualified Data.List.Unsafe as LU
-import qualified Data.Set as S
+import Data.StrMap as SM
+import Data.List as L
+import Data.List.Unsafe as LU
+import Data.Set as S
 import Data.Tuple
 import Debug.Trace
 

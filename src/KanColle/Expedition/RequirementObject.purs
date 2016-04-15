@@ -4,7 +4,6 @@ import Prelude
 import Data.Foldable
 import Data.Maybe
 import Data.Array
-import Data.Monoid
 import Data.Nullable
 
 import KanColle.SType
@@ -135,7 +134,7 @@ checkWithRequirementPack req fleet = case uncons fleet of
                      >= r.stypeReqCount) req.fleetSType
          }
     Nothing ->
-      let toFalseF :: forall a f. (Functor f) => f a -> f Boolean
+      let toFalseF :: forall b f. (Functor f) => f b -> f Boolean
           toFalseF = map (const false)
       in { flagShipLevel: false
          , shipCount: false

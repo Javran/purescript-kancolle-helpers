@@ -13,9 +13,8 @@ module KanColle.Expedition.IncomeBase
 -- note that "great success" is not taken into account.
 
 import Prelude
-import Data.Monoid
-import qualified Data.Int as DI
 import KanColle.Expedition.Base
+import Data.Monoid
 
 -- | `IncomeBase` corresponses to resource income found
 -- | on many KanColle wikis, neither great success nor

@@ -3,13 +3,12 @@ module KanColle.Expedition.Minimal where
 import Prelude
 import Data.Monoid
 import Data.Array
-import qualified Data.Array.Unsafe as AU
+import Data.Array.Unsafe as AU
 import Data.Foldable
-import qualified Data.String as Str
+import Data.String as Str
 
 import KanColle.SType
 
-import KanColle.Expedition
 import KanColle.Expedition.Base
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Requirement

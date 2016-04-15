@@ -10,9 +10,7 @@ module KanColle.Expedition.Base
 -- this module is intended to be imported by other expedition modules
 -- so that we can solve the circular module dependency issue
 
-import Prelude
 import Data.Array
-import Data.Monoid
 
 allExpeditionIds :: Array Int
 allExpeditionIds = 1..40
