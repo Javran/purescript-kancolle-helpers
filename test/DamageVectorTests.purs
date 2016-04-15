@@ -11,12 +11,8 @@ import Data.Monoid
 import Data.Maybe
 import Data.Function
 import KanColle.Util
-import KanColle.DamageAnalysisFFI
 import KanColle.DamageAnalysis
-import KanColle.DamageAnalysis.DamageVector
-import KanColle.DamageAnalysis.Stages
-import KanColle.DamageAnalysis.Damage
-import KanColle.DamageAnalysis.Types
+import KanColle.DamageAnalysis.FFI
 import Test.Unit.Assert as Assert
 import Data.Foldable
 

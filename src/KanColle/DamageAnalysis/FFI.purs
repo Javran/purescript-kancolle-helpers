@@ -1,4 +1,4 @@
-module KanColle.DamageAnalysisFFI
+module KanColle.DamageAnalysis.FFI
   ( analyzeBattleJS
   , analyzeNightBattleJS
   
@@ -10,7 +10,7 @@ module KanColle.DamageAnalysisFFI
 
 import Prelude
 import KanColle.Util
-import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.DamageAnalysis
 import KanColle.DamageAnalysis.Types
 import KanColle.KCAPI.Battle
 import Data.Maybe
