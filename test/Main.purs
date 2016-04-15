@@ -19,13 +19,11 @@ import Data.Foreign
 import Data.Maybe
 
 import DamageVectorTests
-import UtilTests
 import BattleData
 import Base
 
 import Test.QuickCheck as QC
 import Test.Unit.Assert
-import DamageProto as DProto
 
 eqFleetReq :: FleetRequirement -> FleetRequirement -> Boolean
 eqFleetReq r1 r2 = explainFleetRequirement r1 == explainFleetRequirement r2
@@ -143,10 +141,7 @@ unitTests = do
     testRepairTime
 
 main = do
-  qcTestUtils
   -- NOTE: make sure to run "unitTests" after every other
   -- tests are done, for now everything after it doesn't
   -- seem to be executed
   runTest unitTests
-
--- main = DProto.mainBench
