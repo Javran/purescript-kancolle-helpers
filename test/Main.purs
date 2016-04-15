@@ -12,15 +12,12 @@ import KanColle.Expedition
 import KanColle.Expedition.Base
 import KanColle.Expedition.Requirement
 import KanColle.Expedition.Minimal
-import KanColle.DamageAnalysis
-import KanColle.DamageAnalysis.DamageVector
 import KanColle.KCAPI.Battle
 import KanColle.SType
 import KanColle.RepairTime
 import Data.Foreign
 import Data.Maybe
 
-import DamageVectorTests
 import DamageVector2Tests
 import UtilTests
 import BattleData
@@ -100,40 +97,6 @@ testExpeditionHelper =
       assert "Expedition #32, 3 ships should also do" $
         null (unsatisfiedRequirements 32 testFleet5)
 
--- TODO: break into stages
-testDamageAnalyzer :: forall e. MyTest e
-testDamageAnalyzer =
-    test "DamageAnalyzer" do
-      assert "battle sample 1" $
-        trimInfo (analyzeBattle (unsafeFromForeign battle1)) == [Nothing] <>
-          map Just [75,75,75,75-4,77,79-9
-                   ,84-127,60-95,60-21-98,53-213-145,35-164,35-159-157]
-      assert "battle sample 2" $
-        trimInfo (analyzeBattle (unsafeFromForeign battle2)) ==
-          map toMaybeInt [9999
-                         ,15,15-3,18,18,9999,9999
-                         ,90-81-41,55-116,28,28-236,70-121,70-131]
-      assert "night battle sample 1" $
-        trimInfo (analyzeNightBattle (unsafeFromForeign nightBattle1)) ==
-          map toMaybeInt [9999
-                         ,15,12,18,18,9999,9999,0,0,28-94,0,0,0]
-      assert "night battle sample 2" $
-        trimInfo (analyzeNightBattle (unsafeFromForeign nightBattle2)) ==
-          map toMaybeInt [9999
-                         ,75,75,6,69,23,43,0,41-181,21-124,0,0,9999]
-      assert "aerial battle sample 1" $
-        trimInfo (analyzeBattle (unsafeFromForeign aerialBattle1)) ==
-          map toMaybeInt [9999
-                         ,37,31,31,32,32,44-6,96,70,60,20,20,20]
-      assert "ld aerial battle sample 1" $
-        trimInfo (analyzeBattle (unsafeFromForeign ldAerialBattle1)) ==
-          map toMaybeInt [9999
-                         ,31,56,56,42,33,29,500,9999,9999,9999,9999,9999]
-  where
-    toMaybeInt x = if x == 9999 then Nothing else Just x
-    trimInfo :: forall a. Array (Maybe { currentHp:: Int | a}) -> Array (Maybe Int)
-    trimInfo = (map <<< map) (\x -> x.currentHp)
-
 testExpeditionMinimal :: forall e. MyTest e
 testExpeditionMinimal =
     test "ExpeditionMinimalCost" $
@@ -174,9 +137,7 @@ unitTests ::  forall e. TestUnit e
 unitTests = do
     testExpeditionHelper
     testDameCon
-    testDamageVector
     testDamageVector2    
-    testDamageAnalyzer
     testDamageAnalyzer2
     testExpeditionMinimal
     testRepairTime

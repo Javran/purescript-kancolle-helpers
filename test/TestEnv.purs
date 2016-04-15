@@ -3,8 +3,6 @@ module TestEnv
   , module Data.Foreign
   , module Data.Maybe
   , module KanColle.KCAPI.Battle
-  , module KanColle.DamageAnalysis
-  , module KanColle.DamageAnalysis.DamageVector
   , module KanColle.Util
   , module BattleData
   , module KanColle.Expedition.Plan
@@ -33,9 +31,6 @@ import Data.Array.ST
 import Control.Monad.Eff.Console
 
 import KanColle.KCAPI.Battle
-import KanColle.DamageAnalysis
-import KanColle.DamageAnalysis.DamageVector
-import KanColle.DamageAnalysis.Stages
 import KanColle.Expedition.Plan
 import KanColle.Expedition.Minimal
 import KanColle.Generated.SType
@@ -46,7 +41,6 @@ import Debug.Trace
 
 import BattleData
 import MasterData
-import DamageVectorTests
 
 import Control.Monad.Eff
 import KanColle.Util
@@ -59,4 +53,3 @@ testResult2 = generateRemodelGroups testResult
 
 testResult3 :: OriginMap
 testResult3 = generateOriginMap testResult2
-
