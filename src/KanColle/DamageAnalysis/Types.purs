@@ -94,7 +94,7 @@ type ShipResult =
 getShipResult :: Ship -> Ship -> ShipResult
 getShipResult sBefore sAfter =
   { hp: sAfter.hp
-  , sunk: sAfter.sunk
+  , sunk: sAfter.hp <= 0
   , dameConConsumed: 
       isJust sBefore.dameCon && isNothing sAfter.dameCon
   }

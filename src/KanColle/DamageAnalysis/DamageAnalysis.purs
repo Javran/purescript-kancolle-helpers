@@ -37,7 +37,7 @@ getInitFleet ds battle = { main: allyShips, enemy: enemyShips }
     allyMaxHps = maxHps.left
     enemyMaxHps = maxHps.right
     
-    mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: false, dameCon: Nothing }
+    mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
     
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
@@ -65,7 +65,7 @@ getInitFleetCombined ds battle =
     escortNowHps = AU.tail (getInitHpsCombined battle)
     escortMaxHps = AU.tail (getMaxHpsCombined battle)
     
-    mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: false, dameCon: Nothing }
+    mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
     
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
