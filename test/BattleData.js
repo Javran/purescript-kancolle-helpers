@@ -103,7 +103,7 @@ exports.battle2 =
      "api_raigeki":{"api_frai":[-1,1,1,6,5,0,0], "api_erai":[-1,0,0,0,0,0,0],
                     "api_fdam":[-1,0,0,0,0,0,0], "api_edam":[-1,41,0,0,0,121,131],
                     "api_fydam":[-1,0,41,131,121,0,0], "api_eydam":[-1,0,0,0,0,0,0],
-                    "api_fcl":[-1,0,1,1,1,0,0], "api_ecl":[-1,0,0,0,0,0,0]}}
+                    "api_fcl":[-1,0,1,1,1,0,0], "api_ecl":[-1,0,0,0,0,0,0]}};
 
 exports.nightBattle1 =
     {"api_deck_id":"1",
@@ -128,7 +128,7 @@ exports.nightBattle1 =
                     "api_si_list":[-1,[58],[15]],
                     "api_cl_list":[-1,[0],[1]],
                     "api_sp_list":[-1,0,0],
-                    "api_damage":[-1,[0],[94]]}}
+                    "api_damage":[-1,[0],[94]]}};
 
 exports.aerialBattle1 =
     {"api_dock_id":1,
@@ -172,7 +172,7 @@ exports.aerialBattle1 =
                    "api_stage3":{"api_frai_flag":[-1,0,0,0,0,1,0],"api_erai_flag":[-1,0,0,0,0,0,0],
                                  "api_fbak_flag":[-1,0,0,0,0,1,1],"api_ebak_flag":[-1,0,0,0,0,0,0],
                                  "api_fcl_flag":[-1,0,0,0,0,0,0],"api_ecl_flag":[-1,0,0,0,0,0,0],
-                                 "api_fdam":[-1,0,0,0,0,0,6],"api_edam":[-1,0,0,0,0,0,0]}}}
+                                 "api_fdam":[-1,0,0,0,0,0,6],"api_edam":[-1,0,0,0,0,0,0]}}};
 
 exports.nightBattle2 =
     {"api_deck_id":1,
@@ -195,7 +195,7 @@ exports.nightBattle2 =
                     "api_si_list":[-1,[8,7,7],[8],[8],[6]],
                     "api_cl_list":[-1,[1,-1,-1],[0],[0],[1]],
                     "api_sp_list":[-1,5,0,0,0],
-                    "api_damage":[-1,[181,-1,-1],[0],[0],[124]]}}
+                    "api_damage":[-1,[181,-1,-1],[0],[0],[124]]}};
 
 exports.withSupportExpedition1 =
     {"api_dock_id":1,
@@ -266,7 +266,7 @@ exports.withSupportExpedition1 =
                     "api_fydam":[-1,0,0,0,0,0,0],
                     "api_eydam":[-1,0,0,0,0,0,10],
                     "api_fcl":[-1,0,0,0,0,0,0],
-                    "api_ecl":[-1,0,0,0,0,0,2]}}
+                    "api_ecl":[-1,0,0,0,0,0,2]}};
 
 exports.withSupportExpedition2 =
     {"api_dock_id":1,
@@ -338,7 +338,7 @@ exports.withSupportExpedition2 =
      "api_raigeki":{"api_frai":[-1,0,0,0,0,0,0],"api_erai":[-1,0,0,0,0,0,2],
                     "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,0,0,0,0,0],
                     "api_fydam":[-1,0,0,0,0,0,0],"api_eydam":[-1,0,0,0,0,0,0],
-                    "api_fcl":[-1,0,0,0,0,0,0],"api_ecl":[-1,0,0,0,0,0,0]}}
+                    "api_fcl":[-1,0,0,0,0,0,0],"api_ecl":[-1,0,0,0,0,0,0]}};
 
 exports.surfaceTaskForceBattle1 =
     {"api_deck_id":"1",
@@ -401,7 +401,7 @@ exports.surfaceTaskForceBattle1 =
      "api_raigeki":{"api_frai":[-1,4,4,4,4,4,3],"api_erai":[-1,0,0,5,2,0,0],
                     "api_fdam":[-1,0,18,0,0,9,0],"api_edam":[-1,0,0,44,122,0,0],
                     "api_fydam":[-1,0,44,42,0,36,44],"api_eydam":[-1,0,0,9,18,0,0],
-                    "api_fcl":[-1,0,1,1,0,1,1],"api_ecl":[-1,0,0,1,1,0,0]}}
+                    "api_fcl":[-1,0,1,1,0,1,1],"api_ecl":[-1,0,0,1,1,0,0]}};
 
 exports.carrierTaskForceBattle1 =
     {"api_deck_id":"1",
@@ -447,7 +447,7 @@ exports.carrierTaskForceBattle1 =
      "api_raigeki":{"api_frai":[-1,1,1,1,0,1,1],"api_erai":[-1,0,0,0,0,0,0],
                     "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,221,0,0,0,0,0],
                     "api_fydam":[-1,9,43,45,0,0,124],"api_eydam":[-1,0,0,0,0,0,0],
-                    "api_fcl":[-1,1,1,1,0,0,1],"api_ecl":[-1,0,0,0,0,0,0]}}
+                    "api_fcl":[-1,1,1,1,0,0,1],"api_ecl":[-1,0,0,0,0,0,0]}};
 
 exports.carrierTaskForceAirBattle1 =
     {"api_deck_id":"1",
@@ -497,7 +497,7 @@ exports.carrierTaskForceAirBattle1 =
                                  "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,0,12,0,0,0.1]},
                    "api_stage3_combined":{"api_frai_flag":[-1,0,0,0,0,0,0],"api_fbak_flag":[-1,0,0,0,0,1,0],
                                           "api_fcl_flag":[-1,0,0,0,0,0,0],
-                                          "api_fdam":[-1,0,0,0,0,0,0]}}}
+                                          "api_fdam":[-1,0,0,0,0,0,0]}}};
 
 exports.combinedFleetNightBattle1 =
     {"api_deck_id":"1","api_ship_ke":[-1,626,585,585,595,623,623],"api_ship_lv":[-1,1,1,1,1,1,1],
@@ -517,7 +517,7 @@ exports.combinedFleetNightBattle1 =
                     "api_si_list":[-1,[122,122],[550,550],[-1],[123,123],[-1],[7,104],[134,134],[58,58]],
                     "api_cl_list":[-1,[1,1],[1,1],[0],[2,1],[1],[1,1],[1,2],[1,2]],
                     "api_sp_list":[-1,1,1,0,1,0,1,1,3],
-                    "api_damage":[-1,[15,11],[1,1],[0.1],[54,24],[26.1],[29,19],[26,75],[11,73]]}}
+                    "api_damage":[-1,[15,11],[1,1],[0.1],[54,24],[26.1],[29,19],[26,75],[11,73]]}};
 
 exports.carrierTaskForceBattle2 =
     {"api_deck_id":"1",
@@ -574,7 +574,7 @@ exports.carrierTaskForceBattle2 =
                      "api_df_list":[-1,[9,9],[5],[7,7]],
                      "api_si_list":[-1,[7,7],[-1],[7,7]],
                      "api_cl_list":[-1,[1,1],[1],[1,1]],
-                     "api_damage":[-1,[82,108],[29],[52,49]]}}
+                     "api_damage":[-1,[82,108],[29],[52,49]]}};
 
 exports.surfaceTaskForceBattleWithSupport1 =
     {"api_deck_id":"1",
@@ -631,7 +631,7 @@ exports.surfaceTaskForceBattleWithSupport1 =
      "api_raigeki":{"api_frai":[-1,0,3,2,1,3,0],"api_erai":[-1,0,0,6,0,0,0],
                     "api_fdam":[-1,0,0,0,0,0,7],"api_edam":[-1,0,28,8.1,0,0,0],
                     "api_fydam":[-1,0,6,28,0,2,0],"api_eydam":[-1,0,0,7,0,0,0],
-                    "api_fcl":[-1,0,1,1,1,1,0],"api_ecl":[-1,0,0,1,0,0,0]}}
+                    "api_fcl":[-1,0,1,1,1,1,0],"api_ecl":[-1,0,0,1,0,0,0]}};
 
 exports.ldAerialBattle1= 
     {"api_dock_id":1,
@@ -652,7 +652,7 @@ exports.ldAerialBattle1=
                   "api_stage3":{"api_frai_flag":[-1,0,0,0,0,0,0],"api_erai_flag":[-1,0,0,0,0,0,0],
                                 "api_fbak_flag":[-1,0,1,1,0,0,0],"api_ebak_flag":[-1,0,0,0,0,0,0],
                                 "api_fcl_flag":[-1,0,0,0,0,0,0],"api_ecl_flag":[-1,0,0,0,0,0,0],
-                                "api_fdam":[-1,0,0,2,0,0,0],"api_edam":[-1,0,0,0,0,0,0]}}}
+                                "api_fdam":[-1,0,0,2,0,0,0],"api_edam":[-1,0,0,0,0,0,0]}}};
 
 exports.ldAerialBattle2 = 
     {"api_dock_id":1,
@@ -672,7 +672,7 @@ exports.ldAerialBattle2 =
                   "api_stage3":{"api_frai_flag":[-1,0,0,0,0,0,0],"api_erai_flag":[-1,0,0,0,0,0,0],
                                 "api_fbak_flag":[-1,0,1,0,0,0,0],"api_ebak_flag":[-1,0,0,0,0,0,0],
                                 "api_fcl_flag":[-1,0,0,0,0,0,0],"api_ecl_flag":[-1,0,0,0,0,0,0],
-                                "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,0,0,0,0,0]}}}
+                                "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,0,0,0,0,0]}}};
 
 exports.nightBattleWithDameCon1 = 
     {"api_deck_id":"1",
@@ -693,7 +693,7 @@ exports.nightBattleWithDameCon1 =
                     "api_si_list":[-1,[114,114],[-1],[515,514]],
                     "api_cl_list":[-1,[1,1],1,[1,1]],
                     "api_sp_list":[-1,1,0,3],
-                    "api_damage":[-1,[45,64],[22],[27,6]]}}
+                    "api_damage":[-1,[45,64],[22],[27,6]]}};
 
 exports.normBattleWithDameCon1 =
     {"api_dock_id":1,"api_ship_ke":[671,667,666,665,653,558],
@@ -747,4 +747,5 @@ exports.normBattleWithDameCon1 =
      "api_raigeki":{"api_frai":[-1,0,0,0,0,0,0],"api_erai":[-1,0,0,0,0,3,0],
                     "api_fdam":[-1,0,0,4,0,0,0],"api_edam":[-1,0,0,0,0,0,0],
                     "api_fydam":[-1,0,0,0,0,0,0],"api_eydam":[-1,0,0,0,0,4,0],
-                    "api_fcl":[-1,0,0,0,0,0,0],"api_ecl":[-1,0,0,0,0,1,0]}}
+                    "api_fcl":[-1,0,0,0,0,0,0],"api_ecl":[-1,0,0,0,0,1,0]}};
+
