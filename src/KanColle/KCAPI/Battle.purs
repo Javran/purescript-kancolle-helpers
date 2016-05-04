@@ -32,6 +32,7 @@ type Battle =
   , api_hougeki :: Hougeki
   , api_support_flag :: Int
   , api_support_info :: SupportInfo
+  , api_air_base_attack :: Array Kouku
   }
 
 type Kouku =
@@ -193,3 +194,11 @@ getHougeki3CT :: Battle -> Maybe Hougeki
 getHougeki3CT b = do
     checkHouraiFlag 3 b
     return b.api_hougeki3
+
+hasLandBasedAirStrikes :: Battle -> Boolean
+hasLandBasedAirStrikes = hasField "api_air_base_attack"
+
+getLandBasedAirStrikes :: Battle -> Maybe (Array Kouku)
+getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
+    then Just b.api_air_base_attack
+    else Nothing

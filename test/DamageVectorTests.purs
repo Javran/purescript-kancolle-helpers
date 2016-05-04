@@ -97,9 +97,20 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeBattle repairTeam normBattleWithDameCon1) ==
           map toMaybeInt [36-28,72-5-35,50-28-11-4,8,{- sinking 5-103 -}7-3,59-34,
                           480-47-37,130,130-22-7-10-128,130-10-16-44,600-33-47,130-10]
+      Assert.assert "battle with land-based airstrike" $
+        (merge >>> trimInfo) (analyzeBattle dc6 normBattleWithLandBasedAir1) ==
+          map toMaybeInt [63-5,52,68,29-2-19,31-20,11,
+                          640-166-10-17-99-34-24-10-15-13-22,
+                          70-16-148,98-10-12-210,98-12-19-9-9,35-59,35-93]
+      Assert.assert "battle with land-based airstrike (combined)" $
+        (mergeCombined >>> trimInfo) (analyzeSTFBattle dc12 combinedFleetWithLandBasedAir1) ==
+          map toMaybeInt [81,82,58,50,57,56,
+                          45,53,55,31,43,31,
+                          57-42-247,35-98,35-52,20-45,20-66,20-125]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
     merge x = x.main <> x.enemy
+    mergeCombined x = x.main <> x.escort <> x.enemy
     trimInfo :: forall a. Array (Maybe { hp :: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.hp)

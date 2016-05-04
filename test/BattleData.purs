@@ -29,3 +29,6 @@ foreign import ldAerialBattle2 :: Battle
 
 foreign import nightBattleWithDameCon1 :: Battle
 foreign import normBattleWithDameCon1 :: Battle
+
+foreign import normBattleWithLandBasedAir1 :: Battle
+foreign import combinedFleetWithLandBasedAir1 :: Battle

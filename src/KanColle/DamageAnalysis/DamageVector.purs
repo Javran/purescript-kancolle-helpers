@@ -17,6 +17,7 @@ module KanColle.DamageAnalysis.DamageVector
   , calcSupportHouraiDamage
   , calcHougekiDamage
   , calcRaigekiDamage
+  , calcLandBasedKoukuDamage
 
   , toCombined
   
@@ -110,6 +111,11 @@ calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 calcKoukuDamageCombined :: Kouku -> DamageVector
 calcKoukuDamageCombined kk = DV (convertFEDam (kk.api_stage3_combined.api_fdam))
 
+-- | calculate land based kouku damages. whose api_stage3 only have an api_edam field
+-- | (because only enemies are taking damage)
+calcLandBasedKoukuDamage :: Kouku -> DamageVector
+calcLandBasedKoukuDamage lbkk = DV (convertFEDam lbkk.api_stage3.api_edam)
+
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> LR DamageVector
 calcRaigekiDamage = fromFDamAndEDam
@@ -184,15 +190,16 @@ calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV $ convertFEDam info.api_damage
 
 -- | ally fleet's role in this battle
-data FleetRole = FRMain | FREscort | FRSupport
+data FleetRole = FRMain | FREscort | FRSupport | FRLandBased
 
 -- | `toCombined role dv` converts a `LR DamageVector` whose left part
 -- | is playing role `role` into `CombinedDamageVector`
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = case r of
-    FRMain    -> { main: dv.left, escort: mempty, enemy: dv.right }
-    FREscort  -> { main: mempty, escort: dv.left, enemy: dv.right }
-    FRSupport -> { main: mempty, escort: mempty, enemy: dv.right }
+    FRMain      -> { main: dv.left, escort: mempty, enemy: dv.right }
+    FREscort    -> { main: mempty, escort: dv.left, enemy: dv.right }
+    FRSupport   -> { main: mempty, escort: mempty, enemy: dv.right }
+    FRLandBased -> { main: mempty, escort: mempty, enemy: dv.right }
 
 -- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship

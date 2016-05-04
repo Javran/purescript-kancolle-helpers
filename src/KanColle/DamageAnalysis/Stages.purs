@@ -38,6 +38,14 @@ koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
 
+landBasedAirStrikeDVs :: Battle -> LR DamageVector
+landBasedAirStrikeDVs = 
+    connectDV
+      getLandBasedAirStrikes 
+      [] 
+      (map (calcLandBasedKoukuDamage >>> lrOnlyRight))
+    >>> foldl lrAppend memptyLR
+
 kouku2CombinedDV :: Battle -> DamageVector
 kouku2CombinedDV = connectDV getKouku2 mempty calcKoukuDamageCombined
 
@@ -94,7 +102,8 @@ hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
 -- | * `hougeki3` (third shelling stage, always empty for regular battles)
 -- | * `raigeki` (closing torpedo attack)
 battleDV :: Battle -> NormalDamageVector
-battleDV = fconcat [ koukuDV, kouku2DV
+battleDV = fconcat [ landBasedAirStrikeDVs
+                   , koukuDV, kouku2DV
                    , supportAirAttackDV >>> lrOnlyRight
                    , supportHouraiDV >>> lrOnlyRight
                    , openingDV
@@ -125,7 +134,8 @@ fconcat2 xs b = foldl combinedAppend memptyCombined ((\f -> f b) <$> xs)
 -- | get `CombinedDamageVector` of a surface task force battle
 battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
 battleSurfaceTaskForceDV = fconcat2
-    [ koukuDV >>> toCombined FRMain
+    [ landBasedAirStrikeDVs >>> toCombined FRLandBased
+    , koukuDV >>> toCombined FRMain
     , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort
     , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport
     , supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport
@@ -144,17 +154,18 @@ battleSurfaceTaskForceDV = fconcat2
 -- | note that transport escort battle uses this `CombinedDamageVector` as well
 battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
 battleCarrierTaskForceDV = fconcat2
-    [  koukuDV >>> toCombined FRMain    
-    ,  koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
-    ,  supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport 
-    ,  supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport 
+    [ landBasedAirStrikeDVs >>> toCombined FRLandBased
+    , koukuDV >>> toCombined FRMain    
+    , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
+    , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport 
+    , supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport 
     -- the following 2 for aerial battles
-    ,  kouku2DV >>> toCombined FRMain    
-    ,  kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
+    , kouku2DV >>> toCombined FRMain    
+    , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
     -- the followings are for regular battles
-    ,  openingDV >>> toCombined FREscort  
-    ,  hougeki1CTDV >>> toCombined FREscort  
-    ,  raigekiCTDV >>> toCombined FREscort  
-    ,  hougeki2CTDV >>> toCombined FRMain    
-    ,  hougeki3CTDV >>>  toCombined FRMain    
+    , openingDV >>> toCombined FREscort  
+    , hougeki1CTDV >>> toCombined FREscort  
+    , raigekiCTDV >>> toCombined FREscort  
+    , hougeki2CTDV >>> toCombined FRMain    
+    , hougeki3CTDV >>>  toCombined FRMain    
     ]
