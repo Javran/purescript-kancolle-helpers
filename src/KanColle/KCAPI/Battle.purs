@@ -36,7 +36,8 @@ type Battle =
   }
 
 type Kouku =
-  { api_stage3 :: KoukuStage3
+  { api_stage_flag :: Array Int
+  , api_stage3 :: KoukuStage3
   , api_stage3_combined :: KoukuStage3
   }
 
@@ -201,4 +202,9 @@ hasLandBasedAirStrikes = hasField "api_air_base_attack"
 getLandBasedAirStrikes :: Battle -> Maybe (Array Kouku)
 getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
     then Just b.api_air_base_attack
+    else Nothing
+
+getKoukuStage3Maybe :: Kouku -> Maybe KoukuStage3
+getKoukuStage3Maybe kk = if AU.unsafeIndex kk.api_stage_flag 2 == 1
+    then Just kk.api_stage3
     else Nothing
