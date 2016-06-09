@@ -23,7 +23,6 @@ module KanColle.DamageAnalysis.Types
 
 import Prelude
 import Data.Maybe
-import Data.Array
 import KanColle.Util
 
 data DameCon
