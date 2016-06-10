@@ -5,6 +5,7 @@ module KanColle.Expedition.Cost
   ) where
   
 -- this module serves as a database about expedition's cost
+-- TODO: api_mst_mission contains related info that can be extracted.
 
 import Prelude
 import Data.Int
