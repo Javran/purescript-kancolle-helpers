@@ -61,6 +61,9 @@ kouku2DV = connectDV getKouku2 memptyLR calcKoukuDamage
 openingDV :: Battle -> LR DamageVector
 openingDV = connectDV getOpeningAttack memptyLR calcRaigekiDamage
 
+openingTaisenDV :: Battle -> LR DamageVector
+openingTaisenDV = connectDV getOpeningTaisen memptyLR calcHougekiDamage
+
 hougeki1DV :: Battle -> LR DamageVector
 hougeki1DV = connectDV getHougeki1 memptyLR calcHougekiDamage
 
@@ -106,6 +109,11 @@ battleDV = fconcat [ landBasedAirStrikeDVs
                    , koukuDV, kouku2DV
                    , supportAirAttackDV >>> lrOnlyRight
                    , supportHouraiDV >>> lrOnlyRight
+                     -- TODO: before or after support shelling?
+                     -- for now it doesn't matter because subs cannot be attacked during this phase,
+                     -- but we'd better make it right.
+                     -- TODO: same for combined fleets, we can only figure it out during events ...
+                   , openingTaisenDV
                    , openingDV
                    , hougeki1DV, hougeki2DV, hougeki3DV
                    , raigekiDV
@@ -142,7 +150,7 @@ battleSurfaceTaskForceDV = fconcat2
     -- the following 2 for aerial battles
     , kouku2DV >>> toCombined FRMain
     , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
-    -- the followings are for reguler battles
+    -- the followings are for regular battles
     , openingDV >>> toCombined FREscort
     , hougeki1DV >>> toCombined FRMain
     , hougeki2DV >>> toCombined FRMain

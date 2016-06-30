@@ -22,6 +22,8 @@ type Battle =
   , api_stage_flag2 :: Array Int
   , api_kouku :: Kouku
   , api_kouku2 :: Kouku
+  , api_opening_taisen_flag :: Int
+  , api_opening_taisen :: Hougeki
   , api_opening_flag :: Int
   , api_opening_atack :: Raigeki
   , api_hourai_flag :: Array Int
@@ -146,6 +148,13 @@ getOpeningAttack b =
     if hasField "api_opening_flag" b
     && b.api_opening_flag == 1
       then Just b.api_opening_atack
+      else Nothing
+      
+getOpeningTaisen :: Battle -> Maybe Hougeki
+getOpeningTaisen b =
+    if hasField "api_opening_taisen_flag" b
+    && b.api_opening_taisen_flag == 1
+      then Just b.api_opening_taisen
       else Nothing
 
 getHougeki1 :: Battle -> Maybe Hougeki

@@ -111,6 +111,10 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeBattle dc6 normBattleWithLandBasedAir2) ==
           map toMaybeInt [57,30,27-5,12,37,45,
                           600,500,500, 9999,9999,9999]
+      Assert.assert "battle with opening taisen" $
+        (merge >>> trimInfo) (analyzeBattle dc6 normBattleWithOpeningTaisen1) ==
+          map toMaybeInt [39,77,44-4,47, 9999,9999,
+                          44-2-42,27-56,27-36,19-76, 9999,9999]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
