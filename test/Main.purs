@@ -2,6 +2,7 @@ module Test.Main where
 
 import Prelude
 import Test.Unit
+import Test.Unit.Main
 import Control.Monad.Eff
 
 import DamageVectorTests

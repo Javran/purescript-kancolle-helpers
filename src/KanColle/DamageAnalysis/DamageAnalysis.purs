@@ -10,8 +10,8 @@ module KanColle.DamageAnalysis.DamageAnalysis
 
 import Prelude
 import Data.Array
-import Data.Array.Unsafe as AU
 import Data.Maybe
+import Data.Unfoldable
 import KanColle.KCAPI.Battle
 import KanColle.Util
 
@@ -62,8 +62,8 @@ getInitFleetCombined ds battle =
     
     initFleet = getInitFleet dsMain battle
     
-    escortNowHps = AU.tail (getInitHpsCombined battle)
-    escortMaxHps = AU.tail (getMaxHpsCombined battle)
+    escortNowHps = unsafeArrTail (getInitHpsCombined battle)
+    escortMaxHps = unsafeArrTail (getMaxHpsCombined battle)
     
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing

@@ -9,7 +9,7 @@ import Data.Foldable
 import KanColle.SType
 import KanColle.RepairTime
 
-testRepairTime :: forall e. TestUnit e
+testRepairTime :: forall e. TestSuite e
 testRepairTime = do
     let hhmmss h m s = h*3600 + m*60 + s
         mmss m s = m*60 + s

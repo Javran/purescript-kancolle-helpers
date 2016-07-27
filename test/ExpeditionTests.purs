@@ -66,7 +66,7 @@ testFleet5 =
     ]
 
 -- TODO: cover all possible expeditions
-testExpeditionHelper :: forall e. TestUnit e
+testExpeditionHelper :: forall e. TestSuite e
 testExpeditionHelper =
     test "ExpeditionHelper" do
       assert "fleet test 1" $
@@ -82,7 +82,7 @@ testExpeditionHelper =
       assert "Expedition #32, 3 ships should also do" $
         null (unsatisfiedRequirements 32 testFleet5)
 
-testExpeditionMinimal :: forall e. TestUnit e
+testExpeditionMinimal :: forall e. TestSuite e
 testExpeditionMinimal =
     test "ExpeditionMinimalCost" $
       assert "minimal costs are likely to be achivable" $

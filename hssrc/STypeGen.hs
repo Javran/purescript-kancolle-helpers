@@ -28,7 +28,7 @@ sourceContents =
                 : zipWith (\n st -> "fromInt " ++ show n ++ " = " ++ st)
                           [1 :: Int ..]
                           alts
-               ++ ["fromInt v = Unknown (\"num \" ++ show v)"]
+               ++ ["fromInt v = Unknown (\"num \" <> show v)"]
     toIntDefs = "toInt :: SType -> Int"
               : zipWith (\st n -> "toInt " ++ st ++ " = " ++ show n)
                           alts

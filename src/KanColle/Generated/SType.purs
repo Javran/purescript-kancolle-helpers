@@ -78,7 +78,7 @@ fromInt 19 = AR
 fromInt 20 = AS
 fromInt 21 = CT
 fromInt 22 = AO
-fromInt v = Unknown ("num " ++ show v)
+fromInt v = Unknown ("num " <> show v)
 
 toInt :: SType -> Int
 toInt DDE = 1

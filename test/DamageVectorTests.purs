@@ -5,9 +5,9 @@ import Test.Unit
 import Data.Foreign
 
 import Data.String as Str
-import Data.Array.Unsafe as AU
 import Data.Array
 import Data.Monoid
+import Data.Unfoldable
 import Data.Maybe
 import Data.Function
 import KanColle.Util
@@ -30,7 +30,7 @@ dvToStr dv = Str.joinWith "," $ map (damageToInt >>> show) (getDV dv)
 ndvToStr :: LR DamageVector -> String
 ndvToStr ndv = dvToStr ndv.left <> " -- " <> dvToStr ndv.right
 
-testDameCon :: forall e. TestUnit e
+testDameCon :: forall e. TestSuite e
 testDameCon = do
    test "Damage: without damecon" do
       Assert.equal (1-20) (applyDamage (mkDamage 20) (mkShip 1 21 Nothing)).hp
@@ -44,7 +44,7 @@ testDameCon = do
       -- 21/21 -> -20 -> 1/21 -> -30 -> -29/21 (sinking) -> damecon consumed 21/21 -> -20 -> 1/21
       Assert.equal 1 (applyDamage (foldMap mkDamage [20,30,20]) (mkShip 21 21 $ Just RepairGoddess)).hp
 
-testDamageVector :: forall e. TestUnit e
+testDamageVector :: forall e. TestSuite e
 testDamageVector = do
     test "DamageVector: first aerial battle stage" do
       Assert.assert "sample battle1" $
@@ -67,7 +67,7 @@ testDamageVector = do
           "0,70,20,132,40,0"
               == dvToStr (dvF withSupportExpedition2)
 
-testDamageAnalyzer :: forall e. TestUnit e
+testDamageAnalyzer :: forall e. TestSuite e
 testDamageAnalyzer =
     test "DamageAnalyzer" do
       Assert.assert "battle sample 1" $

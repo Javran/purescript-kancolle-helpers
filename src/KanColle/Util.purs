@@ -14,6 +14,10 @@ module KanColle.Util
   , times
   , chooseN
   
+  , unsafeArrIndex
+  , unsafeArrHead
+  , unsafeArrTail
+  
   , LR
   , lrMap
   , memptyLR
@@ -31,11 +35,12 @@ import Control.Monad.Eff
 import Control.Monad.ST
 
 import Data.Array
-import Data.Array.Unsafe as AU
+import Data.Array.Partial as PA
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
 import Data.List as L
 import Data.Foldable
 import Control.Plus
+import Partial.Unsafe
 
 -- | `JSON.stringify`
 foreign import jsonStringify :: forall a. a -> String
@@ -44,6 +49,15 @@ foreign import consoleMessage :: forall a b. Int -> a -> (Unit -> b) -> b
 
 -- | throw anything, raise exceptions from pure code
 foreign import throwWith :: forall a b. a -> b
+
+unsafeArrIndex :: forall a. Array a -> Int -> a
+unsafeArrIndex = unsafePartial PA.unsafeIndex
+
+unsafeArrHead :: forall a. Array a -> a
+unsafeArrHead = unsafePartial PA.head
+
+unsafeArrTail :: forall a. Array a -> Array a
+unsafeArrTail = unsafePartial PA.tail
 
 -- | use it as a placeholder for any not yet implemented
 todo :: forall a b . b -> a
@@ -76,9 +90,9 @@ tails xs = case xs of
 -- | `chooseN xs n` non-deterministically chooses `n` values from `xs`.
 -- | It is recommended to use only small values on `n` (0,1,2,3).
 chooseN :: forall a f. (Foldable f) => f a -> Int -> Array (L.List a)
-chooseN xs = L.fromList <<< pickFrom xsL
+chooseN xs = L.toUnfoldable <<< pickFrom xsL
   where
-    xsL = L.toList xs
+    xsL = L.fromFoldable xs
     pickFrom _ 0 = L.Cons L.Nil L.Nil
     pickFrom remaining i = do
       ys <- tails remaining
@@ -86,7 +100,7 @@ chooseN xs = L.fromList <<< pickFrom xsL
         L.Nil -> empty
         L.Cons hd tl -> do
           rs <- pickFrom tl (i-1)
-          return (L.Cons hd rs)
+          pure (L.Cons hd rs)
 
 -- | `peekSTArray` without array bound checks
 foreign import peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
@@ -117,7 +131,7 @@ fleetSplit cutHead xs = if check
     else throwWith "fleetSplit: array length need to be 12 (or 13 on raw)"
   where
     ys = if cutHead
-           then AU.tail xs
+           then (unsafePartial PA.tail xs)
            else xs
     check = length ys == 12
 

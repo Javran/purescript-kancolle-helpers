@@ -4,7 +4,7 @@ import Prelude
 import Math hiding (round,floor,ceil)
 import Data.Int
 import KanColle.SType
-import Data.Function
+import Data.Function.Uncurried
 
 dockingInSec :: SType -> Int -> Int -> Int -> Int
 dockingInSec _ _ curHp maxHp | curHp == maxHp = 0

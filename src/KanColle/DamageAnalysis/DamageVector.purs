@@ -31,9 +31,9 @@ import Data.Monoid
 import Data.Int as Int
 import Data.Array as A
 import Data.Array.ST as STA
+import Data.Unfoldable
 import Control.Monad.Eff
 import Control.Monad.ST as ST
-import Data.Array.Unsafe as AU
 import KanColle.Util
 import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Damage
@@ -76,7 +76,7 @@ instance semigroupDamageVector :: Semigroup DamageVector where
   append (DV a) (DV b) = DV (A.zipWith (<>) a b)
 
 instance monoidDamageVector :: Monoid DamageVector where
-  mempty = DV (A.replicate 6 mempty)
+  mempty = DV (replicate 6 mempty)
 
 -- | `DamageVector` for normal battles
 type NormalDamageVector = NormalBattle DamageVector
@@ -100,7 +100,7 @@ fromFDamAndEDam v =
 -- we first drop that element and then convert
 -- integers intos Damages
 convertFEDam :: Array Number -> Array Damage
-convertFEDam = AU.tail >>> map (normalizeDamage >>> mkDamage)
+convertFEDam = unsafeArrTail >>> map (normalizeDamage >>> mkDamage)
 
 -- | calculate damage from kouku (aerial) stages
 calcKoukuDamage :: Kouku -> LR DamageVector
@@ -140,7 +140,7 @@ calcHougekiDamage h =
     lengthCheck = A.length eventTargets == A.length eventDamages
 
     eventTargets :: Array Int
-    eventTargets = map (cAI >>> toOne) (AU.tail h.api_df_list)
+    eventTargets = map (cAI >>> toOne) (unsafeArrTail h.api_df_list)
       where
         -- merge targets like [a,a] into a-1
         -- there are 2 checks:
@@ -157,7 +157,7 @@ calcHougekiDamage h =
           Nothing -> throwWith "invalid: empty api_df_list element"
 
     eventDamages :: Array Damage
-    eventDamages = map (cAN >>> convert) (AU.tail h.api_damage)
+    eventDamages = map (cAN >>> convert) (unsafeArrTail h.api_damage)
       where
         convert :: Array Number -> Damage
         convert xs = mkDamage totalDmg
@@ -177,7 +177,7 @@ calcHougekiDamage h =
         pure unit
     resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
     resultDV = do
-        arr <- STA.thaw (A.replicate 12 mempty)
+        arr <- STA.thaw (replicate 12 mempty)
         A.zipWithA (accumulateDamage arr) eventTargets eventDamages
         pure arr
 

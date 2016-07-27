@@ -3,13 +3,13 @@ module KanColle.Remodel where
 import Prelude
 import Data.Maybe
 import Data.Array
-import Data.Maybe.Unsafe
 import Data.Int as I
 import Data.Foldable
 import KanColle.KCAPI.Master
 import Data.StrMap as SM
 import Data.List as L
-import Data.List.Unsafe as LU
+import Data.List.Partial as PL
+import Partial.Unsafe
 import Data.Set as S
 import Data.Tuple
 import Debug.Trace
@@ -67,7 +67,7 @@ fromMstShip ms
   | otherwise =
     let result =
           { shipIdFrom: ms.api_id
-          , shipIdTo: fromJust (I.fromString ms.api_aftershipid)
+          , shipIdTo: unsafePartial fromJust (I.fromString ms.api_aftershipid)
           , level: ms.api_afterlv
           , steel: ms.api_afterfuel
           , ammo: ms.api_afterbull
@@ -103,7 +103,7 @@ collectRemodelInfo2 mstShipUpgrades rim = foldl combine rim upgrades
             -- check and print messages if there's any possible error
             check
               | ri.shipIdTo == upgrade.api_id = ""
-              | otherwise = "WARNING: data inconsistent for id: " ++ show ri.shipIdFrom
+              | otherwise = "WARNING: data inconsistent for id: " <> show ri.shipIdFrom
 
 collectRemodelInfo :: Master -> RemodelInfoMap
 collectRemodelInfo mst = result2
@@ -120,7 +120,7 @@ generateRemodelGroups rim = SM.fromFoldable (map build originIds)
       where
         srcSet = fst tp
         dstSet = snd tp
-    originIds = S.toList (uncurry S.difference srcDstSets)
+    originIds = S.toUnfoldable (uncurry S.difference srcDstSets) :: L.List Int
     build oId = Tuple (show oId) (generateRemodelGroup rim oId)
 
 generateRemodelGroup :: RemodelInfoMap -> Int -> RemodelGroup
@@ -130,7 +130,7 @@ generateRemodelGroup rim originId =
     , group: group }
   where
     getRI i = SM.lookup (show i) rim
-    ri = fromJust (getRI originId)
+    ri = unsafePartial fromJust (getRI originId)
     findLoop :: L.List Int -> Int -> L.List Int
     findLoop visited cur = case L.elemIndex cur visited of
         Nothing ->
@@ -142,7 +142,7 @@ generateRemodelGroup rim originId =
     -- reversed
     groupL' = findLoop L.Nil originId
     group = reverse (listToArray groupL')
-    finalFormsL' = findLoop L.Nil (LU.head groupL')
+    finalFormsL' = findLoop L.Nil ((unsafePartial PL.head) groupL')
     finalForms = reverse (listToArray finalFormsL')
 
 listToArray :: forall a. L.List a -> Array a

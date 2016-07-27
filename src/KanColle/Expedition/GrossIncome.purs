@@ -45,8 +45,8 @@ withFactorToGrossIncome f b = GrossIncome (mapResourceRows modify ib)
     lcFactor = 1.0 + (toNumber normLandingCraft) * 0.05
     gsFactor = if f.greatSuccess then 1.5 else 1.0
     modify = toNumber
-         >>> (* lcFactor)
-         >>> (* gsFactor)
+         >>> (_ * lcFactor)
+         >>> (_ * gsFactor)
          >>> floor
 
 -- | calculate gross income based on `IncomeBase`

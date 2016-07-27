@@ -3,7 +3,7 @@ module KanColle.Expedition.Minimal where
 import Prelude
 import Data.Monoid
 import Data.Array
-import Data.Array.Unsafe as AU
+import Data.Array.Partial as PA
 import Data.Foldable
 import Data.String as Str
 
@@ -14,6 +14,7 @@ import KanColle.Expedition.Cost
 import KanColle.Expedition.Requirement
 import KanColle.Util
 import Data.Maybe
+import Partial.Unsafe
 
 type ShipMaxCost =
   { fuel :: Int
@@ -197,7 +198,7 @@ pprFleetNotes xs = if null notes
     then "<N/A>"
     else
       let grouppedNotes = map formatNote (group notes)
-          formatNote note = "{" <> AU.head note <> "}x" <> show (length note)
+          formatNote note = "{" <> unsafePartial (PA.head note) <> "}x" <> show (length note)
       in Str.joinWith ", " grouppedNotes
   where
     notes = mapMaybe (\x -> x.note) xs

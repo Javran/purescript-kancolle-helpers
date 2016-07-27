@@ -5,7 +5,7 @@ import Data.Maybe
 import Data.Foreign
 import Data.Foreign.Index
 import Control.MonadPlus
-import Data.Array.Unsafe as AU
+import KanColle.Util
 
 -- things might actually be "null" or even "undefined"
 -- we choose to:
@@ -91,12 +91,12 @@ hasField s = hasOwnProperty s <<< toForeign
 
 hasKouku :: Battle -> Boolean
 hasKouku b | hasField "api_stage_flag" b =
-          AU.unsafeIndex b.api_stage_flag 2 == 1
+          unsafeArrIndex b.api_stage_flag 2 == 1
 hasKouku _ = false
 
 hasKouku2 :: Battle -> Boolean
 hasKouku2 b | hasField "api_stage_flag2" b =
-          AU.unsafeIndex b.api_stage_flag2 2 == 1
+          unsafeArrIndex b.api_stage_flag2 2 == 1
 hasKouku2 _ = false
 
 hasHourai :: Battle -> Boolean
@@ -119,13 +119,13 @@ getSupportAirInfo :: Battle -> Maybe SupportAirInfo
 getSupportAirInfo b = do
     i <- getSupportFlag b
     guard (i == 1)
-    return b.api_support_info.api_support_airatack
+    pure b.api_support_info.api_support_airatack
 
 getSupportHouraiInfo :: Battle -> Maybe SupportHouraiInfo
 getSupportHouraiInfo b = do
     i <- getSupportFlag b
     guard $ i == 2 || i == 3
-    return b.api_support_info.api_support_hourai
+    pure b.api_support_info.api_support_hourai
 
 getKouku2 :: Battle -> Maybe Kouku
 getKouku2 b = if hasKouku2 b
@@ -140,7 +140,7 @@ getHouraiFlags b =
 
 checkHouraiFlag :: Int -> Battle -> Maybe Unit
 checkHouraiFlag ind b = do
-    flg <- (`AU.unsafeIndex` ind) <$> getHouraiFlags b
+    flg <- (_ `unsafeArrIndex` ind) <$> getHouraiFlags b
     guard (flg == 1)
 
 getOpeningAttack :: Battle -> Maybe Raigeki
@@ -160,22 +160,22 @@ getOpeningTaisen b =
 getHougeki1 :: Battle -> Maybe Hougeki
 getHougeki1 b = do
     checkHouraiFlag 0 b
-    return b.api_hougeki1
+    pure b.api_hougeki1
 
 getHougeki2 :: Battle -> Maybe Hougeki
 getHougeki2 b = do
     checkHouraiFlag 1 b
-    return b.api_hougeki2
+    pure b.api_hougeki2
 
 getHougeki3 :: Battle -> Maybe Hougeki
 getHougeki3 b = do
     checkHouraiFlag 2 b
-    return b.api_hougeki3
+    pure b.api_hougeki3
 
 getRaigeki :: Battle -> Maybe Raigeki
 getRaigeki b = do
     checkHouraiFlag 3 b
-    return b.api_raigeki
+    pure b.api_raigeki
 
 getHougeki :: Battle -> Maybe Hougeki
 getHougeki b = if hasHougeki b
@@ -188,22 +188,22 @@ getHougeki b = if hasHougeki b
 getHougeki1CT :: Battle -> Maybe Hougeki
 getHougeki1CT b = do
     checkHouraiFlag 0 b
-    return b.api_hougeki1
+    pure b.api_hougeki1
 
 getRaigekiCT :: Battle -> Maybe Raigeki
 getRaigekiCT b = do
     checkHouraiFlag 1 b
-    return b.api_raigeki
+    pure b.api_raigeki
 
 getHougeki2CT :: Battle -> Maybe Hougeki
 getHougeki2CT b = do
     checkHouraiFlag 2 b
-    return b.api_hougeki2
+    pure b.api_hougeki2
 
 getHougeki3CT :: Battle -> Maybe Hougeki
 getHougeki3CT b = do
     checkHouraiFlag 3 b
-    return b.api_hougeki3
+    pure b.api_hougeki3
 
 hasLandBasedAirStrikes :: Battle -> Boolean
 hasLandBasedAirStrikes = hasField "api_air_base_attack"
@@ -214,6 +214,6 @@ getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
     else Nothing
 
 getKoukuStage3Maybe :: Kouku -> Maybe KoukuStage3
-getKoukuStage3Maybe kk = if AU.unsafeIndex kk.api_stage_flag 2 == 1
+getKoukuStage3Maybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
     then Just kk.api_stage3
     else Nothing

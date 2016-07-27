@@ -4,6 +4,7 @@ import Prelude
 import KanColle.Expedition.NetIncome
 import Data.Array as A
 import Data.Traversable
+import Data.Function.Uncurried
 import Data.Function
 import Data.String (joinWith)
 import Number.Format
@@ -69,7 +70,7 @@ dbg :: Number
     -> Eff (console :: CONSOLE) Unit
 dbg pF pA pS pB atime a = do
     void $ traverse (showNI >>> log) $ A.take 50 $ calcNetIncome a pF pA pS pB atime
-    return unit
+    pure unit
 
 
 quickCalc :: Number -> Number -> Number -> Number -> Int -> Array { eIds :: Array Int, hourly :: HourlyIncome, resourceScore :: Number }

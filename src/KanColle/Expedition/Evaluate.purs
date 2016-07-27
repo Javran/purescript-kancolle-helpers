@@ -3,7 +3,7 @@ module KanColle.Expedition.Evaluate where
 import Prelude
 import Data.Array
 import Data.Int
-import Data.Function
+import Data.Function.Uncurried
 import Data.Foldable
 
 import KanColle.Expedition.Base
@@ -46,8 +46,8 @@ ordMax a b = if a >= b then a else b
 minToHour :: Int -> Number
 minToHour m = toNumber m / 60.0
 
-comparing :: forall a b. (Ord a) => (b -> a) -> b -> b -> Ordering
-comparing prj x y = prj x `compare` prj y
+-- comparing :: forall a b. (Ord a) => (b -> a) -> b -> b -> Ordering
+-- comparing prj x y = prj x `compare` prj y
 
 sortByHourlyGain :: (IncomeBase -> Int) -> Array EvalResult
 sortByHourlyGain evalCost = sortBy (flip compareScore) expeditions

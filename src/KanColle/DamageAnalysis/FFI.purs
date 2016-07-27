@@ -14,7 +14,7 @@ import KanColle.DamageAnalysis.DamageAnalysis
 import KanColle.DamageAnalysis.Types
 import KanColle.KCAPI.Battle
 import Data.Maybe
-import Data.Function
+import Data.Function.Uncurried
 import Data.Nullable
 
 readDameCon :: Array Int -> Array (Maybe DameCon)
