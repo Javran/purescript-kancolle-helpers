@@ -64,6 +64,9 @@ openingDV = connectDV getOpeningAttack memptyLR calcRaigekiDamage
 openingTaisenDV :: Battle -> LR DamageVector
 openingTaisenDV = connectDV getOpeningTaisen memptyLR calcHougekiDamage
 
+openingTaisen2DV :: Battle -> LR DamageVector
+openingTaisen2DV = connectDV getOpeningTaisen2 memptyLR calcHougekiDamage
+
 hougeki1DV :: Battle -> LR DamageVector
 hougeki1DV = connectDV getHougeki1 memptyLR calcHougekiDamage
 
@@ -150,6 +153,11 @@ battleSurfaceTaskForceDV = fconcat2
     -- the following 2 for aerial battles
     , kouku2DV >>> toCombined FRMain
     , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
+    
+    -- TODO: preemptive anti-sub, to be verified
+    , openingTaisenDV >>> toCombined FRMain
+    , openingTaisen2DV >>> toCombined FREscort
+
     -- the followings are for regular battles
     , openingDV >>> toCombined FREscort
     , hougeki1DV >>> toCombined FRMain
@@ -170,6 +178,11 @@ battleCarrierTaskForceDV = fconcat2
     -- the following 2 for aerial battles
     , kouku2DV >>> toCombined FRMain    
     , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
+    
+    -- TODO: preemptive anti-sub, to be verified
+    , openingTaisenDV >>> toCombined FRMain
+    , openingTaisen2DV >>> toCombined FREscort    
+
     -- the followings are for regular battles
     , openingDV >>> toCombined FREscort  
     , hougeki1CTDV >>> toCombined FREscort  
