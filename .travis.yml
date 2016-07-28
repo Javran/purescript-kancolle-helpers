@@ -5,16 +5,17 @@ node_js:
 env:
   - PATH=$HOME/purescript:$PATH
 install:
-  - TAG=v0.8.3
+  - TAG=v0.9.2
   - wget -O $HOME/purescript.tar.gz https://github.com/purescript/purescript/releases/download/$TAG/linux64.tar.gz
   - tar -xvf $HOME/purescript.tar.gz -C $HOME/
   - chmod a+x $HOME/purescript
-  - npm install pulp@8.2.1
+  - npm install pulp
   - npm install uglify-js
   - npm install bower
   - npm install benchmark
   - npm install purescript-psa
   - bower install
+  - patch -d bower_components/purescript-number-format -p1 <purescript-number-format.patch
 script:
   - pulp build  --censor-codes=ImplicitImport,HidingImport --censor-lib
   - pulp test

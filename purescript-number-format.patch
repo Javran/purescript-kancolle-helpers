@@ -1,0 +1,283 @@
+diff --git a/bower.json b/bower.json
+index bc36f7f..262738b 100644
+--- a/bower.json
++++ b/bower.json
+@@ -1,22 +1,23 @@
+ {
+-  "name":         "purescript-number-format",
+-  "homepage":     "https://github.com/Jonplussed/purescript-number-format",
+-  "description":  "Number-to-String functions",
+-  "license":      "MIT",
+-  "version":      "0.3.0",
+-
++  "name": "purescript-number-format",
++  "homepage": "https://github.com/Jonplussed/purescript-number-format",
++  "description": "Number-to-String functions",
++  "license": "MIT",
++  "version": "0.3.0",
+   "dependencies": {
+-    "purescript-eff": "0.1.0",
+-    "purescript-exceptions": "0.3.0",
+-    "purescript-maybe": "0.3.2"
++    "purescript-eff": "1.0.0",
++    "purescript-exceptions": "1.0.0",
++    "purescript-maybe": "1.0.0",
++    "purescript-partial": "^1.1.2"
++  },
++  "devDependencies": {
++    "purescript-test-unit": "^7.0.0"
+   },
+-
+   "keywords": [
+     "purescript",
+     "number",
+     "format"
+   ],
+-
+   "ignore": [
+     "**/.*",
+     "bower_components",
+diff --git a/src/Number/Format.purs b/src/Number/Format.purs
+index 69f8c61..42a5a38 100644
+--- a/src/Number/Format.purs
++++ b/src/Number/Format.purs
+@@ -36,4 +36,4 @@ toString radix num = runPure (errorAsNothing $ Just <$> unsafeToString radix num
+ -- private functions
+ 
+ errorAsNothing :: forall eff a. Eff (err :: EXCEPTION | eff) (Maybe a) -> Eff eff (Maybe a)
+-errorAsNothing = catchException (return <<< const Nothing)
++errorAsNothing = catchException (pure <<< const Nothing)
+diff --git a/src/Number/Format/ToString.purs b/src/Number/Format/ToString.purs
+index 76b0d60..ecaefa0 100644
+--- a/src/Number/Format/ToString.purs
++++ b/src/Number/Format/ToString.purs
+@@ -5,19 +5,23 @@ module Number.Format.ToString
+ , toOctString
+ ) where
+ 
+-import Data.Maybe.Unsafe (fromJust)
++import Data.Maybe
+ import Number.Format (toString)
++import Partial.Unsafe
+ 
+ import Prelude
+ 
++toBaseXString :: Int -> Number -> String
++toBaseXString x = unsafePartial fromJust <<< toString x
++
+ toBinString :: Number -> String
+-toBinString = fromJust <<< toString 2
++toBinString = toBaseXString 2
+ 
+ toDecString :: Number -> String
+-toDecString = fromJust <<< toString 10
++toDecString = toBaseXString 10
+ 
+ toHexString :: Number -> String
+-toHexString = fromJust <<< toString 16
++toHexString = toBaseXString 16
+ 
+ toOctString :: Number -> String
+-toOctString = fromJust <<< toString 8
++toOctString = toBaseXString 8
+diff --git a/test/Main.purs b/test/Main.purs
+index 0b07d37..9716e5e 100644
+--- a/test/Main.purs
++++ b/test/Main.purs
+@@ -1,10 +1,10 @@
+ module Test.Main where
+ 
+-import Test.Unit (runTest)
++import Test.Unit.Main (runTest)
+ 
+-import qualified Test.Number.Format           as Safe
+-import qualified Test.Number.Format.Unsafe    as Unsafe
+-import qualified Test.Number.Format.ToString  as ToString
++import Test.Number.Format           as Safe
++import Test.Number.Format.Unsafe    as Unsafe
++import Test.Number.Format.ToString  as ToString
+ 
+ import Prelude
+ 
+diff --git a/test/Number/Format.purs b/test/Number/Format.purs
+index 040d2e1..3e3effa 100644
+--- a/test/Number/Format.purs
++++ b/test/Number/Format.purs
+@@ -4,11 +4,13 @@ import Data.Maybe
+ import Number.Format
+ import Prelude
+ import Test.Unit
++import Test.Unit.Assert
+ 
++tests :: forall e. TestSuite e
+ tests = do
+   let n = 1.2345
+ 
+-  test "Number.Format.toExponential" do
++  suite "Number.Format.toExponential" do
+     test "formatting" do
+       assert "scale of 3" $ toExponential 3 n == Just "1.234e+0"
+       assert "scale of 6" $ toExponential 6 12.345 == Just "1.234500e+1"
+@@ -19,7 +21,7 @@ tests = do
+       assert "20 returns a Just String" $ isJust $ toExponential 20 n
+       assert "21 returns Nothing" $ isNothing $ toExponential 21 n
+ 
+-  test "Number.Format.toFixed" do
++  suite "Number.Format.toFixed" do
+     test "formatting" do
+       assert "scale of 3" $ toFixed 3 n == Just "1.234"
+       assert "scale of 6" $ toFixed 6 n == Just "1.234500"
+@@ -30,7 +32,7 @@ tests = do
+       assert "20 returns a Just String" $ isJust $ toFixed 20 n
+       assert "21 returns Nothing" $ isNothing $ toFixed 21 n
+ 
+-  test "Number.Format.toPrecision" do
++  suite "Number.Format.toPrecision" do
+     test "formatting" do
+       assert "precision of 3" $ toPrecision 3 n == Just "1.23"
+       assert "precision of 4" $ toPrecision 4 n == Just "1.234"
+@@ -41,7 +43,7 @@ tests = do
+       assert "22 returns a Just String" $ isJust $ toPrecision 21 n
+       assert "22 returns Nothing" $ isNothing $ toPrecision 22 n
+ 
+-  test "Number.Format.toString" do
++  suite "Number.Format.toString" do
+     test "formatting" do
+       assert "radix of 10" $ toString 10 n == Just "1.2345"
+       assert "radix of 2" $ toString 2 3.0 == Just "11"
+diff --git a/test/Number/Format/ToString.purs b/test/Number/Format/ToString.purs
+index 1de19f1..90e6f33 100644
+--- a/test/Number/Format/ToString.purs
++++ b/test/Number/Format/ToString.purs
+@@ -3,10 +3,11 @@ module Test.Number.Format.ToString (tests) where
+ import Number.Format.ToString
+ import Prelude
+ import Test.Unit
++import Test.Unit.Assert
+ 
++tests :: forall e. TestSuite e
+ tests = do
+-
+-  test "Safe toString formatters" do
++  suite "Safe toString formatters" do
+     test "Number.Format.ToString.toBinString" do
+       assert "toBinString 64" $ toBinString 64.0 == "1000000"
+       assert "toBinString 128" $ toBinString 128.0 == "10000000"
+diff --git a/test/Number/Format/Unsafe.purs b/test/Number/Format/Unsafe.purs
+index e0762ee..62f356b 100644
+--- a/test/Number/Format/Unsafe.purs
++++ b/test/Number/Format/Unsafe.purs
+@@ -5,76 +5,61 @@ import Control.Monad.Eff.Exception
+ import Number.Format.Unsafe
+ import Prelude
+ import Test.Unit
++import Test.Unit.Assert
+ 
++tests :: forall e. TestSuite e
+ tests = do
+   let n = 1.2345
+ 
+-  test "Number.Format.Unsafe.unsafeToExponential" do
++  suite "Number.Format.Unsafe.unsafeToExponential" do
+     test "formatting" do
+-      assertFn "scale of 3" \check -> do
+-        formatted <- unsafeToExponential 3 n
+-        check $ formatted == "1.234e+0"
+-      assertFn "scale of 6" \check -> do
+-        formatted <- unsafeToExponential 6 12.345
+-        check $ formatted == "1.234500e+1"
++      assert "scale of 3" $ runPure (unsafeToExponential 3 n) ==  "1.234e+0"
++      assert "scale of 6" $ runPure (unsafeToExponential 6 12.345) == "1.234500e+1"
++
+     test "lower scale bound" do
+-      assertFn "0 doesn't error" $ shouldNotError (unsafeToExponential 0 n)
+-      assertFn "-1 throws a RangeError" $ shouldError (unsafeToExponential (-1) n)
++      assert "0 doesn't error" $ runPure $ shouldNotError (unsafeToExponential 0 n)
++      assert "-1 throws a RangeError" $ runPure $ shouldError (unsafeToExponential (-1) n)
+     test "upper scale bound" do
+-      assertFn "20 doesn't error" $ shouldNotError (unsafeToExponential 20 n)
+-      assertFn "21 raises a RangeError" $ shouldError (unsafeToExponential 21 n)
++      assert "20 doesn't error" $ runPure $ shouldNotError (unsafeToExponential 20 n)
++      assert "21 raises a RangeError" $ runPure $ shouldError (unsafeToExponential 21 n)
+ 
+-  test "Number.Format.Unsafe.unsafeToFixed" do
++  suite "Number.Format.Unsafe.unsafeToFixed" do
+     test "formatting" do
+-      assertFn "scale of 3" \check -> do
+-        formatted <- unsafeToFixed 3 n
+-        check $ formatted == "1.234"
+-      assertFn "scale of 6" \check -> do
+-        formatted <- unsafeToFixed 6 n
+-        check $ formatted == "1.234500"
++      assert "scale of 3" $ runPure (unsafeToFixed 3 n) == "1.234"
++      assert "scale of 6" $ runPure (unsafeToFixed 6 n) == "1.234500"
+     test "lower scale bound" do
+-      assertFn "0 doesn't error" $ shouldNotError (unsafeToFixed 0 n)
+-      assertFn "-1 raises a RangeError" $ shouldError (unsafeToFixed (-1) n)
++      assert "0 doesn't error" $ runPure $ shouldNotError (unsafeToFixed 0 n)
++      assert "-1 raises a RangeError" $ runPure $ shouldError (unsafeToFixed (-1) n)
+     test "upper scale bound" do
+-      assertFn "20 doesn't error" $ shouldNotError (unsafeToFixed 20 n)
+-      assertFn "21 raises a RangeError" $ shouldError (unsafeToFixed 21 n)
++      assert "20 doesn't error" $ runPure $ shouldNotError (unsafeToFixed 20 n)
++      assert "21 raises a RangeError" $ runPure $ shouldError (unsafeToFixed 21 n)
+ 
+-  test "Number.Format.Unsafe.unsafeToPrecision" do
++  suite "Number.Format.Unsafe.unsafeToPrecision" do
+     test "formatting" do
+-      assertFn "precision of 3" \check -> do
+-        formatted <- unsafeToPrecision 3 n
+-        check $ formatted == "1.23"
+-      assertFn "precision of 4" \check -> do
+-        formatted <- unsafeToPrecision 4 n
+-        check $ formatted == "1.234"
++      assert "precision of 3" $ runPure (unsafeToPrecision 3 n) == "1.23"
++      assert "precision of 4" $ runPure (unsafeToPrecision 4 n) == "1.234"
+     test "lower precision bound" do
+-      assertFn "1 doesn't error" $ shouldNotError (unsafeToPrecision 1 n)
+-      assertFn "0 raises a RangeError" $ shouldError (unsafeToPrecision 0 n)
++      assert "1 doesn't error" $ runPure $ shouldNotError (unsafeToPrecision 1 n)
++      assert "0 raises a RangeError" $ runPure $ shouldError (unsafeToPrecision 0 n)
+     test "upper precision bound" do
+-      assertFn "22 doesn't error" $ shouldNotError (unsafeToPrecision 21 n)
+-      assertFn "22 raises a RangeError" $ shouldError (unsafeToPrecision 22 n)
++      assert "22 doesn't error" $ runPure $ shouldNotError (unsafeToPrecision 21 n)
++      assert "22 raises a RangeError" $ runPure $ shouldError (unsafeToPrecision 22 n)
+ 
+-  test "Number.Format.Unsafe.unsafeToString" do
++  suite "Number.Format.Unsafe.unsafeToString" do
+     test "formatting" do
+-      assertFn "radix of 10" \check -> do
+-        formatted <- unsafeToString 10 n
+-        check $ formatted == "1.2345"
+-      assertFn "radix of 2" \check -> do
+-        formatted <- unsafeToString 2 3.0
+-        check $ formatted == "11"
++      assert "radix of 10" $ runPure (unsafeToString 10 n) == "1.2345"
++      assert "radix of 2" $ runPure (unsafeToString 2 3.0) == "11"
+     test "lower radix bound" do
+-      assertFn "2 doesn't error" $ shouldNotError (unsafeToString 2 n)
+-      assertFn "1 raises a RangeError" $ shouldError (unsafeToString 1 n)
++      assert "2 doesn't error" $ runPure $ shouldNotError (unsafeToString 2 n)
++      assert "1 raises a RangeError" $ runPure $ shouldError (unsafeToString 1 n)
+     test "upper radix bound" do
+-      assertFn "36 doesn't error" $ shouldNotError (unsafeToString 36 n)
+-      assertFn "37 raises a RangeError" $ shouldError (unsafeToString 37 n)
++      assert "36 doesn't error" $ runPure $ shouldNotError (unsafeToString 36 n)
++      assert "37 raises a RangeError" $ runPure $ shouldError (unsafeToString 37 n)
+ 
+-shouldError :: forall eff a. Eff (err :: EXCEPTION | eff) a -> (Boolean -> Eff eff Unit) -> Eff eff Unit
+-shouldError fn check = do
+-  didError <- catchException (return <<< const true) (fn >>= return <<< const false)
+-  check didError
++shouldError :: forall eff a. Eff (err :: EXCEPTION | eff) a -> Eff eff Boolean
++shouldError fn = do
++  catchException (pure <<< const true) (fn >>= pure <<< const false)
+ 
+-shouldNotError :: forall eff a. Eff (err :: EXCEPTION | eff) a -> (Boolean -> Eff eff Unit) -> Eff eff Unit
+-shouldNotError fn check = do
+-  didError <- catchException (return <<< const false) (fn >>= return <<< const true)
+-  check didError
++shouldNotError :: forall eff a. Eff (err :: EXCEPTION | eff) a -> Eff eff Boolean
++shouldNotError fn = do
++  catchException (pure <<< const false) (fn >>= pure <<< const true)
