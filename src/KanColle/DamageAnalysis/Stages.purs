@@ -10,10 +10,10 @@ module KanColle.DamageAnalysis.Stages
   , nightBattleDV
   , supportAirAttackDV
   , supportHouraiDV
-  
+
   , battleCarrierTaskForceDV
   , battleSurfaceTaskForceDV
-  
+
   ) where
 
 import Prelude
@@ -39,10 +39,10 @@ koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
 
 landBasedAirStrikeDVs :: Battle -> LR DamageVector
-landBasedAirStrikeDVs = 
+landBasedAirStrikeDVs =
     connectDV
-      getLandBasedAirStrikes 
-      [] 
+      getLandBasedAirStrikes
+      []
       (map (calcLandBasedKoukuDamage >>> lrOnlyRight))
     >>> foldl lrAppend memptyLR
 
@@ -121,7 +121,7 @@ battleDV = fconcat [ landBasedAirStrikeDVs
                    , hougeki1DV, hougeki2DV, hougeki3DV
                    , raigekiDV
                    ] >>> lrToNormal
-                   
+
 fconcat :: Array (Battle -> LR DamageVector) -> Battle -> LR DamageVector
 fconcat xs b = foldl lrAppend memptyLR ((\f -> f b) <$> xs)
 
@@ -153,7 +153,7 @@ battleSurfaceTaskForceDV = fconcat2
     -- the following 2 for aerial battles
     , kouku2DV >>> toCombined FRMain
     , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
-    
+
     -- TODO: preemptive anti-sub, to be verified
     , openingTaisenDV >>> toCombined FRMain
     , openingTaisen2DV >>> toCombined FREscort
@@ -171,22 +171,22 @@ battleSurfaceTaskForceDV = fconcat2
 battleCarrierTaskForceDV :: Battle -> CombinedDamageVector
 battleCarrierTaskForceDV = fconcat2
     [ landBasedAirStrikeDVs >>> toCombined FRLandBased
-    , koukuDV >>> toCombined FRMain    
-    , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
-    , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport 
-    , supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport 
+    , koukuDV >>> toCombined FRMain
+    , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort
+    , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport
+    , supportHouraiDV >>> lrOnlyRight >>> toCombined FRSupport
     -- the following 2 for aerial battles
-    , kouku2DV >>> toCombined FRMain    
-    , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort  
-    
+    , kouku2DV >>> toCombined FRMain
+    , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
+
     -- TODO: preemptive anti-sub, to be verified
     , openingTaisenDV >>> toCombined FRMain
-    , openingTaisen2DV >>> toCombined FREscort    
+    , openingTaisen2DV >>> toCombined FREscort
 
     -- the followings are for regular battles
-    , openingDV >>> toCombined FREscort  
-    , hougeki1CTDV >>> toCombined FREscort  
-    , raigekiCTDV >>> toCombined FREscort  
-    , hougeki2CTDV >>> toCombined FRMain    
-    , hougeki3CTDV >>>  toCombined FRMain    
+    , openingDV >>> toCombined FREscort
+    , hougeki1CTDV >>> toCombined FREscort
+    , raigekiCTDV >>> toCombined FREscort
+    , hougeki2CTDV >>> toCombined FRMain
+    , hougeki3CTDV >>>  toCombined FRMain
     ]
