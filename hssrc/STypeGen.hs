@@ -12,12 +12,14 @@ sourceContents =
     , "module KanColle.Generated.SType where", ""
     , "import Prelude", ""] ++
     dataDef ++ [""] ++
+    derivDecls ++ [""] ++
     showDefs ++ [""] ++
     readDefs ++ [""] ++
     fromIntDefs ++ [""] ++
     toIntDefs
   where
     dataDef = ["data SType = " ++ intercalate " | "  alts ++ " | Unknown String"]
+    derivDecls = ["derive instance eqSType :: Eq SType"]
     showDefs = "showSType :: SType -> String"
              : map (\x -> printf "showSType %s = \"%s\"" x x) alts
             ++ ["showSType (Unknown s) = \"<Unknown:\" <> s <> \">\""]
