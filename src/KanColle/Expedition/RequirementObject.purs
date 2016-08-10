@@ -146,7 +146,7 @@ checkWithRequirementPack req fleet = case uncons fleet of
          }
   where
     checkShipType :: SType -> Array SType -> Boolean
-    checkShipType st = any (eqSType st)
+    checkShipType st = any (st == _)
     count pred = length <<< filter pred
 
 resultPackToObject :: ResultPack Maybe -> ResultPack Nullable

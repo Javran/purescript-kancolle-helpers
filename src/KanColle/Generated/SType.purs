@@ -5,6 +5,8 @@ import Prelude
 
 data SType = DDE | DD | CL | CLT | CA | CAV | CVL | FBB | BB | BBV | CV | XBB | SS | SSV | AP | AV | LHA | CVB | AR | AS | CT | AO | Unknown String
 
+derive instance eqSType :: Eq SType
+
 showSType :: SType -> String
 showSType DDE = "DDE"
 showSType DD = "DD"
