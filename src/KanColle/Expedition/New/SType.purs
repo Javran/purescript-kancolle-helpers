@@ -1,4 +1,4 @@
-module KanColle.Expedition.SType
+module KanColle.Expedition.New.SType
   ( SType(..)
   , matchSType
   ) where

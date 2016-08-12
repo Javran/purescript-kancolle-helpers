@@ -1,7 +1,7 @@
-module KanColle.Expedition.CostModel where
+module KanColle.Expedition.New.CostModel where
 
 import Prelude
-import KanColle.Expedition.SType
+import KanColle.Expedition.New.SType
 import Data.Maybe
 import Control.MonadPlus
 
