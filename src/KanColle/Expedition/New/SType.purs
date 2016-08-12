@@ -17,6 +17,9 @@ data SType
   | AS
   | CT
   | AV
+  
+derive instance eqSType :: Eq SType
+derive instance ordSType :: Ord SType
 
 matchSType :: SType -> K.SType -> Boolean
 matchSType s ks = case s of
