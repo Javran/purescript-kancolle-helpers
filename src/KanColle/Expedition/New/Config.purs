@@ -2,6 +2,7 @@ module KanColle.Expedition.New.Config
   ( Config
   , mkConfig
   , defConfig
+  , getCompositionWithConfig
   ) where
 
 import Prelude
@@ -30,8 +31,8 @@ mkConfig gs dCount wt = Conf
 defConfig :: Config
 defConfig = mkConfig false 0 DD
 
-getComposition :: Config -> Int -> FleetCompo
-getComposition (Conf c) n = if c.greatSuccess
+getCompositionWithConfig :: Config -> Int -> FleetCompo
+getCompositionWithConfig (Conf c) n = if c.greatSuccess
     then compo <> replicate (6 - l) c.wildcardSType
     else compo
   where
