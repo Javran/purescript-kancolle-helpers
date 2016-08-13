@@ -1,17 +1,27 @@
-module KanColle.Expedition.New.Compo where
+module KanColle.Expedition.New.MinCompo
+ ( MinFleetCompo
+ , getMinimumComposition
+ ) where
 
 import Prelude
 import Data.Maybe
 import KanColle.Expedition.New.SType
 import Data.Unfoldable
 import Data.Array as A
+import Data.Array.Partial as A
+import Partial.Unsafe
 
 -- Nothing: ship type not specified
 -- Just <stype>: must be of ship type <stype>
-type FleetCompo = Array (Maybe SType)
+type MinFleetCompo = Array (Maybe SType)
 
-expedCompositions :: Array FleetCompo
-expedCompositions =
+getMinimumComposition :: Int -> MinFleetCompo
+getMinimumComposition n =
+    unsafePartial A.unsafeIndex minimumCompositions (n-1)
+
+-- | minimum compositions for all expeditions
+minimumCompositions :: Array MinFleetCompo
+minimumCompositions =
     [ -- Exped 1
       atLeast 2 []
     , -- Exped 2
@@ -101,9 +111,7 @@ expedCompositions =
     full = atLeast 6
     -- fill wildcards to a composition
     -- to meet the ship number requirement
-    atLeast :: Int -> FleetCompo -> FleetCompo
     atLeast n compo = if A.length compo < n
         then compo <> replicate (n - A.length compo) Nothing
         else compo
-    sty :: Int -> SType -> FleetCompo
     sty n st = replicate n (Just st)
