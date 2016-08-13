@@ -1,4 +1,9 @@
-module KanColle.Expedition.New.CostModel where
+module KanColle.Expedition.New.CostModel
+  ( CostModel
+  , MaxCost(..)
+  , mkMC
+  , normalCostModel
+  ) where
 
 import Prelude
 import KanColle.Expedition.New.SType
