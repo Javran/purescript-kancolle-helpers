@@ -37,7 +37,7 @@ normalCostModel :: CostModel
 normalCostModel stype = case stype of
     DD -> ddCost
     CL -> clCost
-    CVLLike -> cvlLikeCost
+    CVLike -> cvlLikeCost
     SSLike -> ssLikeCost
     CA -> caCost
     BBV -> bbvCost

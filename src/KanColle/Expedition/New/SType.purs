@@ -10,7 +10,7 @@ import KanColle.SType as K
 data SType
   = DD
   | CL
-  | CVLLike
+  | CVLike
   | SSLike
   | CA
   | BBV
@@ -25,7 +25,7 @@ matchSType :: SType -> K.SType -> Boolean
 matchSType s ks = case s of
     DD -> ks == K.DD
     CL -> ks == K.CL
-    CVLLike ->
+    CVLike ->
         ks == K.CV
      || ks == K.CVL
      || ks == K.AV

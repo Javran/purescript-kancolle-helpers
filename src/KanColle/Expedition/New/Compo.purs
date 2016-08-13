@@ -42,14 +42,14 @@ expedCompositions =
     , -- Exped 14
       full (sty 1 CL <> sty 3 DD)
     , -- Exped 15
-      full (sty 2 CVLLike <> sty 2 DD)
+      full (sty 2 CVLike <> sty 2 DD)
     , -- Exped 16
       full (sty 1 CL <> sty 2 DD)
       
     , -- Exped 17
       full (sty 1 CL <> sty 3 DD)
     , -- Exped 18
-      full (sty 3 CVLLike <> sty 2 DD)
+      full (sty 3 CVLike <> sty 2 DD)
     , -- Exped 19
       full (sty 2 BBV <> sty 2 DD)
     , -- Exped 20
@@ -66,7 +66,7 @@ expedCompositions =
     , -- Exped 25
       sty 2 CA <> sty 2 DD
     , -- Exped 26
-      sty 1 CVLLike <> sty 1 CL <> sty 2 DD
+      sty 1 CVLike <> sty 1 CL <> sty 2 DD
     , -- Exped 27
       sty 2 SSLike
     , -- Exped 28
@@ -85,7 +85,7 @@ expedCompositions =
     , -- Exped 34
       sty 2 DD
     , -- Exped 35
-      full (sty 2 CVLLike <> sty 1 CA <> sty 1 DD)
+      full (sty 2 CVLike <> sty 1 CA <> sty 1 DD)
     , -- Exped 36
       full (sty 2 AV <> sty 1 CL <> sty 1 DD)
     , -- Exped 37
