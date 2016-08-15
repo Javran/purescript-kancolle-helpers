@@ -115,6 +115,16 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeBattle dc6 normBattleWithOpeningTaisen1) ==
           map toMaybeInt [39,77,44-4,47, 9999,9999,
                           44-2-42,27-56,27-36,19-76, 9999,9999]
+      Assert.assert "STF opening taisen" $
+        (mergeCombined >>> trimInfo) (analyzeSTFBattle dc12 combinedFleetOpeingTaisenSTF1) ==
+          map toMaybeInt [50,50,45, 9999,9999,9999,
+                          44,29,33, 9999,9999,9999,
+                          33-77,33-78, 9999,9999,9999,9999]
+      Assert.assert "CTF opening taisen" $
+        (mergeCombined >>> trimInfo) (analyzeCTFBattle dc12 combinedFleetOpeingTaisenCTF1) ==
+          map toMaybeInt [54,45,45, 9999,9999,9999,
+                          44,47,29,33, 9999,9999,
+                          33-89,33-90, 9999,9999,9999,9999]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
