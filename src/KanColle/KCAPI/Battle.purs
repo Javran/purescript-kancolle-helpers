@@ -25,10 +25,6 @@ type Battle =
   , api_opening_taisen_flag :: Int
   , api_opening_taisen :: Hougeki
  
-  -- the following 2 fields are merely guessing.
-  , api_opening_taisen_flag2 :: Int
-  , api_opening_taisen2 :: Hougeki
-
   , api_opening_flag :: Int
   , api_opening_atack :: Raigeki
   , api_hourai_flag :: Array Int
@@ -162,13 +158,6 @@ getOpeningTaisen b =
       then Just b.api_opening_taisen
       else Nothing
       
-getOpeningTaisen2 :: Battle -> Maybe Hougeki
-getOpeningTaisen2 b =
-    if hasField "api_opening_taisen_flag2" b
-    && b.api_opening_taisen_flag2 == 1
-      then Just b.api_opening_taisen2
-      else Nothing
-
 getHougeki1 :: Battle -> Maybe Hougeki
 getHougeki1 b = do
     checkHouraiFlag 0 b
