@@ -21,6 +21,9 @@ foreign import carrierTaskForceBattle2 :: Battle
 foreign import carrierTaskForceAirBattle1 :: Battle
 
 foreign import combinedFleetNightBattle1 :: Battle
+-- sample data for a HP array of length less than 13 (on combined fleet)
+-- it's very likely that terminating "-1"s are truncated.
+foreign import combinedFleetNightBattle2 :: Battle
 
 foreign import surfaceTaskForceBattleWithSupport1 :: Battle
 
