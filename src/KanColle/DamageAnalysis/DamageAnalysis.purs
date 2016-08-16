@@ -25,15 +25,23 @@ rawSplit = fleetSplit true
 normalSplit :: forall a. Array a -> LR (Array a)
 normalSplit = fleetSplit false
 
+ensureHpsLen :: Int -> Array (Maybe Int) -> Array (Maybe Int)
+ensureHpsLen expectLen xs = case expectLen `compare` actualLen of
+    LT -> throwWith "ensureHpsLen: array length is longer than expected"
+    EQ -> xs
+    GT -> (xs <> replicate (expectLen - actualLen) Nothing)
+  where
+    actualLen = length xs
+
 -- get initial fleet info
 getInitFleet :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo Ship
 getInitFleet ds battle = { main: allyShips, enemy: enemyShips }
   where
-    nowHps = rawSplit (getInitHps battle)
+    nowHps = rawSplit (ensureHpsLen (1+12) $ getInitHps battle)
     allyNowHps = nowHps.left
     enemyNowHps = nowHps.right
 
-    maxHps = rawSplit (getMaxHps battle)
+    maxHps = rawSplit (ensureHpsLen (1+12) $ getMaxHps battle)
     allyMaxHps = maxHps.left
     enemyMaxHps = maxHps.right
     
@@ -62,8 +70,8 @@ getInitFleetCombined ds battle =
     
     initFleet = getInitFleet dsMain battle
     
-    escortNowHps = unsafeArrTail (getInitHpsCombined battle)
-    escortMaxHps = unsafeArrTail (getMaxHpsCombined battle)
+    escortNowHps = unsafeArrTail (ensureHpsLen (1+6) $ getInitHpsCombined battle)
+    escortMaxHps = unsafeArrTail (ensureHpsLen (1+6) $ getMaxHpsCombined battle)
     
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
