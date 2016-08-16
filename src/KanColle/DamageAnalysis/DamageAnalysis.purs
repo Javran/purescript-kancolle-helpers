@@ -25,6 +25,12 @@ rawSplit = fleetSplit true
 normalSplit :: forall a. Array a -> LR (Array a)
 normalSplit = fleetSplit false
 
+-- in KCAPI there are cases where the length of the HP array
+-- is neither 7 or 13, and it seems terminating "-1" elements
+-- have a chance to disappear, so instead of using data from KCAPI
+-- directly, we make sure the array is of the correct length
+-- by applying this wrapper. "Nothing" will be appended to the
+-- end of the list if the length is insufficient
 ensureHpsLen :: Int -> Array (Maybe Int) -> Array (Maybe Int)
 ensureHpsLen expectLen xs = case expectLen `compare` actualLen of
     LT -> throwWith "ensureHpsLen: array length is longer than expected"
