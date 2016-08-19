@@ -1,10 +1,7 @@
 module KanColle.Expedition.New.Resource where
 
-import Prelude
 import KanColle.Expedition.Base
 import KanColle.Expedition.New.EArray
-import Data.Array.Partial as A
-import Partial.Unsafe
 
 newtype Resource = Rsc (ResourceRows Int)
 

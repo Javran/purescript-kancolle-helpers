@@ -10,8 +10,6 @@ import KanColle.Expedition.New.EArray
 
 import Data.Unfoldable
 import Data.Array as A
-import Data.Array.Partial as A
-import Partial.Unsafe
 
 getMinimumComposition :: Int -> MinFleetCompo
 getMinimumComposition = indEA minimumCompositions
