@@ -2,18 +2,19 @@ module KanColle.Expedition.New.Resource where
 
 import Prelude
 import KanColle.Expedition.Base
+import KanColle.Expedition.New.EArray
 import Data.Array.Partial as A
 import Partial.Unsafe
 
 newtype Resource = Rsc (ResourceRows Int)
 
 getResource :: Int -> Resource
-getResource n = unsafePartial A.unsafeIndex resources (n-1)
+getResource = indEA resources
 
 -- | resource chart of the most basic income:
 -- | normal success without daihatsu.
-resources :: Array Resource
-resources =
+resources :: EArray Resource
+resources = mkEA
     [ -- World 1 (1-8)
       i   0  30   0   0
     , i   0 100  30   0

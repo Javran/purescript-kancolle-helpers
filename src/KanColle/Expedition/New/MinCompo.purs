@@ -6,6 +6,7 @@ import Prelude
 import Data.Maybe
 
 import KanColle.Expedition.New.Types
+import KanColle.Expedition.New.EArray
 
 import Data.Unfoldable
 import Data.Array as A
@@ -13,12 +14,11 @@ import Data.Array.Partial as A
 import Partial.Unsafe
 
 getMinimumComposition :: Int -> MinFleetCompo
-getMinimumComposition n =
-    unsafePartial A.unsafeIndex minimumCompositions (n-1)
+getMinimumComposition = indEA minimumCompositions
 
 -- | minimum compositions for all expeditions
-minimumCompositions :: Array MinFleetCompo
-minimumCompositions =
+minimumCompositions :: EArray MinFleetCompo
+minimumCompositions = mkEA
     [ -- Exped 1
       atLeast 2 []
     , -- Exped 2
