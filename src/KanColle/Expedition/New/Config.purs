@@ -7,12 +7,10 @@ module KanColle.Expedition.New.Config
 
 import Prelude
 import Data.Maybe
-import KanColle.Expedition.New.SType
+import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.MinCompo
 import Data.Array as A
 import Data.Unfoldable
-
-type FleetCompo = Array SType
 
 -- configuration for a single expedition.
 data Config = Conf

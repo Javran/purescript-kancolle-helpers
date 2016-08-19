@@ -1,19 +1,16 @@
 module KanColle.Expedition.New.MinCompo
- ( MinFleetCompo
- , getMinimumComposition
+ ( getMinimumComposition
  ) where
 
 import Prelude
 import Data.Maybe
-import KanColle.Expedition.New.SType
+
+import KanColle.Expedition.New.Types
+
 import Data.Unfoldable
 import Data.Array as A
 import Data.Array.Partial as A
 import Partial.Unsafe
-
--- Nothing: ship type not specified
--- Just <stype>: must be of ship type <stype>
-type MinFleetCompo = Array (Maybe SType)
 
 getMinimumComposition :: Int -> MinFleetCompo
 getMinimumComposition n =
