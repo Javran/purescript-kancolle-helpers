@@ -1,11 +1,13 @@
 module KanColle.Expedition.New.Types 
   ( module KanColle.Expedition.New.SType
+  , module KanColle.Expedition.New.Item
   , FleetCompo
   , MinFleetCompo
   ) where
 
 import Data.Maybe
 import KanColle.Expedition.New.SType
+import KanColle.Expedition.New.Item
 
 type FleetCompo = Array SType
 
