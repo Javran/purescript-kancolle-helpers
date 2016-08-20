@@ -18,6 +18,7 @@ import KanColle.Expedition.New.Item
 import Data.Map as M
 import Data.Tuple
 import Data.Traversable
+import Data.Int
 
 -- Nothing: ship type not specified
 -- Just <stype>: must be of ship type <stype>
@@ -39,13 +40,18 @@ type ItemInfo =
   , maxCount :: Int
   }
 
-newtype MaxCost = MC
+newtype MaxCost = MCost
+  { fuel :: Int
+  , ammo :: Int
+  }
+  
+newtype ActualCost = ACost
   { fuel :: Int
   , ammo :: Int
   }
 
 mkMC :: Int -> Int -> MaxCost
-mkMC fuel ammo = MC {fuel: fuel, ammo: ammo}
+mkMC fuel ammo = MCost {fuel: fuel, ammo: ammo}
 
 -- | `CostModel` calculates the total maximum cost
 -- | given a ship type and how many ships are present.
@@ -62,3 +68,9 @@ calcFleetMaxCost cm fcAr = fold <$> sequence compos
     fc :: M.Map SType Int
     fc = M.fromFoldableWith (+) (map (\x -> Tuple x 1) fcAr)
     compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toList fc)
+
+calcActualCost :: MaxCost -> Info -> ActualCost
+calcActualCost (MCost mc) info = ACost
+    { fuel: floor (info.fuelCostPercent * toNumber mc.fuel)
+    , ammo: floor (info.ammoCostPercent * toNumber mc.ammo)
+    }
