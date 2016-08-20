@@ -3,19 +3,27 @@ module KanColle.Expedition.New.Types
   , module KanColle.Expedition.New.Item
   , FleetCompo
   , MinFleetCompo
+  , FleetMaxCost
   , Info
   , ItemInfo
+  , MaxCost(..)
+  , mkMC
+  , CostModel
   ) where
 
+import Prelude
 import Data.Maybe
 import KanColle.Expedition.New.SType
 import KanColle.Expedition.New.Item
-
-type FleetCompo = Array SType
+import Data.Map as M
+import Data.Tuple
+import Data.Traversable
 
 -- Nothing: ship type not specified
 -- Just <stype>: must be of ship type <stype>
 type MinFleetCompo = Array (Maybe SType)
+type FleetCompo = Array SType
+type FleetMaxCost = Array MaxCost
 
 type Info =
   { id :: Int
@@ -30,3 +38,27 @@ type ItemInfo =
   { item :: Item
   , maxCount :: Int
   }
+
+newtype MaxCost = MC
+  { fuel :: Int
+  , ammo :: Int
+  }
+
+mkMC :: Int -> Int -> MaxCost
+mkMC fuel ammo = MC {fuel: fuel, ammo: ammo}
+
+-- | `CostModel` calculates the total maximum cost
+-- | given a ship type and how many ships are present.
+-- | This cost model is designed for just one fleet so
+-- | the input number should only be one of `[0,1,2,3,4,5,6]`.
+-- | Note that for a cost model `f`, it's not guaranteed
+-- | that `f stype a + f stype b` and `f stype (a+b)` give
+-- | the same answer.
+type CostModel = SType -> Int -> Maybe (Array MaxCost)
+
+calcFleetMaxCost :: CostModel -> FleetCompo -> Maybe FleetMaxCost
+calcFleetMaxCost cm fcAr = fold <$> sequence compos
+  where
+    fc :: M.Map SType Int
+    fc = M.fromFoldableWith (+) (map (\x -> Tuple x 1) fcAr)
+    compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toList fc)

@@ -1,32 +1,12 @@
 module KanColle.Expedition.New.CostModel
-  ( CostModel
-  , MaxCost(..)
-  , mkMC
-  , normalCostModel
+  ( normalCostModel
   ) where
 
 import Prelude
-import KanColle.Expedition.New.SType
+import KanColle.Expedition.New.Types
 import Data.Maybe
 import Control.MonadPlus
 import Data.Unfoldable
-
-data MaxCost = MC
-  { fuel :: Int
-  , ammo :: Int
-  }
-
-mkMC :: Int -> Int -> MaxCost
-mkMC fuel ammo = MC {fuel: fuel, ammo: ammo}
-
--- | `CostModel` calculates the total maximum cost
--- | given a ship type and how many ships are present.
--- | This cost model is designed for just one fleet so
--- | the input number should only be one of `[0,1,2,3,4,5,6]`.
--- | Note that for a cost model `f`, it's not guaranteed
--- | that `f stype a + f stype b` and `f stype (a+b)` give
--- | the same answer.
-type CostModel = SType -> Int -> Maybe (Array MaxCost)
 
 -- | a normal cost model assumes all ships are remodelled to
 -- | their final forms. (the exceptions are like Taigei, Chitose-A and Chiyoda-A
