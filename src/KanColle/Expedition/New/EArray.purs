@@ -22,3 +22,6 @@ indEA :: forall a. EArray a -> Int -> a
 indEA (EA xs) i
     | 1 <= i && i <= 40 = unsafePartial (AP.unsafeIndex xs (i-1))
     | otherwise = unsafePartial (crash "index out of range")
+
+instance functorEArray :: Functor EArray where
+  map f (EA xs) = EA (map f xs)
