@@ -49,6 +49,11 @@ newtype ActualCost = ACost
   { fuel :: Int
   , ammo :: Int
   }
+  
+newtype FleetActualCost = FACost
+  { fuel :: Int
+  , ammo :: Int
+  }
 
 mkMC :: Int -> Int -> MaxCost
 mkMC fuel ammo = MCost {fuel: fuel, ammo: ammo}
@@ -74,3 +79,12 @@ calcActualCost (MCost mc) info = ACost
     { fuel: floor (info.fuelCostPercent * toNumber mc.fuel)
     , ammo: floor (info.ammoCostPercent * toNumber mc.ammo)
     }
+
+calcFleetActualCost :: FleetMaxCost -> Info -> FleetActualCost
+calcFleetActualCost fmc info = FACost (foldl merge z fmc)
+  where
+    z = {fuel: 0, ammo: 0}
+    merge acc mc = case calcActualCost mc info of
+      (ACost actual) ->
+        {fuel: acc.fuel+actual.fuel, ammo: acc.ammo+actual.ammo}
+
