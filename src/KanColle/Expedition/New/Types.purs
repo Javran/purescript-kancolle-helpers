@@ -7,18 +7,15 @@ module KanColle.Expedition.New.Types
   , Info
   , ItemInfo
   , MaxCost(..)
+  , ActualCost(..)
+  , FleetActualCost(..)
   , mkMC
   , CostModel
   ) where
 
-import Prelude
 import Data.Maybe
 import KanColle.Expedition.New.SType
 import KanColle.Expedition.New.Item
-import Data.Map as M
-import Data.Tuple
-import Data.Traversable
-import Data.Int
 
 -- Nothing: ship type not specified
 -- Just <stype>: must be of ship type <stype>
@@ -66,25 +63,3 @@ mkMC fuel ammo = MCost {fuel: fuel, ammo: ammo}
 -- | that `f stype a + f stype b` and `f stype (a+b)` give
 -- | the same answer.
 type CostModel = SType -> Int -> Maybe (Array MaxCost)
-
-calcFleetMaxCost :: CostModel -> FleetCompo -> Maybe FleetMaxCost
-calcFleetMaxCost cm fcAr = fold <$> sequence compos
-  where
-    fc :: M.Map SType Int
-    fc = M.fromFoldableWith (+) (map (\x -> Tuple x 1) fcAr)
-    compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toList fc)
-
-calcActualCost :: MaxCost -> Info -> ActualCost
-calcActualCost (MCost mc) info = ACost
-    { fuel: floor (info.fuelCostPercent * toNumber mc.fuel)
-    , ammo: floor (info.ammoCostPercent * toNumber mc.ammo)
-    }
-
-calcFleetActualCost :: FleetMaxCost -> Info -> FleetActualCost
-calcFleetActualCost fmc info = FACost (foldl merge z fmc)
-  where
-    z = {fuel: 0, ammo: 0}
-    merge acc mc = case calcActualCost mc info of
-      (ACost actual) ->
-        {fuel: acc.fuel+actual.fuel, ammo: acc.ammo+actual.ammo}
-

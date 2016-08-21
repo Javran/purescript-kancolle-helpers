@@ -1,12 +1,40 @@
 module KanColle.Expedition.New.CostModel
-  ( normalCostModel
+  ( calcFleetMaxCost
+  , calcActualCost
+  , calcFleetActualCost
+  , normalCostModel
   ) where
 
 import Prelude
 import KanColle.Expedition.New.Types
+import Data.Map as M
 import Data.Maybe
 import Control.MonadPlus
 import Data.Unfoldable
+import Data.Tuple
+import Data.Traversable
+import Data.Int
+
+calcFleetMaxCost :: CostModel -> FleetCompo -> Maybe FleetMaxCost
+calcFleetMaxCost cm fcAr = fold <$> sequence compos
+  where
+    fc :: M.Map SType Int
+    fc = M.fromFoldableWith (+) (map (\x -> Tuple x 1) fcAr)
+    compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toList fc)
+
+calcActualCost :: MaxCost -> Info -> ActualCost
+calcActualCost (MCost mc) info = ACost
+    { fuel: floor (info.fuelCostPercent * toNumber mc.fuel)
+    , ammo: floor (info.ammoCostPercent * toNumber mc.ammo)
+    }
+
+calcFleetActualCost :: FleetMaxCost -> Info -> FleetActualCost
+calcFleetActualCost fmc info = FACost (foldl merge z fmc)
+  where
+    z = {fuel: 0, ammo: 0}
+    merge acc mc = case calcActualCost mc info of
+      (ACost actual) ->
+        {fuel: acc.fuel+actual.fuel, ammo: acc.ammo+actual.ammo}
 
 -- | a normal cost model assumes all ships are remodelled to
 -- | their final forms. (the exceptions are like Taigei, Chitose-A and Chiyoda-A
