@@ -2,6 +2,7 @@ module KanColle.Expedition.New.EArray
   ( EArray()
   , mkEA
   , indEA
+  , unEA
   ) where
 
 import Prelude
@@ -23,5 +24,9 @@ indEA (EA xs) i
     | 1 <= i && i <= 40 = unsafePartial (AP.unsafeIndex xs (i-1))
     | otherwise = unsafePartial (crash "index out of range")
 
+unEA :: forall a. EArray a -> Array a
+unEA (EA xs) = xs
+
+-- is functor instance necessary?
 instance functorEArray :: Functor EArray where
   map f (EA xs) = EA (map f xs)

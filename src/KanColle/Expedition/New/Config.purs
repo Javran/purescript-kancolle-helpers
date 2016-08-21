@@ -11,8 +11,10 @@ import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.MinCompo
 import KanColle.Expedition.New.CostModel
 import KanColle.Expedition.New.EArray
+import KanColle.Expedition.New.Info
 import Data.Array as A
 import Data.Unfoldable
+import Data.Traversable
 
 -- configuration for a single expedition.
 data Config = Conf
@@ -40,10 +42,19 @@ getCompositionWithConfig (Conf c) n = if c.greatSuccess
     compo = map (fromMaybe c.wildcardSType) minCompo
     l = A.length compo
 
-calcFleetActualCostTable :: EArray Config -> Maybe (EArray FleetActualCost)
-calcFleetActualCostTable configs = Nothing -- TODO
+calcFleetActualCostTable :: EArray Config -> CostModel -> Maybe (EArray FleetActualCost)
+calcFleetActualCostTable configs cm = do
+    expedMaxCosts <- unEA <$> mExpedMaxCosts
+    let actualCosts = A.zipWith f expedMaxCosts allExpeds
+        f maxCost eId = calcFleetActualCost maxCost (getInformation eId)
+    pure (mkEA actualCosts)
   where
     allExpeds :: Array Int
     allExpeds = A.range 1 40
     concreteCompos :: EArray FleetCompo
     concreteCompos = mkEA (map (\eId -> getCompositionWithConfig (indEA configs eId) eId) allExpeds)
+    mExpedMaxCosts :: Maybe (EArray FleetMaxCost)
+    mExpedMaxCosts = 
+        mkEA <$> 
+          sequence 
+            (unEA (map (\compo -> calcFleetMaxCost cm compo) concreteCompos))
