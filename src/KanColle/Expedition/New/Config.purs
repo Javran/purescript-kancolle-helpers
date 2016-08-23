@@ -2,7 +2,9 @@ module KanColle.Expedition.New.Config
   ( Config
   , mkConfig
   , defConfig
+  , defConfigs
   , getCompositionWithConfig
+  , calcFleetActualCostTable
   ) where
 
 import Prelude
@@ -32,6 +34,9 @@ mkConfig gs dCount wt = Conf
 
 defConfig :: Config
 defConfig = mkConfig false 0 DD
+
+defConfigs :: EArray Config
+defConfigs = mkEA (replicate 40 defConfig)
 
 getCompositionWithConfig :: Config -> Int -> FleetCompo
 getCompositionWithConfig (Conf c) n = if c.greatSuccess

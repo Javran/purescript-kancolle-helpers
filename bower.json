@@ -32,7 +32,8 @@
   "devDependencies": {
     "purescript-test-unit": "^7.0.0",
     "purescript-quickcheck": "^1.0.0",
-    "purescript-benchotron": "^4.0.0"
+    "purescript-benchotron": "^4.0.0",
+    "purescript-psci-support": "^1.0.0"
   },
   "resolutions": {
     "purescript-maybe": "1.0.0",
