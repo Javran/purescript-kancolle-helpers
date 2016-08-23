@@ -5,6 +5,7 @@ module KanColle.Expedition.New.Config
   , defConfigs
   , getCompositionWithConfig
   , calcFleetActualCostTable
+  , calcFleetNetIncomeTable
   ) where
 
 import Prelude
@@ -12,6 +13,8 @@ import Data.Maybe
 import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.MinCompo
 import KanColle.Expedition.New.CostModel
+import KanColle.Expedition.New.NetIncome
+import KanColle.Expedition.New.Resource
 import KanColle.Expedition.New.EArray
 import KanColle.Expedition.New.Info
 import Data.Array as A
@@ -63,3 +66,19 @@ calcFleetActualCostTable configs cm = do
         mkEA <$> 
           sequence 
             (unEA (map (\compo -> calcFleetMaxCost cm compo) concreteCompos))
+
+calcFleetNetIncomeTable :: EArray Config -> CostModel -> Maybe (EArray FleetNetIncome)
+calcFleetNetIncomeTable configs cm = (convert >>> mkEA) <$> mACostTable
+  where
+    allExpeds :: Array Int
+    allExpeds = A.range 1 40
+
+    mACostTable :: Maybe (EArray FleetActualCost)
+    mACostTable = calcFleetActualCostTable configs cm
+
+    convert :: EArray FleetActualCost -> Array FleetNetIncome
+    convert xs' = A.zipWith f allExpeds xs
+      where
+        f :: Int -> FleetActualCost -> FleetNetIncome
+        f eId c = calcFleetNetIncome (getResource eId) c
+        xs = unEA xs'
