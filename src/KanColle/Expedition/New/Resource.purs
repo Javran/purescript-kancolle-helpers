@@ -1,9 +1,8 @@
 module KanColle.Expedition.New.Resource where
 
-import KanColle.Expedition.Base
-import KanColle.Expedition.New.EArray
 
-newtype Resource = Rsc (ResourceRows Int)
+import KanColle.Expedition.New.EArray
+import KanColle.Expedition.New.Types
 
 getResource :: Int -> Resource
 getResource = indEA resources

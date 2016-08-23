@@ -9,12 +9,15 @@ module KanColle.Expedition.New.Types
   , MaxCost(..)
   , ActualCost(..)
   , FleetActualCost(..)
+  , Resource(..)
+  , FleetNetIncome(..)
   , mkMC
   , CostModel
   ) where
 
 import Data.Maybe
 import KanColle.Expedition.New.SType
+import KanColle.Expedition.Base
 import KanColle.Expedition.New.Item
 
 -- Nothing: ship type not specified
@@ -22,6 +25,9 @@ import KanColle.Expedition.New.Item
 type MinFleetCompo = Array (Maybe SType)
 type FleetCompo = Array SType
 type FleetMaxCost = Array MaxCost
+
+newtype Resource = Rsc (ResourceRows Int)
+newtype FleetNetIncome = FNI (ResourceRows Int)
 
 type Info =
   { id :: Int
