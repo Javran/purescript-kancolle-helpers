@@ -11,7 +11,6 @@ import Partial.Unsafe
 import Partial
 import Data.Array as A
 import Data.Array.Partial as AP
-import Data.Foldable
 import Data.Traversable
 import Data.Unfoldable
 
@@ -63,5 +62,5 @@ instance foldableEArray :: Foldable EArray where
   foldMap f (EA xs) = foldMap f xs
 
 instance traversableEArray :: Traversable EArray where
-  traverse = traverseDefault
-  sequence = sequenceDefault
+  traverse f (EA xs) = EA <$> traverse f xs
+  sequence (EA ms) = EA <$> sequence ms
