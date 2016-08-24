@@ -10,6 +10,7 @@ import Partial.Unsafe
 import Partial
 import Data.Array as A
 import Data.Array.Partial as AP
+import Data.Unfoldable
 
 -- array wrappered for all 40 expeditions
 newtype EArray a = EA (Array a)
@@ -30,3 +31,18 @@ unEA (EA xs) = xs
 -- is functor instance necessary?
 instance functorEArray :: Functor EArray where
   map f (EA xs) = EA (map f xs)
+
+pureEA :: forall a. a -> EArray a
+pureEA =
+    -- no need for passing through the smart constructor
+    -- at the cost of being more careful about our code
+    replicate 40 >>> EA
+
+appEA :: forall a b. EArray (a -> b) -> EArray a -> EArray b
+appEA (EA fs) (EA xs) = EA (A.zipWith ($) fs xs)
+
+instance applyEArray :: Apply EArray where
+  apply = appEA
+
+instance applicativeEArray :: Applicative EArray where
+  pure = pureEA
