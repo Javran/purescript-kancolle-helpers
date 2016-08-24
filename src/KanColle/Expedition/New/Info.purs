@@ -1,5 +1,6 @@
 module KanColle.Expedition.New.Info
   ( getInformation
+  , expedInfoTable
   ) where
 
 import KanColle.Expedition.New.EArray

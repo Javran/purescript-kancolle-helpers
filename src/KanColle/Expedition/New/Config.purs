@@ -51,34 +51,20 @@ getCompositionWithConfig (Conf c) n = if c.greatSuccess
     l = A.length compo
 
 calcFleetActualCostTable :: EArray Config -> CostModel -> Maybe (EArray FleetActualCost)
-calcFleetActualCostTable configs cm = do
-    expedMaxCosts <- unEA <$> mExpedMaxCosts
-    let actualCosts = A.zipWith f expedMaxCosts allExpeds
-        f maxCost eId = calcFleetActualCost maxCost (getInformation eId)
-    pure (mkEA actualCosts)
+calcFleetActualCostTable configs cm = imapEA f <$> mExpedMaxCosts
   where
-    allExpeds :: Array Int
-    allExpeds = A.range 1 40
     concreteCompos :: EArray FleetCompo
-    concreteCompos = mkEA (map (\eId -> getCompositionWithConfig (indEA configs eId) eId) allExpeds)
+    concreteCompos = imapEA (flip getCompositionWithConfig) configs
     mExpedMaxCosts :: Maybe (EArray FleetMaxCost)
-    mExpedMaxCosts = 
-        mkEA <$> 
-          sequence 
-            (unEA (map (\compo -> calcFleetMaxCost cm compo) concreteCompos))
+    mExpedMaxCosts =
+        sequence (map (calcFleetMaxCost cm) concreteCompos)
+    f eId maxCost = calcFleetActualCost maxCost (getInformation eId)
 
 calcFleetNetIncomeTable :: EArray Config -> CostModel -> Maybe (EArray FleetNetIncome)
-calcFleetNetIncomeTable configs cm = (convert >>> mkEA) <$> mACostTable
+calcFleetNetIncomeTable configs cm = imapEA f <$> mACostTable
   where
-    allExpeds :: Array Int
-    allExpeds = A.range 1 40
-
     mACostTable :: Maybe (EArray FleetActualCost)
     mACostTable = calcFleetActualCostTable configs cm
 
-    convert :: EArray FleetActualCost -> Array FleetNetIncome
-    convert xs' = A.zipWith f allExpeds xs
-      where
-        f :: Int -> FleetActualCost -> FleetNetIncome
-        f eId c = calcFleetNetIncome (getResource eId) c
-        xs = unEA xs'
+    f :: Int -> FleetActualCost -> FleetNetIncome
+    f eId = calcFleetNetIncome (getResource eId)

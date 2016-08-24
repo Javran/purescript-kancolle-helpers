@@ -2,6 +2,7 @@ module KanColle.Expedition.New.EArray
   ( EArray()
   , mkEA
   , indEA
+  , imapEA
   , unEA
   ) where
 
@@ -10,10 +11,16 @@ import Partial.Unsafe
 import Partial
 import Data.Array as A
 import Data.Array.Partial as AP
+import Data.Foldable
+import Data.Traversable
 import Data.Unfoldable
 
 -- array wrappered for all 40 expeditions
 newtype EArray a = EA (Array a)
+
+allExpeds :: Array Int
+allExpeds = A.range 1 40
+
 
 mkEA :: forall a. Array a -> EArray a
 mkEA xs
@@ -24,6 +31,9 @@ indEA :: forall a. EArray a -> Int -> a
 indEA (EA xs) i
     | 1 <= i && i <= 40 = unsafePartial (AP.unsafeIndex xs (i-1))
     | otherwise = unsafePartial (crash "index out of range")
+    
+imapEA :: forall a b. (Int -> a -> b) -> EArray a -> EArray b
+imapEA f (EA xs) = EA (A.zipWith f allExpeds xs)
 
 unEA :: forall a. EArray a -> Array a
 unEA (EA xs) = xs
@@ -46,3 +56,12 @@ instance applyEArray :: Apply EArray where
 
 instance applicativeEArray :: Applicative EArray where
   pure = pureEA
+
+instance foldableEArray :: Foldable EArray where
+  foldr f z (EA xs) = foldr f z xs
+  foldl f z (EA xs) = foldl f z xs
+  foldMap f (EA xs) = foldMap f xs
+
+instance traversableEArray :: Traversable EArray where
+  traverse = traverseDefault
+  sequence = sequenceDefault
