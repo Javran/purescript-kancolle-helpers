@@ -4,6 +4,7 @@ module KanColle.Expedition.New.EArray
   , indEA
   , imapEA
   , unEA
+  , extractEA
   ) where
 
 import Prelude
@@ -13,6 +14,7 @@ import Data.Array as A
 import Data.Array.Partial as AP
 import Data.Traversable
 import Data.Unfoldable
+import Data.Tuple
 
 -- array wrappered for all 40 expeditions
 newtype EArray a = EA (Array a)
@@ -49,6 +51,9 @@ pureEA =
 
 appEA :: forall a b. EArray (a -> b) -> EArray a -> EArray b
 appEA (EA fs) (EA xs) = EA (A.zipWith ($) fs xs)
+
+extractEA :: forall a. EArray Boolean -> EArray a -> Array a
+extractEA (EA bs) (EA xs) = map snd (A.filter fst (A.zip bs xs))
 
 instance applyEArray :: Apply EArray where
   apply = appEA
