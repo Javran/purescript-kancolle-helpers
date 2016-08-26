@@ -52,6 +52,8 @@ pureEA =
 appEA :: forall a b. EArray (a -> b) -> EArray a -> EArray b
 appEA (EA fs) (EA xs) = EA (A.zipWith ($) fs xs)
 
+-- TODO: avoid using this frequently: we don't have to compose arrays
+-- instead we can keep origin array and do random access as needed.
 extractEA :: forall a. EArray Boolean -> EArray a -> Array a
 extractEA (EA bs) (EA xs) = map snd (A.filter fst (A.zip bs xs))
 
