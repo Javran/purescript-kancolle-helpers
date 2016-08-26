@@ -11,6 +11,8 @@ module KanColle.Expedition.New.Types
   , FleetActualCost(..)
   , Resource(..)
   , FleetNetIncome(..)
+  , Scorer
+  , ResourcePerHr
   , mkMC
   , CostModel
   ) where
@@ -28,6 +30,10 @@ type FleetMaxCost = Array MaxCost
 
 newtype Resource = Rsc (ResourceRows Int)
 newtype FleetNetIncome = FNI (ResourceRows Int)
+
+type ResourcePerHr = ResourceRows Number
+
+type Scorer f = ResourcePerHr -> f Info -> Number
 
 type Info =
   { id :: Int
