@@ -36,6 +36,7 @@ type Info =
   , ammoCostPercent :: Number
   , item1 :: Maybe ItemInfo
   , item2 :: Maybe ItemInfo
+  , resource :: Resource
   }
 
 type ItemInfo =

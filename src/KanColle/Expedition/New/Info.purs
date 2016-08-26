@@ -5,6 +5,7 @@ module KanColle.Expedition.New.Info
 
 import KanColle.Expedition.New.EArray
 import KanColle.Expedition.New.Types
+import KanColle.Expedition.New.Resource
 import Data.Array.Partial as AP
 import Partial.Unsafe
 import Data.Maybe
@@ -36,6 +37,7 @@ convertRawInfo ri =
     , ammoCostPercent: ri.api_use_bull
     , item1: convertRawItem ri.api_win_item1
     , item2: convertRawItem ri.api_win_item2
+    , resource: getResource ri.api_id
     }
   where
     convertRawItem ar = case (unsafePartial AP.unsafeIndex ar 0) of
