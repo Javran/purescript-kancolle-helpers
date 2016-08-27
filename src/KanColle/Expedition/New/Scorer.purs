@@ -18,8 +18,8 @@ simpleResourceScorer p = resourceScorer scorer
 
 -- TODO: 1. calc fleet net income for one exped
 -- 2. sum up with others
-calcResourcePerHrWithAFKTime :: FleetNetIncome -> Info -> Int -> ResourcePerHr
-calcResourcePerHrWithAFKTime (FNI ni) info afkTimeInMin = 
+calcResourcePerHr :: FleetNetIncome -> Info -> Int -> ResourcePerHr
+calcResourcePerHr (FNI ni) info afkTimeInMin = 
     { fuel: perHr ni.fuel
     , ammo: perHr ni.ammo
     , steel: perHr ni.steel
