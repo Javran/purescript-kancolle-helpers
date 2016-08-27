@@ -10,6 +10,7 @@ module KanColle.Expedition.New.Config
 
 import Prelude
 import Data.Maybe
+import KanColle.Expedition.Base
 import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.MinCompo
 import KanColle.Expedition.New.CostModel
@@ -19,8 +20,11 @@ import KanColle.Expedition.New.EArray
 import KanColle.Expedition.New.Info
 import KanColle.Expedition.New.Scorer
 import Data.Array as A
-import Data.Unfoldable
+import Data.List as L
+import Data.Function
 import Data.Traversable
+import Data.Unfoldable
+import KanColle.Util
 
 -- configuration for a single expedition.
 data Config = Conf
@@ -51,6 +55,7 @@ getCompositionWithConfig (Conf c) n = if c.greatSuccess
     compo = map (fromMaybe c.wildcardSType) minCompo
     l = A.length compo
 
+-- TODO: these table-makers might be separated as another module
 calcFleetActualCostTable :: EArray Config -> CostModel -> Maybe (EArray FleetActualCost)
 calcFleetActualCostTable configs cm = imapEA f <$> mExpedMaxCosts
   where
@@ -78,3 +83,33 @@ calcResourcePerHrTable configs cm afkTimeInMin = do
                    calcResourcePerHr ni (getInformation eId) afkTimeInMin) 
                  netIncomeTbl
     pure rphTbl
+    
+type ExpedId = Int
+type EvalResult =
+  { expedSet :: Array ExpedId
+  , score :: Number
+  }
+
+evaluateExpeditions :: Scorer L.List
+                    -> EArray ResourcePerHr 
+                    -> Array ExpedId
+                    -> Int
+                    -> Array EvalResult
+evaluateExpeditions scorer rphTbl eCandidates fleetCount =
+    A.sortBy (flip compare `on` (\x -> x.score)) (map evaluate expedSets)
+  where
+    expedSets :: Array (L.List ExpedId)
+    expedSets = chooseN eCandidates fleetCount
+    emptyRph = resourceRowsFill 0.0
+    evaluate :: L.List ExpedId -> EvalResult
+    evaluate expedSet =
+        { expedSet: L.toUnfoldable expedSet
+        , score: scorer rphSum infoList
+        }
+      where
+        infoList = map getInformation expedSet
+        rphSum =
+            foldl
+              (resourceRowsLiftOp (+)) 
+              emptyRph 
+              (map (indEA rphTbl) expedSet)
