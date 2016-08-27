@@ -17,6 +17,7 @@ import KanColle.Expedition.New.NetIncome
 import KanColle.Expedition.New.Resource
 import KanColle.Expedition.New.EArray
 import KanColle.Expedition.New.Info
+import KanColle.Expedition.New.Scorer
 import Data.Array as A
 import Data.Unfoldable
 import Data.Traversable
@@ -68,3 +69,12 @@ calcFleetNetIncomeTable configs cm = imapEA f <$> mACostTable
 
     f :: Int -> FleetActualCost -> FleetNetIncome
     f eId = calcFleetNetIncome (getResource eId)
+
+calcResourcePerHrTable :: EArray Config -> CostModel -> Int -> Maybe (EArray ResourcePerHr)
+calcResourcePerHrTable configs cm afkTimeInMin = do
+    netIncomeTbl <- calcFleetNetIncomeTable configs cm
+    let rphTbl = 
+          imapEA (\eId ni ->
+                   calcResourcePerHr ni (getInformation eId) afkTimeInMin) 
+                 netIncomeTbl
+    pure rphTbl
