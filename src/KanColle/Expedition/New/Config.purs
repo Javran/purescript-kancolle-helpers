@@ -90,7 +90,7 @@ type EvalResult =
   , score :: Number
   }
 
-evaluateExpeditions :: Scorer L.List
+evaluateExpeditions :: Scorer
                     -> EArray ResourcePerHr 
                     -> Array ExpedId
                     -> Int
@@ -104,7 +104,7 @@ evaluateExpeditions scorer rphTbl eCandidates fleetCount =
     evaluate :: L.List ExpedId -> EvalResult
     evaluate expedSet =
         { expedSet: L.toUnfoldable expedSet
-        , score: scorer rphSum infoList
+        , score: scorer rphSum (L.toUnfoldable infoList)
         }
       where
         infoList = map getInformation expedSet

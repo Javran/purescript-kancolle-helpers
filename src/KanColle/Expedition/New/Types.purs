@@ -33,7 +33,7 @@ newtype FleetNetIncome = FNI (ResourceRows Int)
 
 type ResourcePerHr = ResourceRows Number
 
-type Scorer f = ResourcePerHr -> f Info -> Number
+type Scorer = ResourcePerHr -> Array Info -> Number
 
 type Info =
   { id :: Int

@@ -5,10 +5,10 @@ import KanColle.Expedition.Base
 import KanColle.Expedition.New.Types
 import Data.Int
 
-resourceScorer :: forall f. (ResourcePerHr -> Number) -> Scorer f
+resourceScorer :: (ResourcePerHr -> Number) -> Scorer
 resourceScorer f rph _ = f rph
 
-simpleResourceScorer :: forall f. ResourceRows Number -> Scorer f
+simpleResourceScorer :: ResourceRows Number -> Scorer
 simpleResourceScorer p = resourceScorer scorer
   where
     scorer rph = rph.fuel * p.fuel
@@ -16,8 +16,6 @@ simpleResourceScorer p = resourceScorer scorer
                + rph.steel * p.steel
                + rph.bauxite * p.bauxite
 
--- TODO: 1. calc fleet net income for one exped
--- 2. sum up with others
 calcResourcePerHr :: FleetNetIncome -> Info -> Int -> ResourcePerHr
 calcResourcePerHr (FNI ni) info afkTimeInMin = 
     { fuel: perHr ni.fuel
