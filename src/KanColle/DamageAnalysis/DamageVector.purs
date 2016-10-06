@@ -20,7 +20,7 @@ module KanColle.DamageAnalysis.DamageVector
   , calcLandBasedKoukuDamage
 
   , toCombined
-  
+
   , applyDamageVector
   , applyNormalDamageVector
   , applyCombinedDamageVector
@@ -66,7 +66,7 @@ getDV (DV v) = v
 -- | creates `DamageVector` from arrays.
 -- | array has to be of length 6
 mkDV :: Array Damage -> DamageVector
-mkDV xs = if check 
+mkDV xs = if check
     then DV xs
     else throwWith "mkDV: array size should be 6"
   where
@@ -194,7 +194,11 @@ calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV $ convertFEDam info.api_damage
 
 -- | ally fleet's role in this battle
-data FleetRole = FRMain | FREscort | FRSupport | FRLandBased
+data FleetRole
+  = FRMain -- ally main vs. enemy main
+  | FREscort -- ally escort vs. enemy main
+  | FRSupport -- ally support exped vs. enemy main
+  | FRLandBased -- ally LBAS vs. enemy main
 
 -- | `toCombined role dv` converts a `LR DamageVector` whose left part
 -- | is playing role `role` into `CombinedDamageVector`
@@ -216,12 +220,12 @@ applyDamageVector dv fleet = A.zipWith combine (getDV dv) fleet
 applyNormalDamageVector :: NormalDamageVector -> NormalFleetInfo Ship -> NormalFleetInfo Ship
 applyNormalDamageVector ndv fleet =
     dupAsNormalBattle applyDamageVector
-      `appNormalBattle` ndv 
+      `appNormalBattle` ndv
       `appNormalBattle` fleet
 
 -- | apply `CombinedDamageVector` on a combined fleet of ships (including enemy ships)
 applyCombinedDamageVector :: CombinedDamageVector -> CombinedFleetInfo Ship -> CombinedFleetInfo Ship
 applyCombinedDamageVector ndv fleet =
     dupAsCombinedBattle applyDamageVector
-      `appCombinedBattle` ndv 
+      `appCombinedBattle` ndv
       `appCombinedBattle` fleet

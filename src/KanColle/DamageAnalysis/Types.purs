@@ -5,9 +5,13 @@ module KanColle.DamageAnalysis.Types
   , ShipResult
   , getShipResult
 
-  , NormalBattle, CombinedBattle
+  , NormalBattle
+  , CombinedBattle, CombinedBattleAC
+  , GCombinedBattle
   , FleetInfo
   , NormalFleetInfo, CombinedFleetInfo
+  
+  , toCombinedBattle, toCombinedBattleAC
 
   , dupAsNormalBattle
   , appNormalBattle
@@ -55,7 +59,24 @@ type NormalBattle a =
   { main :: a, enemy :: a }
 
 type CombinedBattle a =
-  { main :: a, escort :: a, enemy :: a}
+  { main :: a, escort :: a, enemy :: a }
+  
+type CombinedBattleAC a =
+  { main :: a, enemyMain :: a, enemyEscort :: a }
+  
+-- most general form of a battle
+type GCombinedBattle a =
+  { allyMain :: a
+  , allyEscort :: a
+  , enemyMain :: a
+  , enemyEscort :: a
+  }
+
+toCombinedBattle :: forall a. GCombinedBattle a -> CombinedBattle a
+toCombinedBattle g = { main: g.allyMain, escort: g.allyEscort, enemy: g.enemyMain }
+
+toCombinedBattleAC :: forall a. GCombinedBattle a -> CombinedBattleAC a
+toCombinedBattleAC g = { main: g.allyMain, enemyMain: g.enemyMain, enemyEscort: g.enemyEscort }
 
 lrToNormal :: forall a. LR a -> NormalBattle a
 lrToNormal x = { main: x.left, enemy: x.right }

@@ -96,7 +96,7 @@ evaluateExpeditions :: Scorer
                     -> Int
                     -> Array EvalResult
 evaluateExpeditions scorer rphTbl eCandidates fleetCount =
-    A.sortBy (flip compare `on` (\x -> x.score)) (map evaluate expedSets)
+    A.sortBy (flip compare `on` (_.score)) (map evaluate expedSets)
   where
     expedSets :: Array (L.List ExpedId)
     expedSets = chooseN eCandidates fleetCount
