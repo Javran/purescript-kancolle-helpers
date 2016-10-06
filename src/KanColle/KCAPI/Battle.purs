@@ -205,6 +205,18 @@ getHougeki3CT :: Battle -> Maybe Hougeki
 getHougeki3CT b = do
     checkHouraiFlag 3 b
     pure b.api_hougeki3
+    
+getHougeki1AC :: Battle -> Maybe Hougeki
+getHougeki1AC = getHougeki1CT
+
+getRaigekiAC :: Battle -> Maybe Raigeki
+getRaigekiAC = getRaigekiCT
+
+getHougeki2AC :: Battle -> Maybe Hougeki
+getHougeki2AC = getHougeki2CT
+
+getHougeki3AC :: Battle -> Maybe Hougeki
+getHougeki3AC = getHougeki3CT
 
 hasLandBasedAirStrikes :: Battle -> Boolean
 hasLandBasedAirStrikes = hasField "api_air_base_attack"
@@ -217,4 +229,9 @@ getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
 getKoukuStage3Maybe :: Kouku -> Maybe KoukuStage3
 getKoukuStage3Maybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
     then Just kk.api_stage3
+    else Nothing
+
+getKoukuStage3EEscortMaybe :: Kouku -> Maybe KoukuStage3
+getKoukuStage3EEscortMaybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
+    then Just kk.api_stage3_combined
     else Nothing

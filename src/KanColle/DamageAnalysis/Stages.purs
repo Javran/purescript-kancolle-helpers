@@ -5,6 +5,7 @@
  -}
 module KanColle.DamageAnalysis.Stages
   ( koukuDV
+  , koukuDVAC
   , koukuCombinedDV
   , battleDV
   , nightBattleDV
@@ -35,6 +36,9 @@ connectDV getData z calc b = maybe z calc (getData b)
 koukuDV :: Battle -> LR DamageVector
 koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 
+koukuDVAC :: Battle -> LR DamageVector
+koukuDVAC = connectDV getKouku memptyLR calcKoukuDamageAC
+
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
 
@@ -46,6 +50,14 @@ landBasedAirStrikeDVs =
       (map (calcLandBasedKoukuDamage >>> lrOnlyRight))
     >>> foldl lrAppend memptyLR
 
+landBasedAirStrikeDVsAC :: Battle -> LR DamageVector
+landBasedAirStrikeDVsAC =
+    connectDV
+      getLandBasedAirStrikes
+      []
+      (map (calcLandBasedKoukuDamageAC >>> lrOnlyRight))
+    >>> foldl lrAppend memptyLR
+    
 kouku2CombinedDV :: Battle -> DamageVector
 kouku2CombinedDV = connectDV getKouku2 mempty calcKoukuDamageCombined
 
@@ -89,6 +101,19 @@ hougeki2CTDV = connectDV getHougeki2CT memptyLR calcHougekiDamage
 hougeki3CTDV :: Battle -> LR DamageVector
 hougeki3CTDV = connectDV getHougeki3CT memptyLR calcHougekiDamage
 
+-- specalized for Abyssal Combined Fleet
+hougeki1ACDV :: Battle -> LR DamageVector
+hougeki1ACDV = hougeki1CTDV
+
+raigekiACDV :: Battle -> LR DamageVector
+raigekiACDV = raigekiCTDV
+
+hougeki2ACDV :: Battle -> LR DamageVector
+hougeki2ACDV = hougeki2CTDV
+
+hougeki3ACDV :: Battle -> LR DamageVector
+hougeki3ACDV = hougeki3CTDV
+
 hougekiDV :: Battle -> LR DamageVector
 hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
 
@@ -130,14 +155,27 @@ nightBattleDV = hougekiDV >>> lrToNormal
 memptyCombined :: forall m. Monoid m => CombinedBattle m
 memptyCombined = { main: mempty, escort: mempty, enemy: mempty }
 
+memptyCombinedAC :: forall m. Monoid m => CombinedBattleAC m
+memptyCombinedAC = { main: mempty, enemyMain: mempty, enemyEscort: mempty }
+
 combinedAppend :: forall m. Monoid m => CombinedBattle m -> CombinedBattle m -> CombinedBattle m
 combinedAppend a b = { main: a.main <> b.main
                      , escort: a.escort <> b.escort
                      , enemy: a.enemy <> b.enemy
                      }
+                     
+combinedAppendAC :: forall m. Monoid m => CombinedBattleAC m -> CombinedBattleAC m -> CombinedBattleAC m
+combinedAppendAC a b =
+    { main: a.main <> b.main
+    , enemyMain: a.enemyMain <> b.enemyMain
+    , enemyEscort: a.enemyEscort <> b.enemyEscort
+    }
 
 fconcat2 :: Array (Battle -> CombinedDamageVector) -> Battle -> CombinedDamageVector
 fconcat2 xs b = foldl combinedAppend memptyCombined ((\f -> f b) <$> xs)
+
+fconcat2AC :: Array (Battle -> CombinedDamageVectorAC) -> Battle -> CombinedDamageVectorAC
+fconcat2AC xs b = foldl combinedAppendAC memptyCombinedAC ((\f -> f b) <$> xs)
 
 -- | get `CombinedDamageVector` of a surface task force battle
 battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
@@ -184,4 +222,20 @@ battleCarrierTaskForceDV = fconcat2
     , raigekiCTDV >>> toCombined FREscort
     , hougeki2CTDV >>> toCombined FRMain
     , hougeki3CTDV >>>  toCombined FRMain
+    ]
+
+-- TODO: to be verified
+battleEnemyCarrierTaskForceDV :: Battle -> CombinedDamageVectorAC
+battleEnemyCarrierTaskForceDV = fconcat2AC
+    [ landBasedAirStrikeDVs >>> toCombinedAC FRLandBased
+    , landBasedAirStrikeDVsAC >>> toCombinedAC FRLandBasedEEscort
+    -- regular kouku stages
+    , koukuDV >>> toCombinedAC FRMain
+    , koukuDVAC >>> toCombinedAC FRMainEEscort
+    -- regular battles
+    , openingDV >>> toCombinedAC FRMain
+    , hougeki1CTDV >>> toCombinedAC FRMainEEscort
+    , raigekiCTDV >>> toCombinedAC FRMainEEscort
+    , hougeki2CTDV >>> toCombinedAC FRMain
+    , hougeki3CTDV >>>  toCombinedAC FRMain
     ]

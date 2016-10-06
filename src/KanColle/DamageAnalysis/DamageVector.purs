@@ -8,19 +8,24 @@
 module KanColle.DamageAnalysis.DamageVector
   ( DamageVector, getDV, mkDV
 
-  , NormalDamageVector, CombinedDamageVector
+  , NormalDamageVector
+  , GCombinedDamageVector
+  , CombinedDamageVector, CombinedDamageVectorAC  
   , FleetRole(..)
 
   , calcKoukuDamage
+  , calcKoukuDamageAC
   , calcKoukuDamageCombined
   , calcSupportAirAttackDamage
   , calcSupportHouraiDamage
   , calcHougekiDamage
   , calcRaigekiDamage
   , calcLandBasedKoukuDamage
+  , calcLandBasedKoukuDamageAC
 
   , toGCombined
   , toCombined
+  , toCombinedAC
 
   , applyDamageVector
   , applyNormalDamageVector
@@ -85,6 +90,7 @@ type NormalDamageVector = NormalBattle DamageVector
 -- | `DamageVector` for battles involving comined fleets
 type GCombinedDamageVector = GCombinedBattle DamageVector
 type CombinedDamageVector = CombinedBattle DamageVector
+type CombinedDamageVectorAC = CombinedBattleAC DamageVector
 
 debugShowDV :: DamageVector -> String
 debugShowDV (DV xs) = joinWith "," (map (show <<< damageToInt) xs)
@@ -108,6 +114,9 @@ convertFEDam = unsafeArrTail >>> map (normalizeDamage >>> mkDamage)
 calcKoukuDamage :: Kouku -> LR DamageVector
 calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
+calcKoukuDamageAC :: Kouku -> LR DamageVector
+calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
+
 -- | calculate damage from kouku (aerial) stages (combined fleet)
 -- | note that only escort fleet is taking damage. so we just need DamageVector
 calcKoukuDamageCombined :: Kouku -> DamageVector
@@ -121,6 +130,13 @@ calcLandBasedKoukuDamage lbkk = case maybeStage3 of
     Nothing -> mempty
   where
     maybeStage3 = getKoukuStage3Maybe lbkk
+    
+calcLandBasedKoukuDamageAC :: Kouku -> DamageVector
+calcLandBasedKoukuDamageAC lbkk = case maybeStage3 of
+    Just stage3 -> DV (convertFEDam stage3.api_edam)
+    Nothing -> mempty
+  where
+    maybeStage3 = getKoukuStage3EEscortMaybe lbkk
 
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> LR DamageVector
@@ -229,6 +245,9 @@ toGCombined r dv = case r of
 
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = toCombinedBattle (toGCombined r dv)
+
+toCombinedAC :: FleetRole -> LR DamageVector -> CombinedDamageVectorAC
+toCombinedAC r dv = toCombinedBattleAC (toGCombined r dv)
 
 -- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
