@@ -23,7 +23,7 @@ import Data.Array as A
 import Data.List as L
 import Data.Function
 import Data.Traversable
-import Data.Unfoldable
+import Data.Unfoldable hiding (fromMaybe)
 import KanColle.Util
 
 -- configuration for a single expedition.
