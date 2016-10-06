@@ -19,6 +19,7 @@ module KanColle.DamageAnalysis.DamageVector
   , calcRaigekiDamage
   , calcLandBasedKoukuDamage
 
+  , toGCombined
   , toCombined
 
   , applyDamageVector
@@ -82,6 +83,7 @@ instance monoidDamageVector :: Monoid DamageVector where
 type NormalDamageVector = NormalBattle DamageVector
 
 -- | `DamageVector` for battles involving comined fleets
+type GCombinedDamageVector = GCombinedBattle DamageVector
 type CombinedDamageVector = CombinedBattle DamageVector
 
 debugShowDV :: DamageVector -> String
@@ -199,15 +201,34 @@ data FleetRole
   | FREscort -- ally escort vs. enemy main
   | FRSupport -- ally support exped vs. enemy main
   | FRLandBased -- ally LBAS vs. enemy main
+  | FRMainEEscort -- ally main vs. enemy escort
+  | FRLandBasedEEscort -- ally LBAS vs. enemy escort
 
 -- | `toCombined role dv` converts a `LR DamageVector` whose left part
 -- | is playing role `role` into `CombinedDamageVector`
+toGCombined :: FleetRole -> LR DamageVector -> GCombinedDamageVector
+toGCombined r dv = case r of
+    FRMain      -> 
+        { allyMain: dv.left, allyEscort: mempty
+        , enemyMain: dv.right, enemyEscort: mempty }
+    FREscort    ->
+        { allyMain: mempty, allyEscort: dv.left
+        , enemyMain: dv.right, enemyEscort: mempty }
+    FRSupport   ->
+        { allyMain: mempty, allyEscort: mempty
+        , enemyMain: dv.right, enemyEscort: mempty }
+    FRLandBased ->
+        { allyMain: mempty, allyEscort: mempty
+        , enemyMain: dv.right, enemyEscort: mempty }
+    FRMainEEscort ->
+        { allyMain: dv.left, allyEscort: mempty
+        , enemyMain: mempty, enemyEscort: dv.right }
+    FRLandBasedEEscort ->
+        { allyMain: mempty, allyEscort: mempty
+        , enemyMain: mempty, enemyEscort: dv.right }
+
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
-toCombined r dv = case r of
-    FRMain      -> { main: dv.left, escort: mempty, enemy: dv.right }
-    FREscort    -> { main: mempty, escort: dv.left, enemy: dv.right }
-    FRSupport   -> { main: mempty, escort: mempty, enemy: dv.right }
-    FRLandBased -> { main: mempty, escort: mempty, enemy: dv.right }
+toCombined r dv = toCombinedBattle (toGCombined r dv)
 
 -- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
