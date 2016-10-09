@@ -20,6 +20,10 @@ module KanColle.DamageAnalysis.DamageVector
   , calcSupportHouraiDamage
   , calcHougekiDamage
   , calcRaigekiDamage
+  
+  , calcRaigekiDamageAC
+  , calcHougekiDamageAC
+
   , calcLandBasedKoukuDamage
   , calcLandBasedKoukuDamageAC
 
@@ -103,6 +107,21 @@ fromFDamAndEDam v =
     { left: DV (convertFEDam v.api_fdam)
     , right: DV (convertFEDam v.api_edam) }
 
+-- L: ally fleet, LL: ally main, LR: ally escort
+-- R: enemy fleet: RL: enemy main, RR: enemy escort
+fromFDamAndEDamAC :: forall a.
+                  { api_fdam :: Array Number
+                  , api_edam :: Array Number | a} -> LR (LR DamageVector)
+fromFDamAndEDamAC v = (lrMap >>> lrMap) DV
+    { left: allyDams
+    , right: enemyDams }
+  where
+    longFDam = convertFEDam v.api_fdam
+    allyDams = fleetSplit false longFDam
+    
+    longEDam = convertFEDam v.api_edam
+    enemyDams = fleetSplit false longEDam
+
 -- (internal use only)
 -- an "-1" is put in front of both api_fdam and api_edam
 -- we first drop that element and then convert
@@ -142,6 +161,9 @@ calcLandBasedKoukuDamageAC lbkk = case maybeStage3 of
 calcRaigekiDamage :: Raigeki -> LR DamageVector
 calcRaigekiDamage = fromFDamAndEDam
 
+calcRaigekiDamageAC :: Raigeki -> LR (LR DamageVector)
+calcRaigekiDamageAC = fromFDamAndEDamAC
+
 -- | calculate damage from hougeki (shelling) stages
 calcHougekiDamage :: Hougeki -> LR DamageVector
 calcHougekiDamage h =
@@ -160,7 +182,7 @@ calcHougekiDamage h =
     eventTargets :: Array Int
     eventTargets = map (cAI >>> toOne) (unsafeArrTail h.api_df_list)
       where
-        -- merge targets like [a,a] into a-1
+        -- merge targets like [a,a] into a-1 (so that it's zero-indexed)
         -- there are 2 checks:
         --   elements of api_df_list should:
         --   * be non-empty
@@ -196,6 +218,84 @@ calcHougekiDamage h =
     resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
     resultDV = do
         arr <- STA.thaw (replicate 12 mempty)
+        A.zipWithA (accumulateDamage arr) eventTargets eventDamages
+        pure arr
+
+calcHougekiDamageAC :: Hougeki -> LR (LR DamageVector)
+calcHougekiDamageAC h =
+    if lengthCheck
+      then let resultArr = runPure (STA.runSTArray resultDV)
+           in { left:
+                { left: DV (A.slice 0 6 resultArr)
+                , right: DV (A.slice 6 12 resultArr) }
+              , right:
+                { left: DV (A.slice 12 18 resultArr)
+                , right: DV (A.slice 18 24 resultArr) }
+              }
+      else throwWith "invalid: api_df_list / api_damage / api_at_eflag length mismatch"
+  where
+    cAI :: Foreign -> Array Int
+    cAI = unsafeFromForeign
+    cAN :: Foreign -> Array Number
+    cAN = unsafeFromForeign
+    
+    dfList = unsafeArrTail h.api_df_list
+    atEFlag :: Array Int
+    atEFlag = unsafeArrTail h.api_at_eflag
+    damageList = unsafeArrTail h.api_damage
+
+    lengthCheck = A.length dfList == A.length atEFlag
+               && A.length dfList == A.length damageList
+
+    eventTargetsRaw :: Array Int
+    eventTargetsRaw = map (cAI >>> toOne) (unsafeArrTail h.api_df_list)
+      where
+        -- merge targets like [a,a] into a-1 (so that it's zero-indexed)
+        -- there are 2 checks:
+        --   elements of api_df_list should:
+        --   * be non-empty
+        --   * all elements of it should be the same
+        -- the reason for minus 1 in the end is to make it zero-based
+        toOne :: Array Int -> Int
+        toOne xs = case A.uncons xs of
+          Just {head: y, tail: ys} ->
+            if all (\v -> v == y) ys || all (\v -> v == -1) ys
+              then y - 1
+              else throwWith "invalid: elements are different in api_df_list"
+          Nothing -> throwWith "invalid: empty api_df_list element"
+          
+    eventTargets :: Array Int
+    eventTargets = A.zipWith updateTarget eventTargetsRaw atEFlag
+      where
+        updateTarget rawTarget eFlag = case eFlag of
+            -- ally attacks in this turn, so the target is an enemy
+            0 -> rawTarget + 12
+            -- enemy attacks in this turn, so the target is an ally
+            -- nothing to be doing in this case
+            1 -> rawTarget
+            _ -> throwWith "invalid api_at_eflag element"
+
+    eventDamages :: Array Damage
+    eventDamages = map (cAN >>> convert) (unsafeArrTail h.api_damage)
+      where
+        convert :: Array Number -> Damage
+        convert xs = mkDamage totalDmg
+          where
+            -- there are double attacks in the damage list
+            -- because damecon triggers *AFTER* the attack actions are completed
+            -- we need to sum damage values before turning it into real Damage
+            totalDmg = sum (map normalizeDamage xs :: Array Int)
+    accumulateDamage :: forall h r.
+                        STA.STArray h Damage -- array reference
+                     -> Int -> Damage -- target index and corresponding damage
+                     -> Eff (st :: ST.ST h | r) Unit
+    accumulateDamage arr targetInd damage = do
+        dmg <- peekSTArrayUnsafe arr targetInd
+        pokeSTArrayUnsafe arr targetInd (dmg <> damage :: Damage)
+        pure unit
+    resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
+    resultDV = do
+        arr <- STA.thaw (replicate 24 mempty)
         A.zipWithA (accumulateDamage arr) eventTargets eventDamages
         pure arr
 

@@ -15,6 +15,9 @@ import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.FFI
 import Test.Unit.Assert as Assert
 import Data.Foldable
+import Partial.Unsafe
+
+import KanColle.KCAPI.Battle
 
 import BattleData
 
@@ -29,6 +32,9 @@ dvToStr dv = Str.joinWith "," $ map (damageToInt >>> show) (getDV dv)
 
 ndvToStr :: LR DamageVector -> String
 ndvToStr ndv = dvToStr ndv.left <> " -- " <> dvToStr ndv.right
+
+acDVtoStr :: LR (LR DamageVector) -> String
+acDVtoStr dvdv = dvToStr dvdv.left.left <> " -- " <> dvToStr dvdv.right.left <> " && " <> dvToStr dvdv.right.right
 
 testDameCon :: forall e. TestSuite e
 testDameCon = do
@@ -66,6 +72,46 @@ testDamageVector = do
       Assert.assert "sample withSupportExpedition2" $
           "0,70,20,132,40,0"
               == dvToStr (dvF withSupportExpedition2)
+    test "DamageVector: abyssal combined: opening raigeki DV" do
+      let raw :: Raigeki
+          raw = unsafePartial (fromJust (getOpeningAttack abyssalCombinedFleet1))
+          dv :: LR (LR DamageVector)
+          dv = calcRaigekiDamageAC raw
+      Assert.assert "sample1 (openning raigeki)" $
+          "0,0,0,0,0,0 -- 0,0,0,0,0,73 && 0,0,0,0,0,0"
+              == acDVtoStr dv
+    test "DamageVector: abyssal combined: regular raigeki DV" do
+      let raw :: Raigeki
+          raw = unsafePartial (fromJust (getRaigekiAC abyssalCombinedFleet1))
+          dv :: LR (LR DamageVector)
+          dv = calcRaigekiDamageAC raw
+      Assert.assert "sample1" $
+          "0,0,4,0,0,0 -- 0,0,0,0,0,0 && 0,0,4,0,0,0"
+              == acDVtoStr dv
+    test "DamageVector: abyssal combined: hougeki1" do
+      let raw :: Hougeki
+          raw = unsafePartial (fromJust (getHougeki1AC abyssalCombinedFleet1))
+          dv :: LR (LR DamageVector)
+          dv = calcHougekiDamageAC raw
+      Assert.assert "sample1" $
+          "9,0,0,0,0,0 -- 0,0,0,0,0,0 && 232,5,5,0,101,0"
+              == acDVtoStr dv
+    test "DamageVector: abyssal combined: hougeki2" do
+      let raw :: Hougeki
+          raw = unsafePartial (fromJust (getHougeki2AC abyssalCombinedFleet1))
+          dv :: LR (LR DamageVector)
+          dv = calcHougekiDamageAC raw
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 -- 37,71,62,178,0,0 && 0,0,0,0,0,0"
+              == acDVtoStr dv
+    test "DamageVector: abyssal combined: hougeki3" do
+      let raw :: Hougeki
+          raw = unsafePartial (fromJust (getHougeki3AC abyssalCombinedFleet1))
+          dv :: LR (LR DamageVector)
+          dv = calcHougekiDamageAC raw
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 -- 25,148,161,0,93,0 && 0,0,58,0,0,0"
+              == acDVtoStr dv
 
 testDamageAnalyzer :: forall e. TestSuite e
 testDamageAnalyzer =

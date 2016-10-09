@@ -41,3 +41,5 @@ foreign import normBattleWithOpeningTaisen1 :: Battle
 
 foreign import combinedFleetOpeingTaisenSTF1 :: Battle
 foreign import combinedFleetOpeingTaisenCTF1 :: Battle
+
+foreign import abyssalCombinedFleet1 :: Battle

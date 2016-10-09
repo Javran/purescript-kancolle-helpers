@@ -50,8 +50,9 @@ type KoukuStage3 =
   , api_edam :: Array Number
   }
 
-type Hougeki =
+type Hougeki = -- TODO: no need for "Foreign" here
   { api_df_list :: Array Foreign
+  , api_at_eflag :: Array Int
   , api_damage :: Array Foreign
   }
 
