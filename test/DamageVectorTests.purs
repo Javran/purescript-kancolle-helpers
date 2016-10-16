@@ -12,6 +12,7 @@ import Data.Maybe
 import Data.Function
 import KanColle.Util
 import KanColle.DamageAnalysis
+import KanColle.DamageAnalysis.Stages
 import KanColle.DamageAnalysis.FFI
 import Test.Unit.Assert as Assert
 import Data.Foldable
@@ -72,6 +73,18 @@ testDamageVector = do
       Assert.assert "sample withSupportExpedition2" $
           "0,70,20,132,40,0"
               == dvToStr (dvF withSupportExpedition2)
+    test "DamageVector: abyssal combined: LBAS" do
+      let dv :: LR (LR DamageVector)
+          dv = landBasedAirStrikeDVsAC abyssalCombinedFleet1
+      Assert.assert "sample1 (LBAS)" $
+          "0,0,0,0,0,0 -- 0,0,0,0,0,0 && 0,0,0,122,0,176"
+              == acDVtoStr dv
+    test "DamageVector: abyssal combined: kouku" do
+      let dv :: LR (LR DamageVector)
+          dv = koukuDVAC abyssalCombinedFleet1
+      Assert.assert "sample1 (kouku)" $
+          "0,0,0,0,0,0 -- 63,0,10,0,0,0 && 0,0,0,0,0,0"
+              == acDVtoStr dv
     test "DamageVector: abyssal combined: opening raigeki DV" do
       let raw :: Raigeki
           raw = unsafePartial (fromJust (getOpeningAttack abyssalCombinedFleet1))

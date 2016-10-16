@@ -14,6 +14,9 @@ module KanColle.DamageAnalysis.Stages
 
   , battleCarrierTaskForceDV
   , battleSurfaceTaskForceDV
+    -- TODO: should we export this?
+  , koukuDVAC
+  , landBasedAirStrikeDVsAC
 
   ) where
 
@@ -58,8 +61,8 @@ landBasedAirStrikeDVsAC =
       (map calcKoukuDamageAC)
     >>> foldl auxAppend mt
   where
-    auxAppend l r = 
-        { left: lrAppend l.left r.left 
+    auxAppend l r =
+        { left: lrAppend l.left r.left
         , right: lrAppend l.right r.right }
 
 kouku2CombinedDV :: Battle -> DamageVector
@@ -185,7 +188,7 @@ combinedAppend a b = { main: a.main <> b.main
                      , escort: a.escort <> b.escort
                      , enemy: a.enemy <> b.enemy
                      }
-                     
+
 combinedAppendAC :: forall m. Monoid m => CombinedBattleAC m -> CombinedBattleAC m -> CombinedBattleAC m
 combinedAppendAC a b =
     { main: a.main <> b.main
@@ -232,7 +235,7 @@ battleCarrierTaskForceDV = fconcat2
     -- the following 2 for aerial battles
     , kouku2DV >>> toCombined FRMain
     , kouku2CombinedDV >>> lrOnlyLeft >>> toCombined FREscort
-    
+
     -- only escort fleet will do preemptive anti-sub
     , openingTaisenDV >>> toCombined FREscort
 
@@ -247,7 +250,7 @@ battleCarrierTaskForceDV = fconcat2
 fconcat2AC :: Array (Battle -> LR (LR DamageVector)) -> Battle -> LR (LR DamageVector)
 fconcat2AC xs b = foldl auxAppend mt ((\f -> f b) <$> xs)
   where
-    auxAppend l r = 
+    auxAppend l r =
         { left: lrAppend l.left r.left
         , right: lrAppend l.right r.right }
 
