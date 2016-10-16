@@ -100,22 +100,21 @@ type CombinedDamageVectorAC = CombinedBattleAC DamageVector
 debugShowDV :: DamageVector -> String
 debugShowDV (DV xs) = joinWith "," (map (show <<< damageToInt) xs)
 
--- TODO: abandon this and always use the safe version
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: KoukuStage3 -> LR DamageVector
 fromFDamAndEDam ks3 =
-    { left: DV (convertFEDam fDam)
-    , right: DV (convertFEDam eDam) }
+    { left: fromMaybe mempty ((convertFEDam >>> mkDV) <$> fDam)
+    , right: fromMaybe mempty ((convertFEDam >>> mkDV) <$> eDam) }
   where
-    fDam = fromMaybe mempty (getKoukuStage3FDam ks3)
-    eDam = fromMaybe mempty (getKoukuStage3EDam ks3)
+    fDam = getKoukuStage3FDam ks3
+    eDam = getKoukuStage3EDam ks3
 
 -- L: ally fleet, LL: ally main, LR: ally escort
 -- R: enemy fleet: RL: enemy main, RR: enemy escort
 fromFDamAndEDamAC :: forall a.
                   { api_fdam :: Array Number
                   , api_edam :: Array Number | a} -> LR (LR DamageVector)
-fromFDamAndEDamAC v = (lrMap >>> lrMap) DV
+fromFDamAndEDamAC v = (lrMap >>> lrMap) mkDV
     { left: allyDams
     , right: enemyDams }
   where
