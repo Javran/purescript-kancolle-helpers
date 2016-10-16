@@ -88,7 +88,7 @@ getMaxHps b = map fromRawHp b.api_maxhps
 getMaxHpsCombined :: Battle -> Array (Maybe Int)
 getMaxHpsCombined b = map fromRawHp b.api_maxhps_combined
 
-hasField :: String -> Battle -> Boolean
+hasField :: forall a. String -> a -> Boolean
 hasField s = hasOwnProperty s <<< toForeign
 
 hasKouku :: Battle -> Boolean
@@ -235,4 +235,14 @@ getKoukuStage3Maybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
 getKoukuStage3EEscortMaybe :: Kouku -> Maybe KoukuStage3
 getKoukuStage3EEscortMaybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
     then Just kk.api_stage3_combined
+    else Nothing
+
+getKoukuStage3FDam :: KoukuStage3 -> Maybe (Array Number)
+getKoukuStage3FDam ks3 = if hasField "api_fdam" ks3
+    then Just ks3.api_fdam
+    else Nothing
+
+getKoukuStage3EDam :: KoukuStage3 -> Maybe (Array Number)
+getKoukuStage3EDam ks3 = if hasField "api_edam" ks3
+    then Just ks3.api_edam
     else Nothing

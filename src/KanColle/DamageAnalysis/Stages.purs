@@ -5,7 +5,7 @@
  -}
 module KanColle.DamageAnalysis.Stages
   ( koukuDV
---   , koukuDVAC
+  , koukuDVAC
   , koukuCombinedDV
   , battleDV
   , nightBattleDV
@@ -36,8 +36,11 @@ connectDV getData z calc b = maybe z calc (getData b)
 koukuDV :: Battle -> LR DamageVector
 koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 
--- koukuDVAC :: Battle -> LR DamageVector
--- koukuDVAC = connectDV getKouku memptyLR calcKoukuDamageAC
+koukuDVAC :: Battle -> LR (LR DamageVector)
+koukuDVAC = connectDV getKouku mt calcKoukuDamageAC
+  where
+    mt :: LR (LR DamageVector)
+    mt = { left: memptyLR, right: memptyLR }
 
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined

@@ -14,7 +14,7 @@ module KanColle.DamageAnalysis.DamageVector
   , FleetRole(..)
 
   , calcKoukuDamage
---   , calcKoukuDamageAC
+  , calcKoukuDamageAC
   , calcKoukuDamageCombined
   , calcSupportAirAttackDamage
   , calcSupportHouraiDamage
@@ -41,7 +41,7 @@ import Data.Monoid
 import Data.Int as Int
 import Data.Array as A
 import Data.Array.ST as STA
-import Data.Unfoldable
+import Data.Unfoldable hiding (fromMaybe)
 import Control.Monad.Eff
 import Control.Monad.ST as ST
 import KanColle.Util
@@ -99,6 +99,7 @@ type CombinedDamageVectorAC = CombinedBattleAC DamageVector
 debugShowDV :: DamageVector -> String
 debugShowDV (DV xs) = joinWith "," (map (show <<< damageToInt) xs)
 
+-- TODO: abandon this and always use the safe version
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
 fromFDamAndEDam :: forall a.
                 { api_fdam :: Array Number
@@ -106,6 +107,14 @@ fromFDamAndEDam :: forall a.
 fromFDamAndEDam v =
     { left: DV (convertFEDam v.api_fdam)
     , right: DV (convertFEDam v.api_edam) }
+
+fromFDamAndEDamSafe :: KoukuStage3 -> LR DamageVector
+fromFDamAndEDamSafe ks3 =
+    { left: DV (convertFEDam fDam)
+    , right: DV (convertFEDam eDam) }
+  where
+    fDam = fromMaybe mempty (getKoukuStage3FDam ks3)
+    eDam = fromMaybe mempty (getKoukuStage3EDam ks3)
 
 -- L: ally fleet, LL: ally main, LR: ally escort
 -- R: enemy fleet: RL: enemy main, RR: enemy escort
@@ -135,6 +144,26 @@ calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
 -- calcKoukuDamageAC :: Kouku -> LR DamageVector
 -- calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
+
+-- | calculate damage from ally vs. enemy main fleet kouku stages (for Abyssal Combined fleet)
+calcKoukuDamageACEMain :: Kouku -> LR DamageVector
+calcKoukuDamageACEMain kk = fromFDamAndEDamSafe kk.api_stage3
+
+-- | calculate damage from ally vs. enemy escort fleet kouku stages (for Abyssal Combined fleet)
+calcKoukuDamageACEEscort :: Kouku -> LR DamageVector
+calcKoukuDamageACEEscort kk = fromFDamAndEDamSafe kk.api_stage3_combined
+
+calcKoukuDamageAC :: Kouku -> LR (LR DamageVector)
+calcKoukuDamageAC kk =
+    { left:
+      { left: resultEMain.left <> resultEEscort.left
+      , right: mempty }
+    , right:
+      { left: resultEMain.right
+      , right: resultEEscort.right } }
+  where
+    resultEMain = calcKoukuDamageACEMain kk
+    resultEEscort = calcKoukuDamageACEEscort kk
 
 -- | calculate damage from kouku (aerial) stages (combined fleet)
 -- | note that only escort fleet is taking damage. so we just need DamageVector
