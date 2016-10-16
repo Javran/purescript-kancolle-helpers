@@ -27,7 +27,6 @@ module KanColle.DamageAnalysis.DamageVector
   , calcHougekiDamageAC
 
   , calcLandBasedKoukuDamage
---  , calcLandBasedKoukuDamageAC
 
   , toGCombined
   , toCombined
@@ -103,15 +102,8 @@ debugShowDV (DV xs) = joinWith "," (map (show <<< damageToInt) xs)
 
 -- TODO: abandon this and always use the safe version
 -- | get `DamageVector` from raw `fDam` and `eDam` fields
-fromFDamAndEDam :: forall a.
-                { api_fdam :: Array Number
-                , api_edam :: Array Number | a} -> LR DamageVector
-fromFDamAndEDam v =
-    { left: DV (convertFEDam v.api_fdam)
-    , right: DV (convertFEDam v.api_edam) }
-
-fromFDamAndEDamSafe :: KoukuStage3 -> LR DamageVector
-fromFDamAndEDamSafe ks3 =
+fromFDamAndEDam :: KoukuStage3 -> LR DamageVector
+fromFDamAndEDam ks3 =
     { left: DV (convertFEDam fDam)
     , right: DV (convertFEDam eDam) }
   where
@@ -149,11 +141,11 @@ calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
 -- | calculate damage from ally vs. enemy main fleet kouku stages (for Abyssal Combined fleet)
 calcKoukuDamageACEMain :: forall a . {api_stage3 :: KoukuStage3 | a} -> LR DamageVector
-calcKoukuDamageACEMain kk = fromFDamAndEDamSafe kk.api_stage3
+calcKoukuDamageACEMain kk = fromFDamAndEDam kk.api_stage3
 
 -- | calculate damage from ally vs. enemy escort fleet kouku stages (for Abyssal Combined fleet)
 calcKoukuDamageACEEscort :: forall a. {api_stage3_combined :: KoukuStage3 | a} -> LR DamageVector
-calcKoukuDamageACEEscort kk = fromFDamAndEDamSafe kk.api_stage3_combined
+calcKoukuDamageACEEscort kk = fromFDamAndEDam kk.api_stage3_combined
 
 calcKoukuDamageAC :: forall a.
                   { api_stage3 :: KoukuStage3
@@ -178,21 +170,9 @@ calcKoukuDamageCombined kk = DV (convertFEDam (kk.api_stage3_combined.api_fdam))
 -- | calculate land based kouku damages. whose api_stage3 only have an api_edam field
 -- | (because only enemies are taking damage)
 calcLandBasedKoukuDamage :: Kouku -> DamageVector
-calcLandBasedKoukuDamage lbkk = case maybeStage3 of
+calcLandBasedKoukuDamage lbkk = case getKoukuStage3 lbkk  of
     Just stage3 -> DV (convertFEDam stage3.api_edam)
     Nothing -> mempty
-  where
-    maybeStage3 = getKoukuStage3 lbkk
-
-{- 
--- note: here .left means enemy main fleet and .right enemy escort
-calcLandBasedKoukuDamageAC :: Kouku -> LR DamageVector
-calcLandBasedKoukuDamageAC lbkk = case maybeStage3 of
-    Just stage3 -> DV (convertFEDam stage3.api_edam)
-    Nothing -> mempty
-  where
-    maybeStage3 = getKoukuStage3EEscortMaybe lbkk
--}
 
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> LR DamageVector
@@ -382,14 +362,6 @@ toGCombined r dv = case r of
     FRLandBased ->
         { allyMain: mempty, allyEscort: mempty
         , enemyMain: dv.right, enemyEscort: mempty }
-{-
-    FRMainEEscort ->
-        { allyMain: dv.left, allyEscort: mempty
-        , enemyMain: mempty, enemyEscort: dv.right }
-    FRLandBasedEEscort ->
-        { allyMain: mempty, allyEscort: mempty
-        , enemyMain: mempty, enemyEscort: dv.right }
--}
 
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = toCombinedBattle (toGCombined r dv)
