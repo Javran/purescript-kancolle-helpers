@@ -5,7 +5,7 @@
  -}
 module KanColle.DamageAnalysis.Stages
   ( koukuDV
-  , koukuDVAC
+--   , koukuDVAC
   , koukuCombinedDV
   , battleDV
   , nightBattleDV
@@ -36,8 +36,8 @@ connectDV getData z calc b = maybe z calc (getData b)
 koukuDV :: Battle -> LR DamageVector
 koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 
-koukuDVAC :: Battle -> LR DamageVector
-koukuDVAC = connectDV getKouku memptyLR calcKoukuDamageAC
+-- koukuDVAC :: Battle -> LR DamageVector
+-- koukuDVAC = connectDV getKouku memptyLR calcKoukuDamageAC
 
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
@@ -230,8 +230,9 @@ battleEnemyCarrierTaskForceDV = fconcat2AC
     [ landBasedAirStrikeDVs >>> toCombinedAC FRLandBased
     , landBasedAirStrikeDVsAC >>> toCombinedAC FRLandBasedEEscort
     -- regular kouku stages
-    , koukuDV >>> toCombinedAC FRMain
-    , koukuDVAC >>> toCombinedAC FRMainEEscort
+    -- TODO: combind kouku damage vector
+--    , koukuDV >>> toCombinedAC FRMain
+--    , koukuDVAC >>> toCombinedAC FRMainEEscort
     -- regular battles
     , openingDV >>> toCombinedAC FRMain
     , hougeki1CTDV >>> toCombinedAC FRMainEEscort

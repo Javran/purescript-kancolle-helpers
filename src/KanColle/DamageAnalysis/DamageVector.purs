@@ -14,7 +14,7 @@ module KanColle.DamageAnalysis.DamageVector
   , FleetRole(..)
 
   , calcKoukuDamage
-  , calcKoukuDamageAC
+--   , calcKoukuDamageAC
   , calcKoukuDamageCombined
   , calcSupportAirAttackDamage
   , calcSupportHouraiDamage
@@ -133,8 +133,8 @@ convertFEDam = unsafeArrTail >>> map (normalizeDamage >>> mkDamage)
 calcKoukuDamage :: Kouku -> LR DamageVector
 calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
-calcKoukuDamageAC :: Kouku -> LR DamageVector
-calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
+-- calcKoukuDamageAC :: Kouku -> LR DamageVector
+-- calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
 
 -- | calculate damage from kouku (aerial) stages (combined fleet)
 -- | note that only escort fleet is taking damage. so we just need DamageVector
