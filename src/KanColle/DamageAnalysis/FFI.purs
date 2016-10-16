@@ -6,6 +6,7 @@ module KanColle.DamageAnalysis.FFI
   , analyzeCTFBattleJS
   , analyzeTECFBattleJS
   , analyzeCombinedNightBattleJS
+  , analyzeAbyssalCTFBattleJS
   ) where
 
 import Prelude
@@ -28,6 +29,7 @@ readDameCon = map convert
 
 type FleetResult f = Array (f ShipResult)
 type BattleResult f = NormalBattle (FleetResult f)
+type BattleResultAC f = CombinedBattleAC (FleetResult f)
 type CombinedBattleResult f = CombinedBattle (FleetResult f)
   
 liftToFFI :: (Array (Maybe DameCon) -> Battle -> BattleResult Maybe)
@@ -44,6 +46,14 @@ liftToFFICombined f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))
     convert s = { main: map toNullable s.main
                 , enemy: map toNullable s.enemy
                 , escort: map toNullable s.escort }
+
+liftToFFIAC :: (Array (Maybe DameCon) -> Battle -> BattleResultAC Maybe)
+                  -> Fn2 (Array Int) Battle (BattleResultAC Nullable)
+liftToFFIAC f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))
+  where
+    convert s = { main: map toNullable s.main
+                , enemyMain: map toNullable s.enemyMain
+                , enemyEscort: map toNullable s.enemyEscort }
 
 analyzeBattleJS :: Fn2 (Array Int) Battle (BattleResult Nullable)
 analyzeBattleJS = liftToFFI analyzeBattle
@@ -62,3 +72,6 @@ analyzeTECFBattleJS = liftToFFICombined analyzeTECFBattle
 
 analyzeCombinedNightBattleJS :: Fn2 (Array Int) Battle (BattleResult Nullable)
 analyzeCombinedNightBattleJS = liftToFFI analyzeCombinedNightBattle
+
+analyzeAbyssalCTFBattleJS :: Fn2 (Array Int) Battle (BattleResultAC Nullable)
+analyzeAbyssalCTFBattleJS = liftToFFIAC analyzeAbyssalCTFBattle

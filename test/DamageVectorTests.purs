@@ -192,10 +192,16 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeCombinedNightBattle dc6 combinedFleetNightBattle2) ==
           map toMaybeInt [81,34,13,39,17,28,
                           88-158-136,0,0,0,0, 9999]
+      Assert.assert "abyssal combined fleet 1" $
+        (mergeAC >>> trimInfo) (analyzeAbyssalCTFBattle dc6 abyssalCombinedFleet1) ==
+          map toMaybeInt [96-9,38,60-4,50,16,23,
+                          350-63-37-25,96-71-148,96-10-62-161,66-178,38-93,38-73,
+                          57-232,76-5,76-5-4-58,38-122,35-101,35-176]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
     merge x = x.main <> x.enemy
     mergeCombined x = x.main <> x.escort <> x.enemy
+    mergeAC x = x.main <> x.enemyMain <> x.enemyEscort
     trimInfo :: forall a. Array (Maybe { hp :: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.hp)

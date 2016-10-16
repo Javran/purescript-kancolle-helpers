@@ -14,8 +14,9 @@ module KanColle.DamageAnalysis.Stages
 
   , battleCarrierTaskForceDV
   , battleSurfaceTaskForceDV
+  , battleEnemyCarrierTaskForceDV
     -- TODO: should we export this?
-  , koukuDVAC
+  -- , koukuDVAC
   , landBasedAirStrikeDVsAC
 
   ) where

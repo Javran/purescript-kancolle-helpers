@@ -9,7 +9,7 @@ module KanColle.DamageAnalysis.Types
   , CombinedBattle, CombinedBattleAC
   , GCombinedBattle
   , FleetInfo
-  , NormalFleetInfo, CombinedFleetInfo
+  , NormalFleetInfo, CombinedFleetInfo, CombinedFleetInfoAC
   
   , toCombinedBattle, toCombinedBattleAC
 
@@ -123,3 +123,4 @@ getShipResult sBefore sAfter =
 type FleetInfo a = Array (Maybe a)
 type NormalFleetInfo a = NormalBattle (FleetInfo a)
 type CombinedFleetInfo a = CombinedBattle (FleetInfo a)
+type CombinedFleetInfoAC a = CombinedBattleAC (FleetInfo a)
