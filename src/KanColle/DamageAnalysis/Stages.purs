@@ -38,9 +38,6 @@ koukuDV = connectDV getKouku memptyLR calcKoukuDamage
 
 koukuDVAC :: Battle -> LR (LR DamageVector)
 koukuDVAC = connectDV getKouku mt calcKoukuDamageAC
-  where
-    mt :: LR (LR DamageVector)
-    mt = { left: memptyLR, right: memptyLR }
 
 koukuCombinedDV :: Battle -> DamageVector
 koukuCombinedDV = connectDV getKouku mempty calcKoukuDamageCombined
@@ -53,31 +50,50 @@ landBasedAirStrikeDVs =
       (map (calcLandBasedKoukuDamage >>> lrOnlyRight))
     >>> foldl lrAppend memptyLR
 
-landBasedAirStrikeDVsAC :: Battle -> LR DamageVector
+landBasedAirStrikeDVsAC :: Battle -> LR (LR DamageVector)
 landBasedAirStrikeDVsAC =
     connectDV
       getLandBasedAirStrikes
       []
-      (map (calcLandBasedKoukuDamageAC >>> lrOnlyRight))
-    >>> foldl lrAppend memptyLR
-    
+      (map calcKoukuDamageAC)
+    >>> foldl auxAppend mt
+  where
+    auxAppend l r = 
+        { left: lrAppend l.left r.left 
+        , right: lrAppend l.right r.right }
+
 kouku2CombinedDV :: Battle -> DamageVector
 kouku2CombinedDV = connectDV getKouku2 mempty calcKoukuDamageCombined
 
 supportAirAttackDV :: Battle -> DamageVector
 supportAirAttackDV = connectDV getSupportAirInfo mempty calcSupportAirAttackDamage
 
+supportAirAttackDVAC :: Battle -> LR (LR DamageVector)
+supportAirAttackDVAC = connectDV getSupportAirInfo mt calcSupportAirAttackDamageAC
+
 supportHouraiDV :: Battle -> DamageVector
 supportHouraiDV = connectDV getSupportHouraiInfo mempty calcSupportHouraiDamage
+
+supportHouraiDVAC :: Battle -> LR (LR DamageVector)
+supportHouraiDVAC = connectDV getSupportHouraiInfo mt calcSupportHouraiDamageAC
 
 kouku2DV :: Battle -> LR DamageVector
 kouku2DV = connectDV getKouku2 memptyLR calcKoukuDamage
 
+kouku2DVAC :: Battle -> LR (LR DamageVector)
+kouku2DVAC = connectDV getKouku2 mt calcKoukuDamageAC
+
 openingDV :: Battle -> LR DamageVector
 openingDV = connectDV getOpeningAttack memptyLR calcRaigekiDamage
 
+openingDVAC :: Battle -> LR (LR DamageVector)
+openingDVAC = connectDV getOpeningAttack mt calcRaigekiDamageAC
+
 openingTaisenDV :: Battle -> LR DamageVector
 openingTaisenDV = connectDV getOpeningTaisen memptyLR calcHougekiDamage
+
+openingTaisenDVAC :: Battle -> LR (LR DamageVector)
+openingTaisenDVAC = connectDV getOpeningTaisen mt calcHougekiDamageAC
 
 hougeki1DV :: Battle -> LR DamageVector
 hougeki1DV = connectDV getHougeki1 memptyLR calcHougekiDamage
@@ -104,18 +120,21 @@ hougeki2CTDV = connectDV getHougeki2CT memptyLR calcHougekiDamage
 hougeki3CTDV :: Battle -> LR DamageVector
 hougeki3CTDV = connectDV getHougeki3CT memptyLR calcHougekiDamage
 
+mt :: LR (LR DamageVector)
+mt = { left: memptyLR, right: memptyLR }
+
 -- specalized for Abyssal Combined Fleet
-hougeki1ACDV :: Battle -> LR DamageVector
-hougeki1ACDV = hougeki1CTDV
+hougeki1ACDV :: Battle -> LR (LR DamageVector)
+hougeki1ACDV = connectDV getHougeki1CT mt calcHougekiDamageAC
 
-raigekiACDV :: Battle -> LR DamageVector
-raigekiACDV = raigekiCTDV
+raigekiACDV :: Battle -> LR (LR DamageVector)
+raigekiACDV = connectDV getRaigekiCT mt calcRaigekiDamageAC
 
-hougeki2ACDV :: Battle -> LR DamageVector
-hougeki2ACDV = hougeki2CTDV
+hougeki2ACDV :: Battle -> LR (LR DamageVector)
+hougeki2ACDV = connectDV getHougeki2CT mt calcHougekiDamageAC
 
-hougeki3ACDV :: Battle -> LR DamageVector
-hougeki3ACDV = hougeki3CTDV
+hougeki3ACDV :: Battle -> LR (LR DamageVector)
+hougeki3ACDV = connectDV getHougeki3CT mt calcHougekiDamageAC
 
 hougekiDV :: Battle -> LR DamageVector
 hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
@@ -177,8 +196,6 @@ combinedAppendAC a b =
 fconcat2 :: Array (Battle -> CombinedDamageVector) -> Battle -> CombinedDamageVector
 fconcat2 xs b = foldl combinedAppend memptyCombined ((\f -> f b) <$> xs)
 
-fconcat2AC :: Array (Battle -> CombinedDamageVectorAC) -> Battle -> CombinedDamageVectorAC
-fconcat2AC xs b = foldl combinedAppendAC memptyCombinedAC ((\f -> f b) <$> xs)
 
 -- | get `CombinedDamageVector` of a surface task force battle
 battleSurfaceTaskForceDV :: Battle -> CombinedDamageVector
@@ -227,19 +244,31 @@ battleCarrierTaskForceDV = fconcat2
     , hougeki3CTDV >>>  toCombined FRMain
     ]
 
+fconcat2AC :: Array (Battle -> LR (LR DamageVector)) -> Battle -> LR (LR DamageVector)
+fconcat2AC xs b = foldl auxAppend mt ((\f -> f b) <$> xs)
+  where
+    auxAppend l r = 
+        { left: lrAppend l.left r.left
+        , right: lrAppend l.right r.right }
+
 -- TODO: to be verified
 battleEnemyCarrierTaskForceDV :: Battle -> CombinedDamageVectorAC
 battleEnemyCarrierTaskForceDV = fconcat2AC
-    [ landBasedAirStrikeDVs >>> toCombinedAC FRLandBased
-    , landBasedAirStrikeDVsAC >>> toCombinedAC FRLandBasedEEscort
-    -- regular kouku stages
-    -- TODO: combind kouku damage vector
---    , koukuDV >>> toCombinedAC FRMain
---    , koukuDVAC >>> toCombinedAC FRMainEEscort
+    [ landBasedAirStrikeDVsAC
+    , koukuDVAC
+    -- support expedition: aerial or hourai
+    , supportAirAttackDVAC
+    , supportHouraiDVAC
+    -- in case there are aerial battles:
+    , kouku2DVAC
+
+    -- preemptive anti-sub
+    , openingTaisenDVAC
+
     -- regular battles
-    , openingDV >>> toCombinedAC FRMain
-    , hougeki1CTDV >>> toCombinedAC FRMainEEscort
-    , raigekiCTDV >>> toCombinedAC FRMainEEscort
-    , hougeki2CTDV >>> toCombinedAC FRMain
-    , hougeki3CTDV >>>  toCombinedAC FRMain
-    ]
+    , openingDVAC
+    , hougeki1ACDV
+    , raigekiACDV
+    , hougeki2ACDV
+    , hougeki3ACDV
+    ] >>> toCombinedAC

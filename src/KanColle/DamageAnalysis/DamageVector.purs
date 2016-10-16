@@ -17,7 +17,9 @@ module KanColle.DamageAnalysis.DamageVector
   , calcKoukuDamageAC
   , calcKoukuDamageCombined
   , calcSupportAirAttackDamage
+  , calcSupportAirAttackDamageAC
   , calcSupportHouraiDamage
+  , calcSupportHouraiDamageAC
   , calcHougekiDamage
   , calcRaigekiDamage
   
@@ -25,7 +27,7 @@ module KanColle.DamageAnalysis.DamageVector
   , calcHougekiDamageAC
 
   , calcLandBasedKoukuDamage
-  , calcLandBasedKoukuDamageAC
+--  , calcLandBasedKoukuDamageAC
 
   , toGCombined
   , toCombined
@@ -146,14 +148,17 @@ calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 -- calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
 
 -- | calculate damage from ally vs. enemy main fleet kouku stages (for Abyssal Combined fleet)
-calcKoukuDamageACEMain :: Kouku -> LR DamageVector
+calcKoukuDamageACEMain :: forall a . {api_stage3 :: KoukuStage3 | a} -> LR DamageVector
 calcKoukuDamageACEMain kk = fromFDamAndEDamSafe kk.api_stage3
 
 -- | calculate damage from ally vs. enemy escort fleet kouku stages (for Abyssal Combined fleet)
-calcKoukuDamageACEEscort :: Kouku -> LR DamageVector
+calcKoukuDamageACEEscort :: forall a. {api_stage3_combined :: KoukuStage3 | a} -> LR DamageVector
 calcKoukuDamageACEEscort kk = fromFDamAndEDamSafe kk.api_stage3_combined
 
-calcKoukuDamageAC :: Kouku -> LR (LR DamageVector)
+calcKoukuDamageAC :: forall a.
+                  { api_stage3 :: KoukuStage3
+                  , api_stage3_combined :: KoukuStage3
+                  | a} -> LR (LR DamageVector)
 calcKoukuDamageAC kk =
     { left:
       { left: resultEMain.left <> resultEEscort.left
@@ -177,14 +182,17 @@ calcLandBasedKoukuDamage lbkk = case maybeStage3 of
     Just stage3 -> DV (convertFEDam stage3.api_edam)
     Nothing -> mempty
   where
-    maybeStage3 = getKoukuStage3Maybe lbkk
-    
-calcLandBasedKoukuDamageAC :: Kouku -> DamageVector
+    maybeStage3 = getKoukuStage3 lbkk
+
+{- 
+-- note: here .left means enemy main fleet and .right enemy escort
+calcLandBasedKoukuDamageAC :: Kouku -> LR DamageVector
 calcLandBasedKoukuDamageAC lbkk = case maybeStage3 of
     Just stage3 -> DV (convertFEDam stage3.api_edam)
     Nothing -> mempty
   where
     maybeStage3 = getKoukuStage3EEscortMaybe lbkk
+-}
 
 -- | calculate damage from raigeki (torpedo) stages
 calcRaigekiDamage :: Raigeki -> LR DamageVector
@@ -334,11 +342,20 @@ calcHougekiDamageAC h =
 calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
 calcSupportAirAttackDamage info = DV $ convertFEDam info.api_stage3.api_edam
 
+calcSupportAirAttackDamageAC :: SupportAirInfo -> LR (LR DamageVector)
+calcSupportAirAttackDamageAC info = calcKoukuDamageAC info
+
 -- | calculate damage from support shelling stages.
 -- | note that only enemy is taking damage so this results in
 -- | a single `DamageVector`.
 calcSupportHouraiDamage :: SupportHouraiInfo -> DamageVector
 calcSupportHouraiDamage info = DV $ convertFEDam info.api_damage
+
+-- TODO: to be verified, for now I just guess it's an array of raw length 1+12
+calcSupportHouraiDamageAC :: SupportHouraiInfo -> LR (LR DamageVector)
+calcSupportHouraiDamageAC info = { left: memptyLR, right: lrMap mkDV converted }
+  where
+    converted = fleetSplit false (convertFEDam info.api_damage)
 
 -- | ally fleet's role in this battle
 data FleetRole
@@ -346,8 +363,8 @@ data FleetRole
   | FREscort -- ally escort vs. enemy main
   | FRSupport -- ally support exped vs. enemy main
   | FRLandBased -- ally LBAS vs. enemy main
-  | FRMainEEscort -- ally main vs. enemy escort
-  | FRLandBasedEEscort -- ally LBAS vs. enemy escort
+--  | FRMainEEscort -- ally main vs. enemy escort
+--  | FRLandBasedEEscort -- ally LBAS vs. enemy escort
 
 -- | `toCombined role dv` converts a `LR DamageVector` whose left part
 -- | is playing role `role` into `CombinedDamageVector`
@@ -365,18 +382,25 @@ toGCombined r dv = case r of
     FRLandBased ->
         { allyMain: mempty, allyEscort: mempty
         , enemyMain: dv.right, enemyEscort: mempty }
+{-
     FRMainEEscort ->
         { allyMain: dv.left, allyEscort: mempty
         , enemyMain: mempty, enemyEscort: dv.right }
     FRLandBasedEEscort ->
         { allyMain: mempty, allyEscort: mempty
         , enemyMain: mempty, enemyEscort: dv.right }
+-}
 
 toCombined :: FleetRole -> LR DamageVector -> CombinedDamageVector
 toCombined r dv = toCombinedBattle (toGCombined r dv)
 
-toCombinedAC :: FleetRole -> LR DamageVector -> CombinedDamageVectorAC
-toCombinedAC r dv = toCombinedBattleAC (toGCombined r dv)
+-- TODO: add check on dv.left.right, which should be all 0
+toCombinedAC :: LR (LR DamageVector) -> CombinedDamageVectorAC
+toCombinedAC dv = 
+    { main: dv.left.left
+    , enemyMain: dv.right.left
+    , enemyEscort: dv.right.right
+    }
 
 -- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship

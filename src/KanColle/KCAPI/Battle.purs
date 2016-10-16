@@ -62,7 +62,8 @@ type Raigeki =
   }
 
 type SupportAirInfo =
-  { api_stage3 :: { api_edam :: Array Number } }
+  { api_stage3 :: KoukuStage3
+  , api_stage3_combined :: KoukuStage3 }
 
 type SupportHouraiInfo =
   { api_damage :: Array Number }
@@ -227,9 +228,15 @@ getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
     then Just b.api_air_base_attack
     else Nothing
 
-getKoukuStage3Maybe :: Kouku -> Maybe KoukuStage3
-getKoukuStage3Maybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
+getKoukuStage3 :: Kouku -> Maybe KoukuStage3
+getKoukuStage3 kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
     then Just kk.api_stage3
+    else Nothing
+
+-- fancy way of encoding a pair
+getKoukuStage3AC :: forall r. Kouku -> Maybe ((KoukuStage3 -> KoukuStage3 -> r) -> r)
+getKoukuStage3AC kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
+    then Just (\f -> f kk.api_stage3 kk.api_stage3_combined)
     else Nothing
 
 getKoukuStage3EEscortMaybe :: Kouku -> Maybe KoukuStage3
