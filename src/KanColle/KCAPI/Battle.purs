@@ -3,11 +3,11 @@ module KanColle.KCAPI.Battle
   , KArray, fromKArray -- eventually we should remove this ...
 
   , SupportAirInfo
-  , getSupportAirInfo 
+  , getSupportAirInfo
 
   , SupportHouraiInfo
   , getSupportHouraiInfo
-  
+
   , getLandBasedAirStrikes
 
   , Kouku
@@ -18,14 +18,14 @@ module KanColle.KCAPI.Battle
   , getKoukuStage3
   , getKoukuStage3FDam
   , getKoukuStage3EDam
-  
+
   , Hougeki
   , getHougeki
 
   , getHougeki1
   , getHougeki1AC
   , getHougeki1CT
- 
+
   , getHougeki2
   , getHougeki2AC
   , getHougeki2CT
@@ -40,7 +40,7 @@ module KanColle.KCAPI.Battle
   , getRaigeki
   , getRaigekiCT
   , getRaigekiAC
-  , getOpeningAttack  
+  , getOpeningAttack
 
   , getInitHps
   , getInitHpsCombined
@@ -66,7 +66,7 @@ fromKArray (KArray ar) = unsafeArrTail ar
 
 {-
   this module serves as "field accessing" purposes.
-  
+
   - for example, "Battle" definition contains "api_kouku2"
     but not all data of type "Battle" will always have this type,
     it's just convenient doing this rather than have distinct types
@@ -93,7 +93,7 @@ type RawBattle =
   , api_kouku2 :: Kouku
   , api_opening_taisen_flag :: Int
   , api_opening_taisen :: Hougeki
- 
+
   , api_opening_flag :: Int
   , api_opening_atack :: Raigeki
   , api_hourai_flag :: Array Int
@@ -151,7 +151,7 @@ type SupportInfo =
   { api_support_airatack :: SupportAirInfo
   , api_support_hourai :: SupportHouraiInfo
   }
-  
+
 fromRawHp :: Int -> Maybe Int
 fromRawHp -1 = Nothing
 fromRawHp v = Just v
@@ -231,14 +231,14 @@ getOpeningAttack b@(Battle rb) =
     && rb.api_opening_flag == 1
       then Just rb.api_opening_atack
       else Nothing
-      
+
 getOpeningTaisen :: Battle -> Maybe Hougeki
 getOpeningTaisen b@(Battle rb) =
     if hasField "api_opening_taisen_flag" b
     && rb.api_opening_taisen_flag == 1
       then Just rb.api_opening_taisen
       else Nothing
-      
+
 getHougeki1 :: Battle -> Maybe Hougeki
 getHougeki1 b@(Battle rb) = do
     checkHouraiFlag 0 b
@@ -286,7 +286,7 @@ getHougeki3CT :: Battle -> Maybe Hougeki
 getHougeki3CT b@(Battle rb) = do
     checkHouraiFlag 3 b
     pure rb.api_hougeki3
-    
+
 getHougeki1AC :: Battle -> Maybe Hougeki
 getHougeki1AC = getHougeki1CT
 

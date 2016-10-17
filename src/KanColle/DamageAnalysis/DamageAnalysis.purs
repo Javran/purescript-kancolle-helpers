@@ -1,7 +1,7 @@
 module KanColle.DamageAnalysis.DamageAnalysis
   ( analyzeBattle
   , analyzeNightBattle
-  
+
   , analyzeSTFBattle
   , analyzeCTFBattle
   , analyzeTECFBattle
@@ -22,7 +22,7 @@ import KanColle.DamageAnalysis.Types
 
 rawSplit :: forall a. Array a -> LR (Array a)
 rawSplit = fleetSplit true
-    
+
 normalSplit :: forall a. Array a -> LR (Array a)
 normalSplit = fleetSplit false
 
@@ -51,19 +51,19 @@ getInitFleet ds battle = { main: allyShips, enemy: enemyShips }
     maxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
     allyMaxHps = maxHps.left
     enemyMaxHps = maxHps.right
-    
+
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
-    
+
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
     addDameCon _ _ = Nothing
-  
+
     allyShips :: FleetInfo Ship
     allyShips = zipWith addDameCon (zipWith mkShip allyNowHps allyMaxHps) ds
 
     enemyShips :: FleetInfo Ship
     enemyShips = zipWith mkShip enemyNowHps enemyMaxHps
-    
+
 getInitFleetCombined :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo Ship
 getInitFleetCombined ds battle =
     { main: initFleet.main
@@ -74,21 +74,21 @@ getInitFleetCombined ds battle =
     dsSplitted = normalSplit ds
     dsMain = dsSplitted.left
     dsEscort = dsSplitted.right
-    
+
     initFleet = getInitFleet dsMain battle
-    
+
     escortNowHps = ensureHpsLen 6 $ getInitHpsCombined battle
     escortMaxHps = ensureHpsLen 6 $ getMaxHpsCombined battle
-    
+
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
-    
+
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
     addDameCon _ _ = Nothing
-  
+
     escortShips :: FleetInfo Ship
     escortShips = zipWith addDameCon (zipWith mkShip escortNowHps escortMaxHps) dsEscort
-    
+
 
 getInitFleetAC :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfoAC Ship
 getInitFleetAC ds battle =
@@ -105,26 +105,26 @@ getInitFleetAC ds battle =
     allyEMainMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
     allyMaxHps = allyEMainMaxHps.left
     enemyMainMaxHps = allyEMainMaxHps.right
-    
-    -- <null> vs. enemy escort    
+
+    -- <null> vs. enemy escort
     nullEEscortNowHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
     enemyEscortNowHps = nullEEscortNowHps.right
-    
+
     nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
     enemyEscortMaxHps = nullEEscortMaxHps.right
-    
+
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
-    
+
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
     addDameCon _ _ = Nothing
-  
+
     allyShips :: FleetInfo Ship
     allyShips = zipWith addDameCon (zipWith mkShip allyNowHps allyMaxHps) ds
-    
+
     enemyMainShips :: FleetInfo Ship
     enemyMainShips = zipWith mkShip enemyMainNowHps enemyMainMaxHps
-    
+
     enemyEscortShips :: FleetInfo Ship
     enemyEscortShips = zipWith mkShip enemyEscortNowHps enemyEscortMaxHps
 
@@ -135,7 +135,7 @@ analyzeNightBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipRes
 analyzeNightBattle = analyzeBattleBy nightBattleDV
 
 analyzeBattleBy :: (Battle -> NormalDamageVector)
-                -> Array (Maybe DameCon) 
+                -> Array (Maybe DameCon)
                 -> Battle
                 -> NormalFleetInfo ShipResult
 analyzeBattleBy getDVFromBattle ds battle =
@@ -149,7 +149,7 @@ analyzeBattleBy getDVFromBattle ds battle =
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
 
 analyzeCombinedBattleBy :: (Battle -> CombinedDamageVector)
-                -> Array (Maybe DameCon) 
+                -> Array (Maybe DameCon)
                 -> Battle
                 -> CombinedFleetInfo ShipResult
 analyzeCombinedBattleBy getDVFromBattle ds battle =
@@ -177,7 +177,7 @@ analyzeCombinedNightBattle ds b =
       `appNormalBattle` finalFleet
   where
     nightBattleInfo = getInitFleetCombined (replicate 6 Nothing <> ds) b
-    initFleet = 
+    initFleet =
       { main: nightBattleInfo.escort
       , enemy: nightBattleInfo.enemy
       }
