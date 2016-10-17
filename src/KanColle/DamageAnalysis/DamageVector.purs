@@ -49,7 +49,9 @@ import KanColle.Util
 import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Damage
 
+import Data.Tuple
 import Data.Foldable
+import Data.Traversable
 import KanColle.KCAPI.Battle
 import Data.Maybe
 import Data.String (joinWith)
@@ -183,7 +185,7 @@ calcRaigekiDamageAC = fromFDamAndEDamAC
 calcHougekiDamage :: Hougeki -> LR DamageVector
 calcHougekiDamage h =
     if lengthCheck
-      then let resultArr = runPure (STA.runSTArray resultDV)
+      then let resultArr = simulateHougeki 12 (A.zipWith Tuple eventTargets eventDamages)
            in lrMap DV (fleetSplit false resultArr)
       else throwWith "invalid: api_df_list and api_damage length mismatch"
   where
@@ -217,6 +219,11 @@ calcHougekiDamage h =
             -- we need to sum damage values before turning it into real Damage
             totalDmg = sum (map normalizeDamage xs :: Array Int)
 
+-- I could do (forall r. (Int -> Damage -> r) -> r) in place of (Tuple Int Damage)
+-- but I can't persuade PS that is correct.
+simulateHougeki :: forall f. Traversable f => Int -> f (Tuple Int Damage) -> Array Damage
+simulateHougeki len actions = runPure (STA.runSTArray (resultDmgs))
+  where
     accumulateDamage :: forall h r.
                         STA.STArray h Damage -- array reference
                      -> Int -> Damage -- target index and corresponding damage
@@ -225,16 +232,17 @@ calcHougekiDamage h =
         dmg <- peekSTArrayUnsafe arr targetInd
         pokeSTArrayUnsafe arr targetInd (dmg <> damage :: Damage)
         pure unit
-    resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
-    resultDV = do
-        arr <- STA.thaw (replicate 12 mempty)
-        A.zipWithA (accumulateDamage arr) eventTargets eventDamages
+
+    resultDmgs :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
+    resultDmgs = do
+        arr <- STA.thaw (replicate len mempty)
+        traverse (uncurry $ accumulateDamage arr) actions
         pure arr
 
 calcHougekiDamageAC :: Hougeki -> LR (LR DamageVector)
 calcHougekiDamageAC h =
     if lengthCheck
-      then let resultArr = runPure (STA.runSTArray resultDV)
+      then let resultArr = simulateHougeki 24 (A.zipWith Tuple eventTargets eventDamages)
            in { left:
                 { left: DV (A.slice 0 6 resultArr)
                 , right: DV (A.slice 6 12 resultArr) }
@@ -290,19 +298,6 @@ calcHougekiDamageAC h =
             -- because damecon triggers *AFTER* the attack actions are completed
             -- we need to sum damage values before turning it into real Damage
             totalDmg = sum (map normalizeDamage xs :: Array Int)
-    accumulateDamage :: forall h r.
-                        STA.STArray h Damage -- array reference
-                     -> Int -> Damage -- target index and corresponding damage
-                     -> Eff (st :: ST.ST h | r) Unit
-    accumulateDamage arr targetInd damage = do
-        dmg <- peekSTArrayUnsafe arr targetInd
-        pokeSTArrayUnsafe arr targetInd (dmg <> damage :: Damage)
-        pure unit
-    resultDV :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
-    resultDV = do
-        arr <- STA.thaw (replicate 24 mempty)
-        A.zipWithA (accumulateDamage arr) eventTargets eventDamages
-        pure arr
 
 -- | calculate damage from support airstrike stages.
 -- | note that only enemy is taking damage so this results in
