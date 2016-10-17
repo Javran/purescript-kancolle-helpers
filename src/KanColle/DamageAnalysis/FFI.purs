@@ -1,7 +1,7 @@
 module KanColle.DamageAnalysis.FFI
   ( analyzeBattleJS
   , analyzeNightBattleJS
-  
+
   , analyzeSTFBattleJS
   , analyzeCTFBattleJS
   , analyzeTECFBattleJS
@@ -31,14 +31,14 @@ type FleetResult f = Array (f ShipResult)
 type BattleResult f = NormalBattle (FleetResult f)
 type BattleResultAC f = CombinedBattleAC (FleetResult f)
 type CombinedBattleResult f = CombinedBattle (FleetResult f)
-  
+
 liftToFFI :: (Array (Maybe DameCon) -> Battle -> BattleResult Maybe)
           -> Fn2 (Array Int) Battle (BattleResult Nullable)
 liftToFFI f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))
   where
     convert s = { main: map toNullable s.main
                 , enemy: map toNullable s.enemy }
-                
+
 liftToFFICombined :: (Array (Maybe DameCon) -> Battle -> CombinedBattleResult Maybe)
                   -> Fn2 (Array Int) Battle (CombinedBattleResult Nullable)
 liftToFFICombined f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))

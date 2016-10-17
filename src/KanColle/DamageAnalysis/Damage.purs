@@ -5,7 +5,7 @@
 module KanColle.DamageAnalysis.Damage
   ( Damage
   , mkDamage
-  , mergeDamage 
+  , mergeDamage
   , addDamage
   , applyDamage
   , damageToInt
@@ -32,7 +32,7 @@ damageToInt dmg = dummyShip.hp - afterShip.hp
       , sunk: false
       , dameCon: Nothing
       }
-      
+
     afterShip = applyDamage dmg dummyShip
 
 -- | apply DameCon to a `Ship`, regardless of ship's own DameCon setting

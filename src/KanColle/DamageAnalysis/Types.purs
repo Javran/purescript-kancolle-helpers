@@ -10,17 +10,17 @@ module KanColle.DamageAnalysis.Types
   , GCombinedBattle
   , FleetInfo
   , NormalFleetInfo, CombinedFleetInfo, CombinedFleetInfoAC
-  
+
   , toCombinedBattle, toCombinedBattleAC
 
   , dupAsNormalBattle
   , appNormalBattle
   , mapNormalBattle
-  
+
   , dupAsCombinedBattle
   , appCombinedBattle
   , mapCombinedBattle
-  
+
   , lrToNormal
 
   ) where
@@ -60,10 +60,10 @@ type NormalBattle a =
 
 type CombinedBattle a =
   { main :: a, escort :: a, enemy :: a }
-  
+
 type CombinedBattleAC a =
   { main :: a, enemyMain :: a, enemyEscort :: a }
-  
+
 -- most general form of a battle
 type GCombinedBattle a =
   { allyMain :: a
@@ -115,10 +115,10 @@ getShipResult :: Ship -> Ship -> ShipResult
 getShipResult sBefore sAfter =
   { hp: sAfter.hp
   , sunk: sAfter.hp <= 0
-  , dameConConsumed: 
+  , dameConConsumed:
       isJust sBefore.dameCon && isNothing sAfter.dameCon
   }
-  
+
 -- invariant: the length is always 6
 type FleetInfo a = Array (Maybe a)
 type NormalFleetInfo a = NormalBattle (FleetInfo a)

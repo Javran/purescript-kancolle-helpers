@@ -10,7 +10,7 @@ module KanColle.DamageAnalysis.DamageVector
 
   , NormalDamageVector
   , GCombinedDamageVector
-  , CombinedDamageVector, CombinedDamageVectorAC  
+  , CombinedDamageVector, CombinedDamageVectorAC
   , FleetRole(..)
 
   , calcKoukuDamage
@@ -22,7 +22,7 @@ module KanColle.DamageAnalysis.DamageVector
   , calcSupportHouraiDamageAC
   , calcHougekiDamage
   , calcRaigekiDamage
-  
+
   , calcRaigekiDamageAC
   , calcHougekiDamageAC
 
@@ -121,7 +121,7 @@ fromFDamAndEDamAC v = (lrMap >>> lrMap) mkDV
   where
     longFDam = convertFEDam v.api_fdam
     allyDams = fleetSplit false longFDam
-    
+
     longEDam = convertFEDam v.api_edam
     enemyDams = fleetSplit false longEDam
 
@@ -276,7 +276,7 @@ calcHougekiDamageAC h =
               then y - 1
               else throwWith "invalid: elements are different in api_df_list"
           Nothing -> throwWith "invalid: empty api_df_list element"
-          
+
     eventTargets :: Array Int
     eventTargets = A.zipWith updateTarget eventTargetsRaw atEFlag
       where
@@ -326,14 +326,12 @@ data FleetRole
   | FREscort -- ally escort vs. enemy main
   | FRSupport -- ally support exped vs. enemy main
   | FRLandBased -- ally LBAS vs. enemy main
---  | FRMainEEscort -- ally main vs. enemy escort
---  | FRLandBasedEEscort -- ally LBAS vs. enemy escort
 
 -- | `toCombined role dv` converts a `LR DamageVector` whose left part
 -- | is playing role `role` into `CombinedDamageVector`
 toGCombined :: FleetRole -> LR DamageVector -> GCombinedDamageVector
 toGCombined r dv = case r of
-    FRMain      -> 
+    FRMain      ->
         { allyMain: dv.left, allyEscort: mempty
         , enemyMain: dv.right, enemyEscort: mempty }
     FREscort    ->
@@ -351,7 +349,7 @@ toCombined r dv = toCombinedBattle (toGCombined r dv)
 
 -- TODO: add check on dv.left.right, which should be all 0
 toCombinedAC :: LR (LR DamageVector) -> CombinedDamageVectorAC
-toCombinedAC dv = 
+toCombinedAC dv =
     { main: dv.left.left
     , enemyMain: dv.right.left
     , enemyEscort: dv.right.right
