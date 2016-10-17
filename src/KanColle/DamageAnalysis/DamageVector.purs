@@ -49,7 +49,6 @@ import KanColle.Util
 import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Damage
 
-import Data.Foreign
 import Data.Foldable
 import KanColle.KCAPI.Battle
 import Data.Maybe

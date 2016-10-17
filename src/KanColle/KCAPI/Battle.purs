@@ -1,4 +1,52 @@
-module KanColle.KCAPI.Battle where
+module KanColle.KCAPI.Battle
+  ( Battle
+  , KArray, fromKArray -- eventually we should remove this ...
+
+  , SupportAirInfo
+  , getSupportAirInfo 
+
+  , SupportHouraiInfo
+  , getSupportHouraiInfo
+  
+  , getLandBasedAirStrikes
+
+  , Kouku
+  , getKouku
+  , getKouku2
+
+  , KoukuStage3
+  , getKoukuStage3
+  , getKoukuStage3FDam
+  , getKoukuStage3EDam
+  
+  , Hougeki
+  , getHougeki
+
+  , getHougeki1
+  , getHougeki1AC
+  , getHougeki1CT
+ 
+  , getHougeki2
+  , getHougeki2AC
+  , getHougeki2CT
+
+  , getHougeki3
+  , getHougeki3AC
+  , getHougeki3CT
+
+  , getOpeningTaisen
+
+  , Raigeki
+  , getRaigeki
+  , getRaigekiCT
+  , getRaigekiAC
+  , getOpeningAttack  
+
+  , getInitHps
+  , getInitHpsCombined
+  , getMaxHps
+  , getMaxHpsCombined
+  ) where
 
 import Prelude
 import Data.Maybe
@@ -30,8 +78,11 @@ fromKArray (KArray ar) = unsafeArrTail ar
 -- * trust flag api_opening_flag for opening torpedo attacks
 -- * test property existency in other cases
 
--- TODO: change this to foreign, or hide the definition
-type Battle =
+-- TODO: change this to foreign, or hide the definition, the idea is to make "Battle"
+-- structure not accessible outside this module
+-- TODO: maybe eventually we'll make almost everything invisible
+-- to reduce the possibility of accidentally accessing non-existing stuff.
+type RawBattle =
   { api_nowhps :: KArray Int
   , api_nowhps_combined :: KArray Int
   , api_maxhps :: KArray Int
@@ -55,6 +106,16 @@ type Battle =
   , api_support_info :: SupportInfo
   , api_air_base_attack :: Array Kouku
   }
+
+newtype Battle = Battle RawBattle
+
+-- TODO: instead of getHougeki<some stuff>
+data BattleType
+  = BNormal
+  | BCTF
+  | BSTF
+  | BTECF
+  | BAbyCTF
 
 type Kouku =
   { api_stage_flag :: Array Int
@@ -96,67 +157,67 @@ fromRawHp -1 = Nothing
 fromRawHp v = Just v
 
 getInitHps :: Battle -> Array (Maybe Int)
-getInitHps b = map fromRawHp $ fromKArray b.api_nowhps
+getInitHps (Battle rb) = map fromRawHp $ fromKArray rb.api_nowhps
 
 getInitHpsCombined :: Battle -> Array (Maybe Int)
-getInitHpsCombined b = map fromRawHp $ fromKArray b.api_nowhps_combined
+getInitHpsCombined (Battle rb) = map fromRawHp $ fromKArray rb.api_nowhps_combined
 
 getMaxHps :: Battle -> Array (Maybe Int)
-getMaxHps b = map fromRawHp $ fromKArray b.api_maxhps
+getMaxHps (Battle rb) = map fromRawHp $ fromKArray rb.api_maxhps
 
 getMaxHpsCombined :: Battle -> Array (Maybe Int)
-getMaxHpsCombined b = map fromRawHp $ fromKArray b.api_maxhps_combined
+getMaxHpsCombined (Battle rb) = map fromRawHp $ fromKArray rb.api_maxhps_combined
 
 hasField :: forall a. String -> a -> Boolean
 hasField s = hasOwnProperty s <<< toForeign
 
 hasKouku :: Battle -> Boolean
-hasKouku b | hasField "api_stage_flag" b =
-          unsafeArrIndex b.api_stage_flag 2 == 1
+hasKouku (Battle rb) | hasField "api_stage_flag" rb =
+          unsafeArrIndex rb.api_stage_flag 2 == 1
 hasKouku _ = false
 
 hasKouku2 :: Battle -> Boolean
-hasKouku2 b | hasField "api_stage_flag2" b =
-          unsafeArrIndex b.api_stage_flag2 2 == 1
+hasKouku2 (Battle rb) | hasField "api_stage_flag2" rb =
+          unsafeArrIndex rb.api_stage_flag2 2 == 1
 hasKouku2 _ = false
 
 hasHourai :: Battle -> Boolean
-hasHourai = hasField "api_hourai_flag"
+hasHourai (Battle rb) = hasField "api_hourai_flag" rb
 
 hasHougeki :: Battle -> Boolean
-hasHougeki = hasField "api_hougeki"
+hasHougeki (Battle rb) = hasField "api_hougeki" rb
 
 getKouku :: Battle -> Maybe Kouku
-getKouku b = if hasKouku b
-  then Just b.api_kouku
+getKouku b@(Battle rb) = if hasKouku b
+  then Just rb.api_kouku
   else Nothing
 
 getSupportFlag :: Battle -> Maybe Int
-getSupportFlag b = if hasField "api_support_flag" b
-  then Just b.api_support_flag
+getSupportFlag b@(Battle rb) = if hasField "api_support_flag" b
+  then Just rb.api_support_flag
   else Nothing
 
 getSupportAirInfo :: Battle -> Maybe SupportAirInfo
-getSupportAirInfo b = do
+getSupportAirInfo b@(Battle rb) = do
     i <- getSupportFlag b
     guard (i == 1)
-    pure b.api_support_info.api_support_airatack
+    pure rb.api_support_info.api_support_airatack
 
 getSupportHouraiInfo :: Battle -> Maybe SupportHouraiInfo
-getSupportHouraiInfo b = do
+getSupportHouraiInfo b@(Battle rb) = do
     i <- getSupportFlag b
     guard $ i == 2 || i == 3
-    pure b.api_support_info.api_support_hourai
+    pure rb.api_support_info.api_support_hourai
 
 getKouku2 :: Battle -> Maybe Kouku
-getKouku2 b = if hasKouku2 b
-  then Just b.api_kouku2
+getKouku2 b@(Battle rb) = if hasKouku2 b
+  then Just rb.api_kouku2
   else Nothing
 
 getHouraiFlags :: Battle -> Maybe (Array Int)
-getHouraiFlags b =
+getHouraiFlags b@(Battle rb) =
    if hasField "api_hourai_flag" b
-     then Just b.api_hourai_flag
+     then Just rb.api_hourai_flag
      else Nothing
 
 checkHouraiFlag :: Int -> Battle -> Maybe Unit
@@ -165,66 +226,66 @@ checkHouraiFlag ind b = do
     guard (flg == 1)
 
 getOpeningAttack :: Battle -> Maybe Raigeki
-getOpeningAttack b =
+getOpeningAttack b@(Battle rb) =
     if hasField "api_opening_flag" b
-    && b.api_opening_flag == 1
-      then Just b.api_opening_atack
+    && rb.api_opening_flag == 1
+      then Just rb.api_opening_atack
       else Nothing
       
 getOpeningTaisen :: Battle -> Maybe Hougeki
-getOpeningTaisen b =
+getOpeningTaisen b@(Battle rb) =
     if hasField "api_opening_taisen_flag" b
-    && b.api_opening_taisen_flag == 1
-      then Just b.api_opening_taisen
+    && rb.api_opening_taisen_flag == 1
+      then Just rb.api_opening_taisen
       else Nothing
       
 getHougeki1 :: Battle -> Maybe Hougeki
-getHougeki1 b = do
+getHougeki1 b@(Battle rb) = do
     checkHouraiFlag 0 b
-    pure b.api_hougeki1
+    pure rb.api_hougeki1
 
 getHougeki2 :: Battle -> Maybe Hougeki
-getHougeki2 b = do
+getHougeki2 b@(Battle rb) = do
     checkHouraiFlag 1 b
-    pure b.api_hougeki2
+    pure rb.api_hougeki2
 
 getHougeki3 :: Battle -> Maybe Hougeki
-getHougeki3 b = do
+getHougeki3 b@(Battle rb) = do
     checkHouraiFlag 2 b
-    pure b.api_hougeki3
+    pure rb.api_hougeki3
 
 getRaigeki :: Battle -> Maybe Raigeki
-getRaigeki b = do
+getRaigeki b@(Battle rb) = do
     checkHouraiFlag 3 b
-    pure b.api_raigeki
+    pure rb.api_raigeki
 
 getHougeki :: Battle -> Maybe Hougeki
-getHougeki b = if hasHougeki b
-  then Just b.api_hougeki
+getHougeki b@(Battle rb) = if hasHougeki b
+  then Just rb.api_hougeki
   else Nothing
 
 -- TODO: unify this with other functions
 -- Carrier Task Force is using a different ordering.
 -- specalized as "CT" here.
 getHougeki1CT :: Battle -> Maybe Hougeki
-getHougeki1CT b = do
+getHougeki1CT b@(Battle rb) = do
     checkHouraiFlag 0 b
-    pure b.api_hougeki1
+    pure rb.api_hougeki1
 
 getRaigekiCT :: Battle -> Maybe Raigeki
-getRaigekiCT b = do
+getRaigekiCT b@(Battle rb) = do
     checkHouraiFlag 1 b
-    pure b.api_raigeki
+    pure rb.api_raigeki
 
 getHougeki2CT :: Battle -> Maybe Hougeki
-getHougeki2CT b = do
+getHougeki2CT b@(Battle rb) = do
     checkHouraiFlag 2 b
-    pure b.api_hougeki2
+    pure rb.api_hougeki2
 
 getHougeki3CT :: Battle -> Maybe Hougeki
-getHougeki3CT b = do
+getHougeki3CT b@(Battle rb) = do
     checkHouraiFlag 3 b
-    pure b.api_hougeki3
+    pure rb.api_hougeki3
     
 getHougeki1AC :: Battle -> Maybe Hougeki
 getHougeki1AC = getHougeki1CT
@@ -242,8 +303,8 @@ hasLandBasedAirStrikes :: Battle -> Boolean
 hasLandBasedAirStrikes = hasField "api_air_base_attack"
 
 getLandBasedAirStrikes :: Battle -> Maybe (Array Kouku)
-getLandBasedAirStrikes b = if hasLandBasedAirStrikes b
-    then Just b.api_air_base_attack
+getLandBasedAirStrikes b@(Battle rb) = if hasLandBasedAirStrikes b
+    then Just rb.api_air_base_attack
     else Nothing
 
 getKoukuStage3 :: Kouku -> Maybe KoukuStage3
