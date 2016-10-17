@@ -188,15 +188,10 @@ calcHougekiDamage h =
            in lrMap DV (fleetSplit false resultArr)
       else throwWith "invalid: api_df_list and api_damage length mismatch"
   where
-    cAI :: Foreign -> Array Int
-    cAI = unsafeFromForeign
-    cAN :: Foreign -> Array Number
-    cAN = unsafeFromForeign
-
     lengthCheck = A.length eventTargets == A.length eventDamages
 
     eventTargets :: Array Int
-    eventTargets = map (cAI >>> toOne) (unsafeArrTail h.api_df_list)
+    eventTargets = map toOne (fromKArray h.api_df_list)
       where
         -- merge targets like [a,a] into a-1 (so that it's zero-indexed)
         -- there are 2 checks:
@@ -213,7 +208,7 @@ calcHougekiDamage h =
           Nothing -> throwWith "invalid: empty api_df_list element"
 
     eventDamages :: Array Damage
-    eventDamages = map (cAN >>> convert) (unsafeArrTail h.api_damage)
+    eventDamages = map convert (fromKArray h.api_damage)
       where
         convert :: Array Number -> Damage
         convert xs = mkDamage totalDmg
@@ -250,21 +245,16 @@ calcHougekiDamageAC h =
               }
       else throwWith "invalid: api_df_list / api_damage / api_at_eflag length mismatch"
   where
-    cAI :: Foreign -> Array Int
-    cAI = unsafeFromForeign
-    cAN :: Foreign -> Array Number
-    cAN = unsafeFromForeign
-    
-    dfList = unsafeArrTail h.api_df_list
+    dfList = fromKArray h.api_df_list
     atEFlag :: Array Int
     atEFlag = unsafeArrTail h.api_at_eflag
-    damageList = unsafeArrTail h.api_damage
+    damageList = fromKArray h.api_damage
 
     lengthCheck = A.length dfList == A.length atEFlag
                && A.length dfList == A.length damageList
 
     eventTargetsRaw :: Array Int
-    eventTargetsRaw = map (cAI >>> toOne) (unsafeArrTail h.api_df_list)
+    eventTargetsRaw = map toOne (fromKArray h.api_df_list)
       where
         -- merge targets like [a,a] into a-1 (so that it's zero-indexed)
         -- there are 2 checks:
@@ -292,7 +282,7 @@ calcHougekiDamageAC h =
             _ -> throwWith "invalid api_at_eflag element"
 
     eventDamages :: Array Damage
-    eventDamages = map (cAN >>> convert) (unsafeArrTail h.api_damage)
+    eventDamages = map convert (fromKArray h.api_damage)
       where
         convert :: Array Number -> Damage
         convert xs = mkDamage totalDmg

@@ -11,13 +11,12 @@ module KanColle.DamageAnalysis.Stages
   , nightBattleDV
   , supportAirAttackDV
   , supportHouraiDV
+  , landBasedAirStrikeDVsAC
 
   , battleCarrierTaskForceDV
   , battleSurfaceTaskForceDV
   , battleEnemyCarrierTaskForceDV
-    -- TODO: should we export this?
-  -- , koukuDVAC
-  , landBasedAirStrikeDVsAC
+
 
   ) where
 

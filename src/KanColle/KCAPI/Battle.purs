@@ -7,6 +7,24 @@ import Data.Foreign.Index
 import Control.MonadPlus
 import KanColle.Util
 
+-- | `KArray` is a special kind of array that KCAPI uses a lot,
+-- | it's first element is always "-1" so that the first element
+-- | in fact the second element, this makes "arr[i]" literally means the i-th element
+newtype KArray a = KArray (Array a)
+
+-- | remove leading "-1" so the array is zero-indexed
+fromKArray :: forall a. KArray a -> Array a
+fromKArray (KArray ar) = unsafeArrTail ar
+
+{-
+  this module serves as "field accessing" purposes.
+  
+  - for example, "Battle" definition contains "api_kouku2"
+    but not all data of type "Battle" will always have this type,
+    it's just convenient doing this rather than have distinct types
+    for different kind of similar structures
+-}
+
 -- things might actually be "null" or even "undefined"
 -- we choose to:
 -- * trust flag api_opening_flag for opening torpedo attacks
@@ -50,10 +68,10 @@ type KoukuStage3 =
   , api_edam :: Array Number
   }
 
-type Hougeki = -- TODO: no need for "Foreign" here
-  { api_df_list :: Array Foreign
+type Hougeki =
+  { api_df_list :: KArray (Array Int)
   , api_at_eflag :: Array Int
-  , api_damage :: Array Foreign
+  , api_damage :: KArray (Array Number)
   }
 
 type Raigeki =
