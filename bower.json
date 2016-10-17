@@ -76,6 +76,7 @@
     "purescript-lists": "^1.0.1",
     "purescript-integers": "1.0.0",
     "purescript-quickcheck": "~1.0.0",
-    "purescript-math": "2.0.0"
+    "purescript-math": "2.0.0",
+    "purescript-generics": "v3.0.0"
   }
 }
