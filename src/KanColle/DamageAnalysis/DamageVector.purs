@@ -112,8 +112,8 @@ fromFDamAndEDam ks3 =
 -- L: ally fleet, LL: ally main, LR: ally escort
 -- R: enemy fleet: RL: enemy main, RR: enemy escort
 fromFDamAndEDamAC :: forall a.
-                  { api_fdam :: Array Number
-                  , api_edam :: Array Number | a} -> LR (LR DamageVector)
+                  { api_fdam :: KArray Number
+                  , api_edam :: KArray Number | a} -> LR (LR DamageVector)
 fromFDamAndEDamAC v = (lrMap >>> lrMap) mkDV
     { left: allyDams
     , right: enemyDams }
@@ -128,8 +128,8 @@ fromFDamAndEDamAC v = (lrMap >>> lrMap) mkDV
 -- an "-1" is put in front of both api_fdam and api_edam
 -- we first drop that element and then convert
 -- integers intos Damages
-convertFEDam :: Array Number -> Array Damage
-convertFEDam = unsafeArrTail >>> map (normalizeDamage >>> mkDamage)
+convertFEDam :: KArray Number -> Array Damage
+convertFEDam = fromKArray >>> map (normalizeDamage >>> mkDamage)
 
 -- | calculate damage from kouku (aerial) stages
 calcKoukuDamage :: Kouku -> LR DamageVector
@@ -247,7 +247,7 @@ calcHougekiDamageAC h =
   where
     dfList = fromKArray h.api_df_list
     atEFlag :: Array Int
-    atEFlag = unsafeArrTail h.api_at_eflag
+    atEFlag = fromKArray h.api_at_eflag
     damageList = fromKArray h.api_damage
 
     lengthCheck = A.length dfList == A.length atEFlag

@@ -32,10 +32,10 @@ fromKArray (KArray ar) = unsafeArrTail ar
 
 -- TODO: change this to foreign, or hide the definition
 type Battle =
-  { api_nowhps :: Array Int
-  , api_nowhps_combined :: Array Int
-  , api_maxhps :: Array Int
-  , api_maxhps_combined :: Array Int
+  { api_nowhps :: KArray Int
+  , api_nowhps_combined :: KArray Int
+  , api_maxhps :: KArray Int
+  , api_maxhps_combined :: KArray Int
   , api_stage_flag :: Array Int
   , api_stage_flag2 :: Array Int
   , api_kouku :: Kouku
@@ -64,19 +64,19 @@ type Kouku =
 
 -- WARNING: keep in mind that combined fleet does not have an "api_edam" field
 type KoukuStage3 =
-  { api_fdam :: Array Number
-  , api_edam :: Array Number
+  { api_fdam :: KArray Number
+  , api_edam :: KArray Number
   }
 
 type Hougeki =
   { api_df_list :: KArray (Array Int)
-  , api_at_eflag :: Array Int
+  , api_at_eflag :: KArray Int
   , api_damage :: KArray (Array Number)
   }
 
 type Raigeki =
-  { api_fdam :: Array Number
-  , api_edam :: Array Number
+  { api_fdam :: KArray Number
+  , api_edam :: KArray Number
   }
 
 type SupportAirInfo =
@@ -84,7 +84,7 @@ type SupportAirInfo =
   , api_stage3_combined :: KoukuStage3 }
 
 type SupportHouraiInfo =
-  { api_damage :: Array Number }
+  { api_damage :: KArray Number }
 
 type SupportInfo =
   { api_support_airatack :: SupportAirInfo
@@ -96,16 +96,16 @@ fromRawHp -1 = Nothing
 fromRawHp v = Just v
 
 getInitHps :: Battle -> Array (Maybe Int)
-getInitHps b = map fromRawHp b.api_nowhps
+getInitHps b = map fromRawHp $ fromKArray b.api_nowhps
 
 getInitHpsCombined :: Battle -> Array (Maybe Int)
-getInitHpsCombined b = map fromRawHp b.api_nowhps_combined
+getInitHpsCombined b = map fromRawHp $ fromKArray b.api_nowhps_combined
 
 getMaxHps :: Battle -> Array (Maybe Int)
-getMaxHps b = map fromRawHp b.api_maxhps
+getMaxHps b = map fromRawHp $ fromKArray b.api_maxhps
 
 getMaxHpsCombined :: Battle -> Array (Maybe Int)
-getMaxHpsCombined b = map fromRawHp b.api_maxhps_combined
+getMaxHpsCombined b = map fromRawHp $ fromKArray b.api_maxhps_combined
 
 hasField :: forall a. String -> a -> Boolean
 hasField s = hasOwnProperty s <<< toForeign
@@ -262,12 +262,12 @@ getKoukuStage3EEscortMaybe kk = if unsafeArrIndex kk.api_stage_flag 2 == 1
     then Just kk.api_stage3_combined
     else Nothing
 
-getKoukuStage3FDam :: KoukuStage3 -> Maybe (Array Number)
+getKoukuStage3FDam :: KoukuStage3 -> Maybe (KArray Number)
 getKoukuStage3FDam ks3 = if hasField "api_fdam" ks3
     then Just ks3.api_fdam
     else Nothing
 
-getKoukuStage3EDam :: KoukuStage3 -> Maybe (Array Number)
+getKoukuStage3EDam :: KoukuStage3 -> Maybe (KArray Number)
 getKoukuStage3EDam ks3 = if hasField "api_edam" ks3
     then Just ks3.api_edam
     else Nothing

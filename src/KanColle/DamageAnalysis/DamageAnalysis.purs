@@ -44,11 +44,11 @@ ensureHpsLen expectLen xs = case expectLen `compare` actualLen of
 getInitFleet :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo Ship
 getInitFleet ds battle = { main: allyShips, enemy: enemyShips }
   where
-    nowHps = rawSplit (ensureHpsLen (1+12) $ getInitHps battle)
+    nowHps = normalSplit (ensureHpsLen 12 $ getInitHps battle)
     allyNowHps = nowHps.left
     enemyNowHps = nowHps.right
 
-    maxHps = rawSplit (ensureHpsLen (1+12) $ getMaxHps battle)
+    maxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
     allyMaxHps = maxHps.left
     enemyMaxHps = maxHps.right
     
@@ -77,8 +77,8 @@ getInitFleetCombined ds battle =
     
     initFleet = getInitFleet dsMain battle
     
-    escortNowHps = unsafeArrTail (ensureHpsLen (1+6) $ getInitHpsCombined battle)
-    escortMaxHps = unsafeArrTail (ensureHpsLen (1+6) $ getMaxHpsCombined battle)
+    escortNowHps = ensureHpsLen 6 $ getInitHpsCombined battle
+    escortMaxHps = ensureHpsLen 6 $ getMaxHpsCombined battle
     
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
@@ -98,19 +98,19 @@ getInitFleetAC ds battle =
     }
   where
     -- ally vs. enemy main
-    allyEMainNowHps = rawSplit (ensureHpsLen (1+12) $ getInitHps battle)
+    allyEMainNowHps = normalSplit (ensureHpsLen 12 $ getInitHps battle)
     allyNowHps = allyEMainNowHps.left
     enemyMainNowHps = allyEMainNowHps.right
 
-    allyEMainMaxHps = rawSplit (ensureHpsLen (1+12) $ getMaxHps battle)
+    allyEMainMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
     allyMaxHps = allyEMainMaxHps.left
     enemyMainMaxHps = allyEMainMaxHps.right
     
     -- <null> vs. enemy escort    
-    nullEEscortNowHps = rawSplit (ensureHpsLen (1+12) $ getMaxHpsCombined battle)
+    nullEEscortNowHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
     enemyEscortNowHps = nullEEscortNowHps.right
     
-    nullEEscortMaxHps = rawSplit (ensureHpsLen (1+12) $ getInitHpsCombined battle)
+    nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
     enemyEscortMaxHps = nullEEscortMaxHps.right
     
     mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
