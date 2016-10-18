@@ -197,6 +197,16 @@ testDamageAnalyzer =
           map toMaybeInt [96-9,38,60-4,50,16,23,
                           350-63-37-25,96-71-148,96-10-62-161,66-178,38-93,38-73,
                           57-232,76-5,76-5-4-58,38-122,35-101,35-176]
+      Assert.assert "abyssal combined fleet night 1 (against main)" $
+        (mergeAC >>> trimInfo) (analyzeAbyssalCTFNightBattle dc6 abyssalCombinedFleetNight1) ==
+          map toMaybeInt [87,38,56,50,16,23,
+                          225-91-42-31-71,0,0,0,0,0,
+                          0,71,9,0,0,0]
+      Assert.assert "abyssal combined fleet night 2 (against escort)" $
+        (mergeAC >>> trimInfo) (analyzeAbyssalCTFNightBattle dc6 abyssalCombinedFleetNight2) ==
+          map toMaybeInt [45,69,92,29,29,48,
+                          142,27,53,21,0,0,
+                          0,0,61-99-62,24-74-72,0,35-121-81]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x

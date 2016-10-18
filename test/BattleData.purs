@@ -43,3 +43,5 @@ foreign import combinedFleetOpeingTaisenSTF1 :: Battle
 foreign import combinedFleetOpeingTaisenCTF1 :: Battle
 
 foreign import abyssalCombinedFleet1 :: Battle
+foreign import abyssalCombinedFleetNight1 :: Battle
+foreign import abyssalCombinedFleetNight2 :: Battle
