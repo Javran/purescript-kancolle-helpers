@@ -106,10 +106,10 @@ getInitFleetAC ds battle =
     enemyMainMaxHps = allyEMainMaxHps.right
 
     -- <null> vs. enemy escort
-    nullEEscortNowHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
+    nullEEscortNowHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
     enemyEscortNowHps = nullEEscortNowHps.right
 
-    nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
+    nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
     enemyEscortMaxHps = nullEEscortMaxHps.right
 
     mkShip (Just hp) (Just fullHp) = Just 
