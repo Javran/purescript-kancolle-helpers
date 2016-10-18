@@ -20,9 +20,6 @@ import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
 import KanColle.DamageAnalysis.Types
 
-rawSplit :: forall a. Array a -> LR (Array a)
-rawSplit = fleetSplit true
-
 normalSplit :: forall a. Array a -> LR (Array a)
 normalSplit = fleetSplit false
 
