@@ -6,7 +6,9 @@ module KanColle.DamageAnalysis.FFI
   , analyzeCTFBattleJS
   , analyzeTECFBattleJS
   , analyzeCombinedNightBattleJS
+
   , analyzeAbyssalCTFBattleJS
+  , analyzeAbyssalCTFNightBattleJS
   ) where
 
 import Prelude
@@ -75,3 +77,6 @@ analyzeCombinedNightBattleJS = liftToFFI analyzeCombinedNightBattle
 
 analyzeAbyssalCTFBattleJS :: Fn2 (Array Int) Battle (BattleResultAC Nullable)
 analyzeAbyssalCTFBattleJS = liftToFFIAC analyzeAbyssalCTFBattle
+
+analyzeAbyssalCTFNightBattleJS :: Fn2 (Array Int) Battle (BattleResultAC Nullable)
+analyzeAbyssalCTFNightBattleJS = liftToFFIAC analyzeAbyssalCTFNightBattle

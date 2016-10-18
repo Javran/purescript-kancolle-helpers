@@ -46,6 +46,8 @@ module KanColle.KCAPI.Battle
   , getInitHpsCombined
   , getMaxHps
   , getMaxHpsCombined
+  
+  , getEnemyActiveDeck
   ) where
 
 import Prelude
@@ -83,7 +85,8 @@ fromKArray (KArray ar) = unsafeArrTail ar
 -- TODO: maybe eventually we'll make almost everything invisible
 -- to reduce the possibility of accidentally accessing non-existing stuff.
 type RawBattle =
-  { api_nowhps :: KArray Int
+  { api_active_deck :: Array Int -- for abyssal combined fleet
+  , api_nowhps :: KArray Int
   , api_nowhps_combined :: KArray Int
   , api_maxhps :: KArray Int
   , api_maxhps_combined :: KArray Int
@@ -332,3 +335,7 @@ getKoukuStage3EDam :: KoukuStage3 -> Maybe (KArray Number)
 getKoukuStage3EDam ks3 = if hasField "api_edam" ks3
     then Just ks3.api_edam
     else Nothing
+
+getEnemyActiveDeck :: Battle -> Int
+getEnemyActiveDeck (Battle rb) =
+    unsafeArrIndex rb.api_active_deck 1

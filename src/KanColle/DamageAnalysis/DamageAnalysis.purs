@@ -6,11 +6,14 @@ module KanColle.DamageAnalysis.DamageAnalysis
   , analyzeCTFBattle
   , analyzeTECFBattle
   , analyzeCombinedNightBattle
+
   , analyzeAbyssalCTFBattle
+  , analyzeAbyssalCTFNightBattle
   ) where
 
 import Prelude
 import Data.Array
+import Data.Tuple
 import Data.Maybe
 import Data.Unfoldable
 import KanColle.KCAPI.Battle
@@ -86,7 +89,6 @@ getInitFleetCombined ds battle =
     escortShips :: FleetInfo Ship
     escortShips = zipWith addDameCon (zipWith mkShip escortNowHps escortMaxHps) dsEscort
 
-
 getInitFleetAC :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfoAC Ship
 getInitFleetAC ds battle =
     { main: allyShips
@@ -110,7 +112,9 @@ getInitFleetAC ds battle =
     nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
     enemyEscortMaxHps = nullEEscortMaxHps.right
 
-    mkShip (Just hp) (Just fullHp) = Just { hp: hp, fullHp: fullHp, sunk: hp <= 0, dameCon: Nothing }
+    mkShip (Just hp) (Just fullHp) = Just 
+        { hp: hp, fullHp: fullHp
+        , sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
 
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
@@ -199,3 +203,33 @@ analyzeAbyssalCTFBattle ds b =
       }
     getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+
+analyzeAbyssalCTFNightBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfoAC ShipResult
+analyzeAbyssalCTFNightBattle ds b =
+    { main: z (_.main)
+    , enemyMain: z (_.enemyMain)
+    , enemyEscort: z (_.enemyEscort)    
+    }
+  where
+    z prj = zipWith getShipResult' (prj allInitFleet) (prj allFinalFleet)
+    getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+
+    allInitFleet = getInitFleetAC ds b
+    enemySplitted = case getEnemyActiveDeck b of
+        1 -> Tuple allInitFleet.enemyMain allInitFleet.enemyEscort
+        2 -> Tuple allInitFleet.enemyEscort allInitFleet.enemyMain
+        _ -> throwWith "invalid api_active_deck value"
+    resultDV = nightBattleDV b
+    initFleet = { main: allInitFleet.main, enemy: fst enemySplitted }
+    finalFleet = applyNormalDamageVector resultDV initFleet
+    allFinalFleet = case getEnemyActiveDeck b of
+        1 ->
+          { main: finalFleet.main
+          , enemyMain: finalFleet.enemy
+          , enemyEscort: snd enemySplitted }
+        2 ->
+          { main: finalFleet.main
+          , enemyMain: snd enemySplitted
+          , enemyEscort: finalFleet.enemy }
+        _ -> throwWith "invalid api_active_deck value"
