@@ -6,9 +6,11 @@
 module KanColle.DamageAnalysis.Stages
   ( koukuDV
   , koukuDVAC
+  , koukuDVBC
   , koukuCombinedDV
   , battleDV
   , nightBattleDV
+  , openingDVAC
   , supportAirAttackDV
   , supportHouraiDV
   , landBasedAirStrikeDVsAC
@@ -16,6 +18,7 @@ module KanColle.DamageAnalysis.Stages
   , battleCarrierTaskForceDV
   , battleSurfaceTaskForceDV
   , battleEnemyCarrierTaskForceDV
+  , battleBothCombinedCarrierTaskForceDV
   
   , hougeki1BCDV
   , hougeki2BCDV  

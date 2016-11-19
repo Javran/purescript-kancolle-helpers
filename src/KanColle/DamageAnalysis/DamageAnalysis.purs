@@ -9,6 +9,8 @@ module KanColle.DamageAnalysis.DamageAnalysis
 
   , analyzeAbyssalCTFBattle
   , analyzeAbyssalCTFNightBattle
+  
+  , analyzeBothCombinedCTFBattle
   ) where
 
 import Prelude
@@ -27,7 +29,7 @@ normalSplit :: forall a. Array a -> LR (Array a)
 normalSplit = fleetSplit false
 
 -- in KCAPI there are cases where the length of the HP array
--- is neither 7 or 13, and it seems terminating "-1" elements
+-- is neither 7 nor 13, and it seems terminating "-1" elements
 -- have a chance to disappear, so instead of using data from KCAPI
 -- directly, we make sure the array is of the correct length
 -- by applying this wrapper. "Nothing" will be appended to the
@@ -128,6 +130,40 @@ getInitFleetAC ds battle =
 
     enemyEscortShips :: FleetInfo Ship
     enemyEscortShips = zipWith mkShip enemyEscortNowHps enemyEscortMaxHps
+
+getInitFleetBC :: Array (Maybe DameCon) -> Battle -> GCombinedFleetInfo Ship
+getInitFleetBC ds battle =
+    { allyMain: zipWith addDameCon (zipWith mkShip allyMainNowHps allyMainMaxHps) dsPair.left
+    , allyEscort: zipWith addDameCon (zipWith mkShip allyEscortNowHps allyEscortMaxHps) dsPair.right
+    , enemyMain: zipWith mkShip enemyMainNowHps enemyMainMaxHps
+    , enemyEscort: zipWith mkShip enemyEscortNowHps enemyEscortMaxHps
+    }
+  where
+    allyEMainNowHps = normalSplit (ensureHpsLen 12 $ getInitHps battle)
+    allyMainNowHps = allyEMainNowHps.left
+    enemyMainNowHps = allyEMainNowHps.right
+    
+    allyEMainMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
+    allyMainMaxHps = allyEMainMaxHps.left
+    enemyMainMaxHps = allyEMainMaxHps.right
+
+    allyEEscortNowHps = normalSplit (ensureHpsLen 12 $ getInitHpsCombined battle)
+    allyEscortNowHps = allyEEscortNowHps.left
+    enemyEscortNowHps = allyEEscortNowHps.right
+
+    allyEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
+    allyEscortMaxHps = allyEEscortMaxHps.left
+    enemyEscortMaxHps = allyEEscortMaxHps.right
+    
+    mkShip (Just hp) (Just fullHp) = Just 
+        { hp: hp, fullHp: fullHp
+        , sunk: hp <= 0, dameCon: Nothing }
+    mkShip _ _ = Nothing
+
+    addDameCon (Just ship) dc = Just (ship { dameCon = dc })
+    addDameCon _ _ = Nothing
+    
+    dsPair = normalSplit ds
 
 analyzeBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipResult
 analyzeBattle = analyzeBattleBy battleDV
@@ -233,3 +269,23 @@ analyzeAbyssalCTFNightBattle ds b =
           , enemyMain: snd enemySplitted
           , enemyEscort: finalFleet.enemy }
         _ -> throwWith "invalid api_active_deck value"
+
+analyzeBothCombinedCTFBattle :: Array (Maybe DameCon) -> Battle -> GCombinedFleetInfo ShipResult
+analyzeBothCombinedCTFBattle ds b =
+    { allyMain: z (_.allyMain)
+    , allyEscort: z (_.allyEscort)
+    , enemyMain: z (_.enemyMain)
+    , enemyEscort: z (_.enemyEscort)
+    }
+  where
+    initFleet = getInitFleetBC ds b
+    resultDV = battleBothCombinedCarrierTaskForceDV b
+    finalFleet =
+      { allyMain: applyDamageVector resultDV.allyMain initFleet.allyMain
+      , allyEscort: applyDamageVector resultDV.allyEscort initFleet.allyEscort
+      , enemyMain: applyDamageVector resultDV.enemyMain initFleet.enemyMain
+      , enemyEscort: applyDamageVector resultDV.enemyEscort initFleet.enemyEscort
+      }
+    getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+    z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)    

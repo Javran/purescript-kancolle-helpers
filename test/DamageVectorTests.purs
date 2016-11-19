@@ -150,6 +150,16 @@ testDamageVector = do
           dv = hougeki3BCDV bothCombinedCTF1
       Assert.assert "sample1" $
           "0,0,0,0,0,0 && 0,0,0,0,13,0 -- 167,0,0,98,0,0 && 0,0,0,0,0,0" == bothDVtoStr dv
+    test "DamageVector: bothCombinedCTF: opening" do
+      let dv :: LR (LR DamageVector)
+          dv = openingDVAC bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 && 0,0,0,0,0,0 -- 0,0,91,0,0,0 && 0,0,0,0,0,0" == bothDVtoStr dv
+    test "DamageVector: bothCombinedCTF: kouku" do
+      let dv :: LR (LR DamageVector)
+          dv = koukuDVBC bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 && 0,4,0,0,0,0 -- 0,0,0,0,65,0 && 0,0,0,0,0,0" == bothDVtoStr dv
 
 testDamageAnalyzer :: forall e. TestSuite e
 testDamageAnalyzer =
@@ -232,11 +242,19 @@ testDamageAnalyzer =
           map toMaybeInt [45,69,92,29,29,48,
                           142,27,53,21,0,0,
                           0,0,61-99-62,24-74-72,0,35-121-81]
+      Assert.assert "both combined CTF 1" $
+        (mergeBC >>> trimInfo) (analyzeBothCombinedCTFBattle dc12 bothCombinedCTF1) ==
+          map toMaybeInt
+            [67,57-25,83,52,57,45,
+             50,35-4,31,52-6,53-7-13,43,
+             370-34-167,88-154,88-91,80-79-98,35-65,35-133,
+             57-261,76-116,76-7-237,55-55,20-234,20-71]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
     merge x = x.main <> x.enemy
     mergeCombined x = x.main <> x.escort <> x.enemy
     mergeAC x = x.main <> x.enemyMain <> x.enemyEscort
+    mergeBC x = x.allyMain <> x.allyEscort <> x.enemyMain <> x.enemyEscort    
     trimInfo :: forall a. Array (Maybe { hp :: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.hp)
