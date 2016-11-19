@@ -11,6 +11,7 @@ module KanColle.DamageAnalysis.DamageAnalysis
   , analyzeAbyssalCTFNightBattle
   
   , analyzeBothCombinedCTFBattle
+  , analyzeBothCombinedCTFNightBattle
   ) where
 
 import Prelude
@@ -288,4 +289,38 @@ analyzeBothCombinedCTFBattle ds b =
       }
     getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
-    z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)    
+    z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)
+
+analyzeBothCombinedCTFNightBattle :: Array (Maybe DameCon) -> Battle 
+                                  -> GCombinedFleetInfo ShipResult
+analyzeBothCombinedCTFNightBattle ds b =
+    { allyMain: z (_.allyMain)
+    , allyEscort: z (_.allyEscort)    
+    , enemyMain: z (_.enemyMain)
+    , enemyEscort: z (_.enemyEscort)    
+    }
+  where
+    z prj = zipWith getShipResult' (prj allInitFleet) (prj allFinalFleet)
+    getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+
+    allInitFleet = getInitFleetBC ds b
+    enemySplitted = case getEnemyActiveDeck b of
+        1 -> Tuple allInitFleet.enemyMain allInitFleet.enemyEscort
+        2 -> Tuple allInitFleet.enemyEscort allInitFleet.enemyMain
+        _ -> throwWith "invalid api_active_deck value"
+    resultDV = nightBattleDV b
+    initFleet = { main: allInitFleet.allyEscort, enemy: fst enemySplitted }
+    finalFleet = applyNormalDamageVector resultDV initFleet
+    allFinalFleet = case getEnemyActiveDeck b of
+        1 ->
+          { allyMain: allInitFleet.allyMain
+          , allyEscort: finalFleet.main
+          , enemyMain: finalFleet.enemy
+          , enemyEscort: snd enemySplitted }
+        2 ->
+          { allyMain: allInitFleet.allyMain
+          , allyEscort: finalFleet.main
+          , enemyMain: snd enemySplitted
+          , enemyEscort: finalFleet.enemy }
+        _ -> throwWith "invalid api_active_deck value"

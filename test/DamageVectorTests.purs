@@ -249,6 +249,13 @@ testDamageAnalyzer =
              50,35-4,31,52-6,53-7-13,43,
              370-34-167,88-154,88-91,80-79-98,35-65,35-133,
              57-261,76-116,76-7-237,55-55,20-234,20-71]
+      Assert.assert "both combined CTF (night) 1" $
+        (mergeBC >>> trimInfo) (analyzeBothCombinedCTFNightBattle dc12 bothCombinedCTFNight1) ==
+          map toMaybeInt 
+            [67,32,83,52,57,45,
+             50,31,31-17,46,33,43,
+             169-21-38-15-6-6-10-8-5-7-69,0,0,0,0,0,
+             0,0,0,0,0,0]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
