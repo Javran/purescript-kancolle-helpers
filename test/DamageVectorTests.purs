@@ -37,6 +37,11 @@ ndvToStr ndv = dvToStr ndv.left <> " -- " <> dvToStr ndv.right
 acDVtoStr :: LR (LR DamageVector) -> String
 acDVtoStr dvdv = dvToStr dvdv.left.left <> " -- " <> dvToStr dvdv.right.left <> " && " <> dvToStr dvdv.right.right
 
+bothDVtoStr :: LR (LR DamageVector) -> String
+bothDVtoStr dvdv = 
+    dvToStr dvdv.left.left <> " && " <> dvToStr dvdv.left.right <> " -- " 
+ <> dvToStr dvdv.right.left <> " && " <> dvToStr dvdv.right.right
+
 testDameCon :: forall e. TestSuite e
 testDameCon = do
    test "Damage: without damecon" do
@@ -125,6 +130,26 @@ testDamageVector = do
       Assert.assert "sample1" $
           "0,0,0,0,0,0 -- 25,148,161,0,93,0 && 0,0,58,0,0,0"
               == acDVtoStr dv
+    test "DamageVector: bothCombinedCTF: hougeki1" do
+      let dv :: LR (LR DamageVector)
+          dv = hougeki1BCDV bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,25,0,0,0,0 && 0,0,0,0,0,0 -- 0,154,0,79,0,133 && 0,0,0,0,0,0" == bothDVtoStr dv
+    test "DamageVector: bothCombinedCTF: hougeki2" do
+      let dv :: LR (LR DamageVector)
+          dv = hougeki2BCDV bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 && 0,0,0,6,7,0 -- 0,0,0,0,0,0 && 261,116,7,55,234,71" == bothDVtoStr dv
+    test "DamageVector: bothCombinedCTF: raigeki" do
+      let dv :: LR (LR DamageVector)
+          dv = raigekiBCDV bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 && 0,0,0,0,0,0 -- 34,0,0,0,0,0 && 0,0,237,0,0,0" == bothDVtoStr dv
+    test "DamageVector: bothCombinedCTF: hougeki3" do
+      let dv :: LR (LR DamageVector)
+          dv = hougeki3BCDV bothCombinedCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 && 0,0,0,0,13,0 -- 167,0,0,98,0,0 && 0,0,0,0,0,0" == bothDVtoStr dv
 
 testDamageAnalyzer :: forall e. TestSuite e
 testDamageAnalyzer =

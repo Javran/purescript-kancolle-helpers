@@ -317,9 +317,6 @@ battleBothCombinedCarrierTaskForceDV = fconcat2AC
     , openingTaisenDVAC
 
     -- regular battles
-    , openingTaisenDVAC
-
-    -- regular battles
     , openingDVAC
     , hougeki1BCDV
     , hougeki2BCDV
