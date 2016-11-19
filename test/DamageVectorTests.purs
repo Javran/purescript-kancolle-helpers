@@ -250,7 +250,7 @@ testDamageAnalyzer =
              370-34-167,88-154,88-91,80-79-98,35-65,35-133,
              57-261,76-116,76-7-237,55-55,20-234,20-71]
       Assert.assert "both combined CTF (night) 1" $
-        (mergeBC >>> trimInfo) (analyzeBothCombinedCTFNightBattle dc12 bothCombinedCTFNight1) ==
+        (mergeBC >>> trimInfo) (analyzeBothCombinedNightBattle dc12 bothCombinedCTFNight1) ==
           map toMaybeInt 
             [67,32,83,52,57,45,
              50,31,31-17,46,33,43,

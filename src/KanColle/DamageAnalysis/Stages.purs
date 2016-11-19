@@ -19,11 +19,17 @@ module KanColle.DamageAnalysis.Stages
   , battleSurfaceTaskForceDV
   , battleEnemyCarrierTaskForceDV
   , battleBothCombinedCarrierTaskForceDV
+  , battleBothCombinedSurfaceTaskForceDV  
   
   , hougeki1BCDV
   , hougeki2BCDV  
+  , raigekiBCDV  
   , hougeki3BCDV
-  , raigekiBCDV
+  
+  , hougeki1BC2DV
+  , hougeki2BC2DV  
+  , hougeki3BC2DV
+  , raigekiBC2DV    
   ) where
 
 import Prelude
@@ -145,26 +151,40 @@ mt = { left: memptyLR, right: memptyLR }
 hougeki1ACDV :: Battle -> LR (LR DamageVector)
 hougeki1ACDV = connectDV getHougeki1CT mt calcHougekiDamageAC
 
-raigekiACDV :: Battle -> LR (LR DamageVector)
-raigekiACDV = connectDV getRaigekiCT mt calcRaigekiDamageAC
-
 hougeki2ACDV :: Battle -> LR (LR DamageVector)
 hougeki2ACDV = connectDV getHougeki2CT mt calcHougekiDamageAC
+
+raigekiACDV :: Battle -> LR (LR DamageVector)
+raigekiACDV = connectDV getRaigekiCT mt calcRaigekiDamageAC
 
 hougeki3ACDV :: Battle -> LR (LR DamageVector)
 hougeki3ACDV = connectDV getHougeki3CT mt calcHougekiDamageAC
 
+-- both,CTF
 hougeki1BCDV :: Battle -> LR (LR DamageVector)
 hougeki1BCDV = connectDV getHougeki1BC mt calcHougekiDamageAC
-
-raigekiBCDV :: Battle -> LR (LR DamageVector)
-raigekiBCDV = connectDV getRaigekiBC mt calcRaigekiDamageAC
 
 hougeki2BCDV :: Battle -> LR (LR DamageVector)
 hougeki2BCDV = connectDV getHougeki2BC mt calcHougekiDamageAC
 
+raigekiBCDV :: Battle -> LR (LR DamageVector)
+raigekiBCDV = connectDV getRaigekiBC mt calcRaigekiDamageAC
+
 hougeki3BCDV :: Battle -> LR (LR DamageVector)
 hougeki3BCDV = connectDV getHougeki3BC mt calcHougekiDamageAC
+
+-- both,STF
+hougeki1BC2DV :: Battle -> LR (LR DamageVector)
+hougeki1BC2DV = connectDV getHougeki1BC2 mt calcHougekiDamageAC
+
+hougeki2BC2DV :: Battle -> LR (LR DamageVector)
+hougeki2BC2DV = connectDV getHougeki2BC2 mt calcHougekiDamageAC
+
+hougeki3BC2DV :: Battle -> LR (LR DamageVector)
+hougeki3BC2DV = connectDV getHougeki3BC2 mt calcHougekiDamageAC
+
+raigekiBC2DV :: Battle -> LR (LR DamageVector)
+raigekiBC2DV = connectDV getRaigekiBC2 mt calcRaigekiDamageAC
 
 hougekiDV :: Battle -> LR DamageVector
 hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
@@ -325,4 +345,25 @@ battleBothCombinedCarrierTaskForceDV = fconcat2AC
     , hougeki2BCDV
     , raigekiBCDV    
     , hougeki3BCDV
+    ] >>> toCombinedBC
+
+battleBothCombinedSurfaceTaskForceDV :: Battle -> GCombinedDamageVector
+battleBothCombinedSurfaceTaskForceDV = fconcat2AC
+    [ landBasedAirStrikeDVsBC
+    , koukuDVBC
+    -- support expedition: aerial or hourai
+    , supportAirAttackDVAC
+    , supportHouraiDVAC
+    -- in case there are aerial battles:
+    , kouku2DVBC
+
+    -- preemptive anti-sub
+    , openingTaisenDVAC
+
+    -- regular battles
+    , openingDVAC
+    , hougeki1BC2DV
+    , hougeki2BC2DV
+    , hougeki3BC2DV
+    , raigekiBC2DV        
     ] >>> toCombinedBC

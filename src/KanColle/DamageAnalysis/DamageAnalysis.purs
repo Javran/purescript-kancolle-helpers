@@ -9,9 +9,10 @@ module KanColle.DamageAnalysis.DamageAnalysis
 
   , analyzeAbyssalCTFBattle
   , analyzeAbyssalCTFNightBattle
-  
+
   , analyzeBothCombinedCTFBattle
-  , analyzeBothCombinedCTFNightBattle
+  , analyzeBothCombinedSTFBattle
+  , analyzeBothCombinedNightBattle
   ) where
 
 import Prelude
@@ -115,7 +116,7 @@ getInitFleetAC ds battle =
     nullEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
     enemyEscortMaxHps = nullEEscortMaxHps.right
 
-    mkShip (Just hp) (Just fullHp) = Just 
+    mkShip (Just hp) (Just fullHp) = Just
         { hp: hp, fullHp: fullHp
         , sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
@@ -143,7 +144,7 @@ getInitFleetBC ds battle =
     allyEMainNowHps = normalSplit (ensureHpsLen 12 $ getInitHps battle)
     allyMainNowHps = allyEMainNowHps.left
     enemyMainNowHps = allyEMainNowHps.right
-    
+
     allyEMainMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHps battle)
     allyMainMaxHps = allyEMainMaxHps.left
     enemyMainMaxHps = allyEMainMaxHps.right
@@ -155,15 +156,15 @@ getInitFleetBC ds battle =
     allyEEscortMaxHps = normalSplit (ensureHpsLen 12 $ getMaxHpsCombined battle)
     allyEscortMaxHps = allyEEscortMaxHps.left
     enemyEscortMaxHps = allyEEscortMaxHps.right
-    
-    mkShip (Just hp) (Just fullHp) = Just 
+
+    mkShip (Just hp) (Just fullHp) = Just
         { hp: hp, fullHp: fullHp
         , sunk: hp <= 0, dameCon: Nothing }
     mkShip _ _ = Nothing
 
     addDameCon (Just ship) dc = Just (ship { dameCon = dc })
     addDameCon _ _ = Nothing
-    
+
     dsPair = normalSplit ds
 
 analyzeBattle :: Array (Maybe DameCon) -> Battle -> NormalFleetInfo ShipResult
@@ -245,7 +246,7 @@ analyzeAbyssalCTFNightBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleet
 analyzeAbyssalCTFNightBattle ds b =
     { main: z (_.main)
     , enemyMain: z (_.enemyMain)
-    , enemyEscort: z (_.enemyEscort)    
+    , enemyEscort: z (_.enemyEscort)
     }
   where
     z prj = zipWith getShipResult' (prj allInitFleet) (prj allFinalFleet)
@@ -291,13 +292,33 @@ analyzeBothCombinedCTFBattle ds b =
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
     z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)
 
-analyzeBothCombinedCTFNightBattle :: Array (Maybe DameCon) -> Battle 
-                                  -> GCombinedFleetInfo ShipResult
-analyzeBothCombinedCTFNightBattle ds b =
+analyzeBothCombinedSTFBattle :: Array (Maybe DameCon) -> Battle -> GCombinedFleetInfo ShipResult
+analyzeBothCombinedSTFBattle ds b =
     { allyMain: z (_.allyMain)
-    , allyEscort: z (_.allyEscort)    
+    , allyEscort: z (_.allyEscort)
     , enemyMain: z (_.enemyMain)
-    , enemyEscort: z (_.enemyEscort)    
+    , enemyEscort: z (_.enemyEscort)
+    }
+  where
+    initFleet = getInitFleetBC ds b
+    resultDV = battleBothCombinedSurfaceTaskForceDV b
+    finalFleet =
+      { allyMain: applyDamageVector resultDV.allyMain initFleet.allyMain
+      , allyEscort: applyDamageVector resultDV.allyEscort initFleet.allyEscort
+      , enemyMain: applyDamageVector resultDV.enemyMain initFleet.enemyMain
+      , enemyEscort: applyDamageVector resultDV.enemyEscort initFleet.enemyEscort
+      }
+    getShipResult' :: Maybe Ship -> Maybe Ship -> Maybe ShipResult
+    getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
+    z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)
+
+analyzeBothCombinedNightBattle :: Array (Maybe DameCon) -> Battle
+                                  -> GCombinedFleetInfo ShipResult
+analyzeBothCombinedNightBattle ds b =
+    { allyMain: z (_.allyMain)
+    , allyEscort: z (_.allyEscort)
+    , enemyMain: z (_.enemyMain)
+    , enemyEscort: z (_.enemyEscort)
     }
   where
     z prj = zipWith getShipResult' (prj allInitFleet) (prj allFinalFleet)

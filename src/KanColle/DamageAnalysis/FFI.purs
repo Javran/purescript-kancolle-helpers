@@ -9,6 +9,10 @@ module KanColle.DamageAnalysis.FFI
 
   , analyzeAbyssalCTFBattleJS
   , analyzeAbyssalCTFNightBattleJS
+  
+  , analyzeBothCombinedCTFBattleJS
+  , analyzeBothCombinedSTFBattleJS
+  , analyzeBothCombinedNightBattleJS
   ) where
 
 import Prelude
@@ -32,6 +36,7 @@ readDameCon = map convert
 type FleetResult f = Array (f ShipResult)
 type BattleResult f = NormalBattle (FleetResult f)
 type BattleResultAC f = CombinedBattleAC (FleetResult f)
+type GBattleResult f = GCombinedBattle (FleetResult f)
 type CombinedBattleResult f = CombinedBattle (FleetResult f)
 
 liftToFFI :: (Array (Maybe DameCon) -> Battle -> BattleResult Maybe)
@@ -54,6 +59,15 @@ liftToFFIAC :: (Array (Maybe DameCon) -> Battle -> BattleResultAC Maybe)
 liftToFFIAC f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))
   where
     convert s = { main: map toNullable s.main
+                , enemyMain: map toNullable s.enemyMain
+                , enemyEscort: map toNullable s.enemyEscort }
+                
+liftToFFIBC :: (Array (Maybe DameCon) -> Battle -> GBattleResult Maybe)
+                  -> Fn2 (Array Int) Battle (GBattleResult Nullable)
+liftToFFIBC f = mkFn2 (\ds b -> convert (f (readDameCon ds) b))
+  where
+    convert s = { allyMain: map toNullable s.allyMain
+                , allyEscort: map toNullable s.allyEscort
                 , enemyMain: map toNullable s.enemyMain
                 , enemyEscort: map toNullable s.enemyEscort }
 
@@ -80,3 +94,12 @@ analyzeAbyssalCTFBattleJS = liftToFFIAC analyzeAbyssalCTFBattle
 
 analyzeAbyssalCTFNightBattleJS :: Fn2 (Array Int) Battle (BattleResultAC Nullable)
 analyzeAbyssalCTFNightBattleJS = liftToFFIAC analyzeAbyssalCTFNightBattle
+
+analyzeBothCombinedCTFBattleJS :: Fn2 (Array Int) Battle (GBattleResult Nullable)
+analyzeBothCombinedCTFBattleJS = liftToFFIBC analyzeBothCombinedCTFBattle
+
+analyzeBothCombinedSTFBattleJS :: Fn2 (Array Int) Battle (GBattleResult Nullable)
+analyzeBothCombinedSTFBattleJS = liftToFFIBC analyzeBothCombinedSTFBattle
+
+analyzeBothCombinedNightBattleJS :: Fn2 (Array Int) Battle (GBattleResult Nullable)
+analyzeBothCombinedNightBattleJS = liftToFFIBC analyzeBothCombinedNightBattle

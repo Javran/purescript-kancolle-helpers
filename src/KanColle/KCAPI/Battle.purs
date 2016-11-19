@@ -36,8 +36,13 @@ module KanColle.KCAPI.Battle
 
   , getHougeki1BC
   , getHougeki2BC
+  , getRaigekiBC  
   , getHougeki3BC
-  , getRaigekiBC
+
+  , getHougeki1BC2
+  , getHougeki2BC2
+  , getHougeki3BC2
+  , getRaigekiBC2  
 
   , getOpeningTaisen
 
@@ -320,6 +325,18 @@ getRaigekiBC b@(Battle rb) = do
 
 getHougeki3BC :: Battle -> Maybe Hougeki
 getHougeki3BC = getHougeki3CT
+
+getHougeki1BC2 :: Battle -> Maybe Hougeki
+getHougeki1BC2 = getHougeki1
+
+getHougeki2BC2 :: Battle -> Maybe Hougeki
+getHougeki2BC2 = getHougeki2
+
+getHougeki3BC2 :: Battle -> Maybe Hougeki
+getHougeki3BC2 = getHougeki3
+
+getRaigekiBC2 :: Battle -> Maybe Raigeki
+getRaigekiBC2 = getRaigeki
 
 hasLandBasedAirStrikes :: Battle -> Boolean
 hasLandBasedAirStrikes = hasField "api_air_base_attack"
