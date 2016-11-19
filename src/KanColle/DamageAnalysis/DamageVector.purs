@@ -136,9 +136,6 @@ convertFEDam = fromKArray >>> map (normalizeDamage >>> mkDamage)
 calcKoukuDamage :: Kouku -> LR DamageVector
 calcKoukuDamage kk = fromFDamAndEDam kk.api_stage3
 
--- calcKoukuDamageAC :: Kouku -> LR DamageVector
--- calcKoukuDamageAC kk = fromFDamAndEDam kk.api_stage3_combined
-
 -- | calculate damage from ally vs. enemy main fleet kouku stages (for Abyssal Combined fleet)
 calcKoukuDamageACEMain :: forall a . {api_stage3 :: KoukuStage3 | a} -> LR DamageVector
 calcKoukuDamageACEMain kk = fromFDamAndEDam kk.api_stage3
@@ -153,14 +150,14 @@ calcKoukuDamageAC :: forall a.
                   | a} -> LR (LR DamageVector)
 calcKoukuDamageAC kk =
     { left:
-      { left: resultEMain.left <> resultEEscort.left
-      , right: mempty }
+      { left: resultCMain.left
+      , right: resultCEscort.left }
     , right:
-      { left: resultEMain.right
-      , right: resultEEscort.right } }
+      { left: resultCMain.right
+      , right: resultCEscort.right } }
   where
-    resultEMain = calcKoukuDamageACEMain kk
-    resultEEscort = calcKoukuDamageACEEscort kk
+    resultCMain = calcKoukuDamageACEMain kk
+    resultCEscort = calcKoukuDamageACEEscort kk
 
 -- | calculate damage from kouku (aerial) stages (combined fleet)
 -- | note that only escort fleet is taking damage. so we just need DamageVector
