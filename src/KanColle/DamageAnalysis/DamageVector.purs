@@ -31,6 +31,7 @@ module KanColle.DamageAnalysis.DamageVector
   , toGCombined
   , toCombined
   , toCombinedAC
+  , toCombinedBC  
 
   , applyDamageVector
   , applyNormalDamageVector
@@ -303,7 +304,7 @@ calcSupportAirAttackDamage :: SupportAirInfo -> DamageVector
 calcSupportAirAttackDamage info = DV $ convertFEDam info.api_stage3.api_edam
 
 calcSupportAirAttackDamageAC :: SupportAirInfo -> LR (LR DamageVector)
-calcSupportAirAttackDamageAC info = calcKoukuDamageAC info
+calcSupportAirAttackDamageAC = calcKoukuDamageAC
 
 -- | calculate damage from support shelling stages.
 -- | note that only enemy is taking damage so this results in
@@ -351,7 +352,16 @@ toCombinedAC dv =
     , enemyMain: dv.right.left
     , enemyEscort: dv.right.right
     }
+    
 
+toCombinedBC :: LR (LR DamageVector) -> GCombinedDamageVector
+toCombinedBC dv =
+   { allyMain: dv.left.left
+   , allyEscort: dv.left.right
+   , enemyMain: dv.right.left
+   , enemyEscort: dv.right.right
+   }
+   
 -- | apply a single `DamageVector` on a single fleet
 applyDamageVector :: DamageVector -> FleetInfo Ship -> FleetInfo Ship
 applyDamageVector dv fleet = A.zipWith combine (getDV dv) fleet
