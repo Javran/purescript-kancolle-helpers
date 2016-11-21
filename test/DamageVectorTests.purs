@@ -256,6 +256,13 @@ testDamageAnalyzer =
              50,31,31-17,46,33,43,
              169-21-38-15-6-6-10-8-5-7-69,0,0,0,0,0,
              0,0,0,0,0,0]
+      Assert.assert "both combined STF 1" $
+        (mergeBC >>> trimInfo) (analyzeBothCombinedSTFBattle dc12 bothCombinedSTF1) ==
+          map toMaybeInt
+            [45,67-63-2,82,57-3-39,58-8,40,
+             41-23-14,43,42,30-18,42,29,
+             390,160-49-3-4-4,160,88-67-45,88-57-44,88-68,
+             57-92,76-6-6-178,76-68-56,66,35-99,35-41]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x

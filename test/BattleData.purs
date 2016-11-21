@@ -48,3 +48,4 @@ foreign import abyssalCombinedFleetNight2 :: Battle
 
 foreign import bothCombinedCTF1 :: Battle
 foreign import bothCombinedCTFNight1 :: Battle
+foreign import bothCombinedSTF1 :: Battle
