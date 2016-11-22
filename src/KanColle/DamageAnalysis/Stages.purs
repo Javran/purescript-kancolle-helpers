@@ -14,8 +14,6 @@ import Data.Monoid
 import Data.Foldable
 
 import KanColle.KCAPI.Battle
-import KanColle.KCAPI.Battle.CTF as CTF
--- import KanColle.KCAPI.Battle.STF as STF -- TODO: I want to use this explicitly
 
 import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
