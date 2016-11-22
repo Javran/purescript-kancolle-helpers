@@ -19,6 +19,7 @@ import Data.Foldable
 import Partial.Unsafe
 
 import KanColle.KCAPI.Battle
+import KanColle.KCAPI.Battle.AbyssalCombined as AC
 
 import BattleData
 
@@ -100,7 +101,7 @@ testDamageVector = do
               == acDVtoStr dv
     test "DamageVector: abyssal combined: regular raigeki DV" do
       let raw :: Raigeki
-          raw = unsafePartial (fromJust (getRaigekiAC abyssalCombinedFleet1))
+          raw = unsafePartial (fromJust (AC.getRaigeki abyssalCombinedFleet1))
           dv :: LR (LR DamageVector)
           dv = calcRaigekiDamageAC raw
       Assert.assert "sample1" $
@@ -108,7 +109,7 @@ testDamageVector = do
               == acDVtoStr dv
     test "DamageVector: abyssal combined: hougeki1" do
       let raw :: Hougeki
-          raw = unsafePartial (fromJust (getHougeki1AC abyssalCombinedFleet1))
+          raw = unsafePartial (fromJust (AC.getHougeki1 abyssalCombinedFleet1))
           dv :: LR (LR DamageVector)
           dv = calcHougekiDamageAC raw
       Assert.assert "sample1" $
@@ -116,7 +117,7 @@ testDamageVector = do
               == acDVtoStr dv
     test "DamageVector: abyssal combined: hougeki2" do
       let raw :: Hougeki
-          raw = unsafePartial (fromJust (getHougeki2AC abyssalCombinedFleet1))
+          raw = unsafePartial (fromJust (AC.getHougeki2 abyssalCombinedFleet1))
           dv :: LR (LR DamageVector)
           dv = calcHougekiDamageAC raw
       Assert.assert "sample1" $
@@ -124,7 +125,7 @@ testDamageVector = do
               == acDVtoStr dv
     test "DamageVector: abyssal combined: hougeki3" do
       let raw :: Hougeki
-          raw = unsafePartial (fromJust (getHougeki3AC abyssalCombinedFleet1))
+          raw = unsafePartial (fromJust (AC.getHougeki3 abyssalCombinedFleet1))
           dv :: LR (LR DamageVector)
           dv = calcHougekiDamageAC raw
       Assert.assert "sample1" $

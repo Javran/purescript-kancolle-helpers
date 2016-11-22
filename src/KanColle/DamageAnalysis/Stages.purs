@@ -38,6 +38,11 @@ import Data.Monoid
 import Data.Foldable
 
 import KanColle.KCAPI.Battle
+import KanColle.KCAPI.Battle.CTF as CTF
+-- import KanColle.KCAPI.Battle.STF as STF -- TODO: I want to use this explicitly
+import KanColle.KCAPI.Battle.BothCombinedCTF as BCTF
+import KanColle.KCAPI.Battle.BothCombinedSTF as BSTF
+
 import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Types
@@ -133,58 +138,58 @@ raigekiDV = connectDV getRaigeki memptyLR calcRaigekiDamage
 
 -- specalized for Carrier Task Force
 hougeki1CTDV :: Battle -> LR DamageVector
-hougeki1CTDV = connectDV getHougeki1CT memptyLR calcHougekiDamage
+hougeki1CTDV = connectDV CTF.getHougeki1 memptyLR calcHougekiDamage
 
 raigekiCTDV :: Battle -> LR DamageVector
-raigekiCTDV = connectDV getRaigekiCT memptyLR calcRaigekiDamage
+raigekiCTDV = connectDV CTF.getRaigeki memptyLR calcRaigekiDamage
 
 hougeki2CTDV :: Battle -> LR DamageVector
-hougeki2CTDV = connectDV getHougeki2CT memptyLR calcHougekiDamage
+hougeki2CTDV = connectDV CTF.getHougeki2 memptyLR calcHougekiDamage
 
 hougeki3CTDV :: Battle -> LR DamageVector
-hougeki3CTDV = connectDV getHougeki3CT memptyLR calcHougekiDamage
+hougeki3CTDV = connectDV CTF.getHougeki3 memptyLR calcHougekiDamage
 
 mt :: LR (LR DamageVector)
 mt = { left: memptyLR, right: memptyLR }
 
 -- specalized for Abyssal Combined Fleet
 hougeki1ACDV :: Battle -> LR (LR DamageVector)
-hougeki1ACDV = connectDV getHougeki1CT mt calcHougekiDamageAC
+hougeki1ACDV = connectDV CTF.getHougeki1 mt calcHougekiDamageAC
 
 hougeki2ACDV :: Battle -> LR (LR DamageVector)
-hougeki2ACDV = connectDV getHougeki2CT mt calcHougekiDamageAC
+hougeki2ACDV = connectDV CTF.getHougeki2 mt calcHougekiDamageAC
 
 raigekiACDV :: Battle -> LR (LR DamageVector)
-raigekiACDV = connectDV getRaigekiCT mt calcRaigekiDamageAC
+raigekiACDV = connectDV CTF.getRaigeki mt calcRaigekiDamageAC
 
 hougeki3ACDV :: Battle -> LR (LR DamageVector)
-hougeki3ACDV = connectDV getHougeki3CT mt calcHougekiDamageAC
+hougeki3ACDV = connectDV CTF.getHougeki3 mt calcHougekiDamageAC
 
 -- both,CTF
 hougeki1BCDV :: Battle -> LR (LR DamageVector)
-hougeki1BCDV = connectDV getHougeki1BC mt calcHougekiDamageAC
+hougeki1BCDV = connectDV BCTF.getHougeki1 mt calcHougekiDamageAC
 
 hougeki2BCDV :: Battle -> LR (LR DamageVector)
-hougeki2BCDV = connectDV getHougeki2BC mt calcHougekiDamageAC
+hougeki2BCDV = connectDV BCTF.getHougeki2 mt calcHougekiDamageAC
 
 raigekiBCDV :: Battle -> LR (LR DamageVector)
-raigekiBCDV = connectDV getRaigekiBC mt calcRaigekiDamageAC
+raigekiBCDV = connectDV BCTF.getRaigeki mt calcRaigekiDamageAC
 
 hougeki3BCDV :: Battle -> LR (LR DamageVector)
-hougeki3BCDV = connectDV getHougeki3BC mt calcHougekiDamageAC
+hougeki3BCDV = connectDV BCTF.getHougeki3 mt calcHougekiDamageAC
 
 -- both,STF
 hougeki1BC2DV :: Battle -> LR (LR DamageVector)
-hougeki1BC2DV = connectDV getHougeki1BC2 mt calcHougekiDamageAC
+hougeki1BC2DV = connectDV BSTF.getHougeki1 mt calcHougekiDamageAC
 
 hougeki2BC2DV :: Battle -> LR (LR DamageVector)
-hougeki2BC2DV = connectDV getHougeki2BC2 mt calcHougekiDamageAC
+hougeki2BC2DV = connectDV BSTF.getHougeki2 mt calcHougekiDamageAC
 
 hougeki3BC2DV :: Battle -> LR (LR DamageVector)
-hougeki3BC2DV = connectDV getHougeki3BC2 mt calcHougekiDamageAC
+hougeki3BC2DV = connectDV BSTF.getHougeki3 mt calcHougekiDamageAC
 
 raigekiBC2DV :: Battle -> LR (LR DamageVector)
-raigekiBC2DV = connectDV getRaigekiBC2 mt calcRaigekiDamageAC
+raigekiBC2DV = connectDV BSTF.getRaigeki mt calcRaigekiDamageAC
 
 hougekiDV :: Battle -> LR DamageVector
 hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage

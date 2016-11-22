@@ -1,5 +1,5 @@
-module KanColle.KCAPI.Battle.Internal where
-{-  ( RawBattle
+module KanColle.KCAPI.Battle.Internal
+  ( RawBattle
   , Kouku
   , KoukuStage3
   , Hougeki
@@ -11,7 +11,18 @@ module KanColle.KCAPI.Battle.Internal where
   , Battle(..)
   
   , KArray, fromKArray -- eventually we should remove this ...
-  ) where -}
+  
+  , getHouraiFlags
+  , checkHouraiFlag
+  , hasField
+  ) where
+
+import Prelude
+import Data.Maybe
+import Control.MonadPlus
+
+import Data.Foreign
+import Data.Foreign.Index
 
 import KanColle.Util
 
@@ -93,3 +104,17 @@ type SupportInfo =
   { api_support_airatack :: SupportAirInfo
   , api_support_hourai :: SupportHouraiInfo
   }
+
+hasField :: forall a. String -> a -> Boolean
+hasField s = hasOwnProperty s <<< toForeign
+
+getHouraiFlags :: Battle -> Maybe (Array Int)
+getHouraiFlags b@(Battle rb) =
+   if hasField "api_hourai_flag" b
+     then Just rb.api_hourai_flag
+     else Nothing
+
+checkHouraiFlag :: Int -> Battle -> Maybe Unit
+checkHouraiFlag ind b = do
+    flg <- (_ `unsafeArrIndex` ind) <$> getHouraiFlags b
+    guard (flg == 1)

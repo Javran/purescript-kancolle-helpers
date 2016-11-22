@@ -51,7 +51,6 @@ import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Damage
 
 import Data.Tuple
-import Data.Foldable
 import Data.Traversable
 import KanColle.KCAPI.Battle
 import Data.Maybe
