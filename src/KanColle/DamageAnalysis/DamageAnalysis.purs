@@ -25,6 +25,12 @@ import KanColle.Util
 
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Stages
+import KanColle.DamageAnalysis.Stages.CTF as CTF
+import KanColle.DamageAnalysis.Stages.STF as STF
+import KanColle.DamageAnalysis.Stages.BothCombinedCTF as BCTF
+import KanColle.DamageAnalysis.Stages.BothCombinedSTF as BSTF
+import KanColle.DamageAnalysis.Stages.AbyssalCombined as AC
+
 import KanColle.DamageAnalysis.Types
 
 normalSplit :: forall a. Array a -> LR (Array a)
@@ -201,10 +207,10 @@ analyzeCombinedBattleBy getDVFromBattle ds battle =
     getShipResult' ms1 ms2 = getShipResult <$> ms1 <*> ms2
 
 analyzeSTFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
-analyzeSTFBattle = analyzeCombinedBattleBy battleSurfaceTaskForceDV
+analyzeSTFBattle = analyzeCombinedBattleBy STF.battleDV
 
 analyzeCTFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
-analyzeCTFBattle = analyzeCombinedBattleBy battleCarrierTaskForceDV
+analyzeCTFBattle = analyzeCombinedBattleBy CTF.battleDV
 
 analyzeTECFBattle :: Array (Maybe DameCon) -> Battle -> CombinedFleetInfo ShipResult
 analyzeTECFBattle = analyzeCTFBattle
@@ -233,7 +239,7 @@ analyzeAbyssalCTFBattle ds b =
   where
     z prj = zipWith getShipResult' (prj initFleet) (prj finalFleet)
     initFleet = getInitFleetAC ds b
-    resultDV = battleEnemyCarrierTaskForceDV b
+    resultDV = AC.battleDV b
     finalFleet =
       { main: applyDamageVector resultDV.main initFleet.main
       , enemyMain: applyDamageVector resultDV.enemyMain initFleet.enemyMain
@@ -281,7 +287,7 @@ analyzeBothCombinedCTFBattle ds b =
     }
   where
     initFleet = getInitFleetBC ds b
-    resultDV = battleBothCombinedCarrierTaskForceDV b
+    resultDV = BCTF.battleDV b
     finalFleet =
       { allyMain: applyDamageVector resultDV.allyMain initFleet.allyMain
       , allyEscort: applyDamageVector resultDV.allyEscort initFleet.allyEscort
@@ -301,7 +307,7 @@ analyzeBothCombinedSTFBattle ds b =
     }
   where
     initFleet = getInitFleetBC ds b
-    resultDV = battleBothCombinedSurfaceTaskForceDV b
+    resultDV = BSTF.battleDV b
     finalFleet =
       { allyMain: applyDamageVector resultDV.allyMain initFleet.allyMain
       , allyEscort: applyDamageVector resultDV.allyEscort initFleet.allyEscort

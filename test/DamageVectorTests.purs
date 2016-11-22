@@ -13,6 +13,7 @@ import Data.Function
 import KanColle.Util
 import KanColle.DamageAnalysis
 import KanColle.DamageAnalysis.Stages
+import KanColle.DamageAnalysis.Stages.Internal
 import KanColle.DamageAnalysis.FFI
 import Test.Unit.Assert as Assert
 import Data.Foldable
@@ -20,6 +21,11 @@ import Partial.Unsafe
 
 import KanColle.KCAPI.Battle
 import KanColle.KCAPI.Battle.AbyssalCombined as AC
+import KanColle.DamageAnalysis.Stages.CTF as CTF
+import KanColle.DamageAnalysis.Stages.STF as STF
+import KanColle.DamageAnalysis.Stages.BothCombinedCTF as BCTF
+import KanColle.DamageAnalysis.Stages.BothCombinedSTF as BSTF
+import KanColle.DamageAnalysis.Stages.AbyssalCombined as AC
 
 import BattleData
 
@@ -133,22 +139,22 @@ testDamageVector = do
               == acDVtoStr dv
     test "DamageVector: bothCombinedCTF: hougeki1" do
       let dv :: LR (LR DamageVector)
-          dv = hougeki1BCDV bothCombinedCTF1
+          dv = BCTF.hougeki1DV bothCombinedCTF1
       Assert.assert "sample1" $
           "0,25,0,0,0,0 && 0,0,0,0,0,0 -- 0,154,0,79,0,133 && 0,0,0,0,0,0" == bothDVtoStr dv
     test "DamageVector: bothCombinedCTF: hougeki2" do
       let dv :: LR (LR DamageVector)
-          dv = hougeki2BCDV bothCombinedCTF1
+          dv = BCTF.hougeki2DV bothCombinedCTF1
       Assert.assert "sample1" $
           "0,0,0,0,0,0 && 0,0,0,6,7,0 -- 0,0,0,0,0,0 && 261,116,7,55,234,71" == bothDVtoStr dv
     test "DamageVector: bothCombinedCTF: raigeki" do
       let dv :: LR (LR DamageVector)
-          dv = raigekiBCDV bothCombinedCTF1
+          dv = BCTF.raigekiDV bothCombinedCTF1
       Assert.assert "sample1" $
           "0,0,0,0,0,0 && 0,0,0,0,0,0 -- 34,0,0,0,0,0 && 0,0,237,0,0,0" == bothDVtoStr dv
     test "DamageVector: bothCombinedCTF: hougeki3" do
       let dv :: LR (LR DamageVector)
-          dv = hougeki3BCDV bothCombinedCTF1
+          dv = BCTF.hougeki3DV bothCombinedCTF1
       Assert.assert "sample1" $
           "0,0,0,0,0,0 && 0,0,0,0,13,0 -- 167,0,0,98,0,0 && 0,0,0,0,0,0" == bothDVtoStr dv
     test "DamageVector: bothCombinedCTF: opening" do
