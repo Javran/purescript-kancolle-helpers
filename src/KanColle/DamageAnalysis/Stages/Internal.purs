@@ -11,6 +11,8 @@ import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
 import KanColle.DamageAnalysis.Types
 
+-- TODO: AC and BC can be unified 
+
 landBasedAirStrikeDVs :: Battle -> LR DamageVector
 landBasedAirStrikeDVs =
     connectDV
