@@ -13,6 +13,13 @@ import KanColle.DamageAnalysis.Types
 
 -- TODO: AC and BC can be unified 
 
+-- TODO: there are actually two types of slightly different formats for battle
+-- representation: 
+-- 1. one used in both-combined fleet and abyssal-only combined fleet
+-- 2. and the old one we are all familiar with
+-- eventually we need to have some distinction between them
+-- instead of having them named "BC" or "AC"
+
 landBasedAirStrikeDVs :: Battle -> LR DamageVector
 landBasedAirStrikeDVs =
     connectDV
@@ -68,7 +75,6 @@ koukuDVAC = connectDV getKouku mt calcKoukuDamageAC
 
 koukuDVBC :: Battle -> LR (LR DamageVector)
 koukuDVBC = koukuDVAC
-
 
 supportAirAttackDVAC :: Battle -> LR (LR DamageVector)
 supportAirAttackDVAC = connectDV getSupportAirInfo mt calcSupportAirAttackDamageAC
