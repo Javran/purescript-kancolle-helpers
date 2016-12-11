@@ -50,6 +50,7 @@ type RawBattle =
   , api_maxhps_combined :: KArray Int
   , api_stage_flag :: Array Int
   , api_stage_flag2 :: Array Int
+  , api_injection_kouku :: Kouku
   , api_kouku :: Kouku
   , api_kouku2 :: Kouku
   , api_opening_taisen_flag :: Int
@@ -66,6 +67,7 @@ type RawBattle =
   , api_support_flag :: Int
   , api_support_info :: SupportInfo
   , api_air_base_attack :: Array Kouku
+  , api_air_base_injection :: Kouku
   }
 
 newtype Battle = Battle RawBattle

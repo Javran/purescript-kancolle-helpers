@@ -5,7 +5,9 @@ module KanColle.KCAPI.Battle
   , getSupportHouraiInfo
 
   , getLandBasedAirStrikes
-  
+  , getAirBaseInjection
+
+  , getInjectionKouku
   , getKouku
   , getKouku2
 
@@ -192,3 +194,13 @@ getKoukuStage3EDam ks3 = if hasField "api_edam" ks3
 getEnemyActiveDeck :: Battle -> Int
 getEnemyActiveDeck (Battle rb) =
     unsafeArrIndex rb.api_active_deck 1
+
+getAirBaseInjection :: Battle -> Maybe Kouku
+getAirBaseInjection b@(Battle rb) = do
+    guard (hasField "api_air_base_injection" b)
+    Just rb.api_air_base_injection
+
+getInjectionKouku :: Battle -> Maybe Kouku
+getInjectionKouku b@(Battle rb) = do
+    guard (hasField "api_injection_kouku" b)
+    Just rb.api_injection_kouku

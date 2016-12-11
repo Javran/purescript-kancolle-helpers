@@ -167,7 +167,7 @@ calcKoukuDamageCombined kk = DV (convertFEDam (kk.api_stage3_combined.api_fdam))
 -- | calculate land based kouku damages. whose api_stage3 only have an api_edam field
 -- | (because only enemies are taking damage)
 calcLandBasedKoukuDamage :: Kouku -> DamageVector
-calcLandBasedKoukuDamage lbkk = case getKoukuStage3 lbkk  of
+calcLandBasedKoukuDamage lbkk = case getKoukuStage3 lbkk of
     Just stage3 -> DV (convertFEDam stage3.api_edam)
     Nothing -> mempty
 
