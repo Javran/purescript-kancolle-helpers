@@ -20,6 +20,9 @@ import KanColle.DamageAnalysis.Types
 -- eventually we need to have some distinction between them
 -- instead of having them named "BC" or "AC"
 
+injLandBasedDV :: Battle -> LR DamageVector
+injLandBasedDV = connectDV getAirBaseInjection memptyLR calcKoukuDamage
+
 landBasedAirStrikeDVs :: Battle -> LR DamageVector
 landBasedAirStrikeDVs =
     connectDV
@@ -27,6 +30,9 @@ landBasedAirStrikeDVs =
       []
       (map (calcLandBasedKoukuDamage >>> lrOnlyRight))
     >>> foldl lrAppend memptyLR
+    
+injKoukuDV :: Battle -> LR DamageVector
+injKoukuDV = connectDV getInjectionKouku memptyLR calcKoukuDamage
     
 -- | get `DamageVector` of kouku stage from battle data
 -- | all the names in this module are kept consistent with functions in
