@@ -45,8 +45,8 @@ acDVtoStr :: LR (LR DamageVector) -> String
 acDVtoStr dvdv = dvToStr dvdv.left.left <> " -- " <> dvToStr dvdv.right.left <> " && " <> dvToStr dvdv.right.right
 
 bothDVtoStr :: LR (LR DamageVector) -> String
-bothDVtoStr dvdv = 
-    dvToStr dvdv.left.left <> " && " <> dvToStr dvdv.left.right <> " -- " 
+bothDVtoStr dvdv =
+    dvToStr dvdv.left.left <> " && " <> dvToStr dvdv.left.right <> " -- "
  <> dvToStr dvdv.right.left <> " && " <> dvToStr dvdv.right.right
 
 testDameCon :: forall e. TestSuite e
@@ -216,7 +216,7 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeBattle dc6 normBattleWithOpeningTaisen1) ==
           map toMaybeInt [39,77,44-4,47, 9999,9999,
                           44-2-42,27-56,27-36,19-76, 9999,9999]
-                          
+
       Assert.assert "STF opening taisen" $
         (mergeCombined >>> trimInfo) (analyzeSTFBattle dc12 combinedFleetOpeingTaisenSTF1) ==
           map toMaybeInt [50,50,45, 9999,9999,9999,
@@ -259,7 +259,7 @@ testDamageAnalyzer =
              57-261,76-116,76-7-237,55-55,20-234,20-71]
       Assert.assert "both combined CTF (night) 1" $
         (mergeBC >>> trimInfo) (analyzeBothCombinedNightBattle dc12 bothCombinedCTFNight1) ==
-          map toMaybeInt 
+          map toMaybeInt
             [67,32,83,52,57,45,
              50,31,31-17,46,33,43,
              169-21-38-15-6-6-10-8-5-7-69,0,0,0,0,0,
@@ -275,13 +275,18 @@ testDamageAnalyzer =
         (merge >>> trimInfo) (analyzeBattle dc6 jetAssault1) ==
           map toMaybeInt
             [92,78,79,57,37,43,
-             -54,-181 -47{- additional dmg from jet assault -},-77,-183,-84,-19]             
+             -54,-181 -47{- additional dmg from jet assault -},-77,-183,-84,-19]
+      Assert.assert "abyssal combined fleet w/ jet assault" $
+        (mergeAC >>> trimInfo) (analyzeAbyssalCTFBattle dc6 jetAssaultWithAbyssalCombined1) ==
+          map toMaybeInt [92,21,71,57,29,43,
+                          -65,-80,-79,-25,-32,-100,
+                          -25,-40 -6 {- dmg from jet -},-26,-103,-16,-75]
   where
     repairTeam = replicate 6 (Just RepairTeam)
     toMaybeInt x = if x == 9999 then Nothing else Just x
     merge x = x.main <> x.enemy
     mergeCombined x = x.main <> x.escort <> x.enemy
     mergeAC x = x.main <> x.enemyMain <> x.enemyEscort
-    mergeBC x = x.allyMain <> x.allyEscort <> x.enemyMain <> x.enemyEscort    
+    mergeBC x = x.allyMain <> x.allyEscort <> x.enemyMain <> x.enemyEscort
     trimInfo :: forall a. Array (Maybe { hp :: Int | a}) -> Array (Maybe Int)
     trimInfo = (map <<< map) (\x -> x.hp)
