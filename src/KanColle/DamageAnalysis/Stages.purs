@@ -48,9 +48,9 @@ hougekiDV = connectDV getHougeki memptyLR calcHougekiDamage
 -- | * `hougeki3` (third shelling stage, always empty for regular battles)
 -- | * `raigeki` (closing torpedo attack)
 battleDV :: Battle -> NormalDamageVector
-battleDV = fconcat [ injLandBasedDV
-                   , landBasedAirStrikeDVs
+battleDV = fconcat [ injLandBasedDV -- TODO: the ordering doesn't matter, but we'd better make it correct.
                    , injKoukuDV
+                   , landBasedAirStrikeDVs
                    , koukuDV, kouku2DV
                    , supportAirAttackDV >>> lrOnlyRight
                    , supportHouraiDV >>> lrOnlyRight
