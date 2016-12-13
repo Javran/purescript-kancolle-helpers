@@ -1,5 +1,7 @@
 module KanColle.DamageAnalysis.Stages.STF where
 
+-- TODO: see CTF.purs
+
 import KanColle.KCAPI.Battle
 
 import Prelude

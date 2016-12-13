@@ -1,5 +1,8 @@
 module KanColle.DamageAnalysis.Stages.CTF where
 
+-- TODO: regular CTF / STF's behavior is still unknown under jet assault
+-- for now we have no way to verify though.
+
 import KanColle.KCAPI.Battle
 
 import Prelude

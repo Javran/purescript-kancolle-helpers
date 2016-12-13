@@ -29,7 +29,9 @@ hougeki3DV = connectDV BCTF.getHougeki3 mt calcHougekiDamageAC
 
 battleDV :: Battle -> GCombinedDamageVector
 battleDV = fconcat2AC
-    [ landBasedAirStrikeDVsBC
+    [ injLandBasedDVAC
+    , injKoukuDVAC
+    , landBasedAirStrikeDVsBC
     , koukuDVBC
     -- support expedition: aerial or hourai
     , supportAirAttackDVAC

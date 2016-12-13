@@ -79,6 +79,12 @@ landBasedAirStrikeDVsBC = landBasedAirStrikeDVsAC
 koukuDVAC :: Battle -> LR (LR DamageVector)
 koukuDVAC = connectDV getKouku mt calcKoukuDamageAC
 
+injKoukuDVAC :: Battle -> LR (LR DamageVector)
+injKoukuDVAC = connectDV getInjectionKouku mt calcKoukuDamageAC
+
+injLandBasedDVAC :: Battle -> LR (LR DamageVector)
+injLandBasedDVAC = connectDV getAirBaseInjection mt calcKoukuDamageAC
+
 koukuDVBC :: Battle -> LR (LR DamageVector)
 koukuDVBC = koukuDVAC
 
