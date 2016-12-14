@@ -52,3 +52,4 @@ foreign import bothCombinedSTF1 :: Battle
 
 foreign import jetAssault1 :: Battle
 foreign import jetAssaultWithAbyssalCombined1 :: Battle
+foreign import jetAssaultLBAS1 :: Battle
