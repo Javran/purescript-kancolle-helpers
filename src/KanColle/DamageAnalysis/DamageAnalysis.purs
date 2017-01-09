@@ -19,7 +19,7 @@ import Prelude
 import Data.Array
 import Data.Tuple
 import Data.Maybe
-import Data.Unfoldable
+import Data.Unfoldable hiding (replicate)
 import KanColle.KCAPI.Battle
 import KanColle.Util
 

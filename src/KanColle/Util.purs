@@ -51,7 +51,7 @@ foreign import consoleMessage :: forall a b. Int -> a -> (Unit -> b) -> b
 foreign import throwWith :: forall a b. a -> b
 
 unsafeArrIndex :: forall a. Array a -> Int -> a
-unsafeArrIndex = unsafePartial PA.unsafeIndex
+unsafeArrIndex = unsafePartial unsafeIndex
 
 unsafeArrHead :: forall a. Array a -> a
 unsafeArrHead = unsafePartial PA.head

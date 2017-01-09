@@ -6,7 +6,7 @@ module KanColle.Expedition.New.Info
 import KanColle.Expedition.New.EArray
 import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.Resource
-import Data.Array.Partial as AP
+import Data.Array as A
 import Partial.Unsafe
 import Data.Maybe
 import Prelude
@@ -40,10 +40,10 @@ convertRawInfo ri =
     , resource: getResource ri.api_id
     }
   where
-    convertRawItem ar = case (unsafePartial AP.unsafeIndex ar 0) of
+    convertRawItem ar = case (unsafePartial A.unsafeIndex ar 0) of
       0 -> Nothing
       itmCode -> Just
         { item: itemFromInt itmCode
-        , maxCount: (unsafePartial AP.unsafeIndex ar 1)
+        , maxCount: (unsafePartial A.unsafeIndex ar 1)
         }
               

@@ -30,7 +30,7 @@ mkEA xs
 
 indEA :: forall a. EArray a -> Int -> a
 indEA (EA xs) i
-    | 1 <= i && i <= 40 = unsafePartial (AP.unsafeIndex xs (i-1))
+    | 1 <= i && i <= 40 = unsafePartial (A.unsafeIndex xs (i-1))
     | otherwise = unsafePartial (crash "index out of range")
     
 imapEA :: forall a b. (Int -> a -> b) -> EArray a -> EArray b
