@@ -9,11 +9,7 @@ install:
   - wget -O $HOME/purescript.tar.gz https://github.com/purescript/purescript/releases/download/$TAG/linux64.tar.gz
   - tar -xvf $HOME/purescript.tar.gz -C $HOME/
   - chmod a+x $HOME/purescript
-  - npm install pulp
-  - npm install uglify-js
-  - npm install bower
-  - npm install benchmark
-  - npm install purescript-psa
+  - npm install -g pulp uglify-js bower benchmark purescript-psa
   - bower install
   - patch -d bower_components/purescript-number-format -p1 <purescript-number-format.patch
 script:
