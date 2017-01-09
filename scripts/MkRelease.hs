@@ -74,7 +74,7 @@ main = do
     mapM_ (putStrLn . ("* " ++)) pursModules
     putStrLn "=== End of list ===="
     -- build and optimize
-    (ExitSuccess, _) <- shellStrict "pulp build  --censor-codes=ImplicitImport,HidingImport --censor-lib " empty
+    (ExitSuccess, _) <- shellStrict "pulp build -- --censor-codes=ImplicitImport,HidingImport --censor-lib " empty
     let pscBundleArgs = "output/*/*.js" : concatMap pmConvert pursModules
         pmConvert pm = ["-m", pm]
         bundleCmd = unwords ("psc-bundle" : pscBundleArgs)

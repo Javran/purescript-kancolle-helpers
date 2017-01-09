@@ -13,5 +13,5 @@ install:
   - bower install
   - patch -d bower_components/purescript-number-format -p1 <purescript-number-format.patch
 script:
-  - travis_wait 30 pulp build  --censor-codes=ImplicitImport,HidingImport --censor-lib
+  - travis_wait 30 pulp build -- --censor-codes=ImplicitImport,HidingImport --censor-lib
   - travis_wait 30 pulp test
