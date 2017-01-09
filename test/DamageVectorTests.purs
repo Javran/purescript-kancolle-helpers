@@ -7,7 +7,7 @@ import Data.Foreign
 import Data.String as Str
 import Data.Array
 import Data.Monoid
-import Data.Unfoldable
+import Data.Unfoldable hiding (replicate)
 import Data.Maybe
 import Data.Function
 import KanColle.Util
