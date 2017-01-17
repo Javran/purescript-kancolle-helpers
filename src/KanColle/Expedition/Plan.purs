@@ -7,7 +7,6 @@ import Data.Traversable
 import Data.Function.Uncurried
 import Data.Function
 import Data.String (joinWith)
-import Number.Format
 import Data.Maybe
 import KanColle.Util
 

@@ -1,13 +1,14 @@
 module KanColle.Expedition.NetIncome where
 
 import Prelude
+import KanColle.Util
 import KanColle.Expedition.Evaluate
 import KanColle.Expedition.IncomeBase
 import KanColle.Expedition.Cost
 import KanColle.Expedition.Minimal
 import KanColle.Expedition.Base
+
 import Data.Maybe
-import Number.Format
 import Data.String (joinWith)
 import Data.Int
 import Data.Foldable

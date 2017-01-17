@@ -45,3 +45,11 @@ exports.consoleMessage = function(level) {
 exports.throwWith = function(o) {
     throw o;
 };
+
+exports.unsafeToFixed = function (scale) {
+    return function (number) {
+        return function () {
+            return number.toFixed(scale);
+        }
+    }
+};

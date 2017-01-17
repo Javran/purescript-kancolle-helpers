@@ -26,12 +26,16 @@ module KanColle.Util
   , lrAppend
   
   , fleetSplit
+  
+  , toFixed
   ) where
 
 import Prelude
 import Data.Monoid
+import Data.Maybe
 import Data.Int
 import Control.Monad.Eff
+import Control.Monad.Eff.Exception
 import Control.Monad.ST
 
 import Data.Array
@@ -154,3 +158,9 @@ lrOnlyLeft l = { left: l, right: mempty }
 -- | lift some Monoid that has only right part into `LR`
 lrOnlyRight :: forall m. Monoid m => m -> LR m
 lrOnlyRight r = { left: mempty, right: r }
+
+foreign import unsafeToFixed :: forall eff. Int -> Number -> Eff eff String
+
+-- from: https://github.com/Jonplussed/purescript-number-format
+toFixed :: Int -> Number -> Maybe String
+toFixed scale num = runPure (catchException (pure <<< const Nothing) (Just <$> unsafeToFixed scale num))
