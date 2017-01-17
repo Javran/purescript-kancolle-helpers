@@ -11,7 +11,6 @@ import Prelude
 import Partial.Unsafe
 import Partial
 import Data.Array as A
-import Data.Array.Partial as AP
 import Data.Traversable
 import Data.Unfoldable
 import Data.Tuple

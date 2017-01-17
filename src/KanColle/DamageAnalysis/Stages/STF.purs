@@ -2,19 +2,13 @@ module KanColle.DamageAnalysis.Stages.STF where
 
 -- TODO: see CTF.purs
 
-import KanColle.KCAPI.Battle
-
 import Prelude
-import Data.Maybe
-import Data.Monoid
-import Data.Foldable
 
 import KanColle.KCAPI.Battle
 import KanColle.KCAPI.Battle.STF as STF
 
 import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
-import KanColle.DamageAnalysis.Types
 import KanColle.DamageAnalysis.Stages.Internal
 
 hougeki1DV :: Battle -> LR DamageVector

@@ -9,9 +9,6 @@ module KanColle.DamageAnalysis.Stages
   ) where
 
 import Prelude
-import Data.Maybe
-import Data.Monoid
-import Data.Foldable
 
 import KanColle.KCAPI.Battle
 
