@@ -23,7 +23,6 @@
     "purescript-strings": "^2.1.0",
     "purescript-foreign": "^3.0.1",
     "purescript-math": "2.0.0",
-    "purescript-number-format": "~0.3.0",
     "purescript-st": "2.0.0",
     "purescript-lists": "~3.3.0",
     "purescript-debug": "^2.0.0",
