@@ -1,11 +1,14 @@
 module KanColle.Expedition.New.Config
-  ( Config
+  ({- Config
   , mkConfig
   , defConfig
   , defConfigs
   , getCompositionWithConfig
   , calcFleetActualCostTable
   , calcFleetNetIncomeTable
+
+  , -} class IncomeModifier
+  , getModifier
   ) where
 
 import Prelude
@@ -25,7 +28,29 @@ import Data.Function
 import Data.Traversable
 import Data.Unfoldable hiding (fromMaybe)
 import KanColle.Util
+import Data.Int
 
+class IncomeModifier im where
+    getModifier :: im -> Number
+    
+class ResupplyCost rc where
+    getResupplyCost :: rc -> MaxCost
+    
+newtype NormalModifier = NormMod
+  { greatSuccess :: Boolean
+  , daihatsuCount :: Int
+  }
+
+instance normalIncomeModifier :: IncomeModifier NormalModifier where
+   getModifier (NormMod nm) = gs' * (1.0 + 0.02 * toNumber nm.daihatsuCount)
+     where
+       gs' = if nm.greatSuccess then 1.5 else 1.0
+
+newtype DirectModifier = DirectMod Number
+
+instance directIncomeModifier :: IncomeModifier DirectModifier where
+   getModifier (DirectMod v) = v
+    
 -- configuration for a single expedition.
 data Config = Conf
   { greatSuccess :: Boolean
@@ -33,6 +58,7 @@ data Config = Conf
   , wildcardSType :: SType
   }
 
+{-
 mkConfig :: Boolean -> Int -> SType -> Config
 mkConfig gs dCount wt = Conf
     { greatSuccess: gs
@@ -113,3 +139,4 @@ evaluateExpeditions scorer rphTbl eCandidates fleetCount =
               (resourceRowsLiftOp (+)) 
               emptyRph 
               (map (indEA rphTbl) expedSet)
+-}
