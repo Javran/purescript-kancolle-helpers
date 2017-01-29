@@ -34,7 +34,7 @@ class IncomeModifier im where
     getModifier :: im -> Number
     
 class ResupplyCost rc where
-    getResupplyCost :: rc -> MaxCost
+    getResupplyCost :: rc -> Int {- ExpedId -} -> MaxCost
     
 newtype NormalModifier = NormMod
   { greatSuccess :: Boolean

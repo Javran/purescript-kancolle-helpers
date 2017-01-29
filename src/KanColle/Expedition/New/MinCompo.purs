@@ -8,11 +8,20 @@ import Data.Maybe
 import KanColle.Expedition.New.Types
 import KanColle.Expedition.New.EArray
 
-import Data.Unfoldable
+import Data.Unfoldable hiding (fromMaybe)
 import Data.Array as A
 
 getMinimumComposition :: Int -> MinFleetCompo
 getMinimumComposition = indEA minimumCompositions
+
+concretizeComposition :: Int -> SType -> MinFleetCompo -> FleetCompo
+concretizeComposition expectCount wildcard mfc = 
+    concretize <$> (atLeast expectCount mfc)
+  where
+    atLeast n compo = if A.length compo < n
+        then compo <> replicate (n - A.length compo) Nothing
+        else compo
+    concretize = fromMaybe wildcard
 
 -- | minimum compositions for all expeditions
 minimumCompositions :: EArray MinFleetCompo
