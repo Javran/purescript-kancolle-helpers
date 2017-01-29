@@ -72,9 +72,13 @@ normalCostModel stype = case stype of
         c <- avCost 2
         Just (c <> [mkMC 40 45])
       | n <= 4 = do
-        -- and Akitsushima Kai
+        -- and Commandant Teste Kai      
         c <- avCost 3
-        Just (c <> [mkMC 60 15])
+        Just (c <> [mkMC 40 50])        
+      | n <= 5 = do
+        -- and Akitsushima Kai
+        c <- avCost 4
+        Just (c <> [mkMC 60 15])        
       | otherwise = Nothing
     -- Taigei
     asCost n = do
