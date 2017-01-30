@@ -118,7 +118,7 @@ normalCostModel stype = case stype of
         -- no need for SSV if we just consider:
         -- I-168, I-58, I-19, I-8 and Ro-500
         c <- ssLikeCost 1
-        Just (replicate (n-1) (mkMC 10 20))
+        Just (c <> replicate (n-1) (mkMC 10 20))
       | otherwise = Nothing
     cvlLikeCost n
       | n <= 1 =

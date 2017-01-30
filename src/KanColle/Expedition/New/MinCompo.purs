@@ -1,5 +1,6 @@
 module KanColle.Expedition.New.MinCompo
  ( getMinimumComposition
+ , concretizeComposition
  ) where
 
 import Prelude

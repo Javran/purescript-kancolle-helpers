@@ -45,6 +45,9 @@ import MasterData
 import Control.Monad.Eff
 import KanColle.Util
 
+import KanColle.Expedition.New.SType as ExpedSType
+import KanColle.Expedition.New.MinCompo as ExpedMinCompo
+
 testResult :: RemodelInfoMap
 testResult = collectRemodelInfo masterData
 
