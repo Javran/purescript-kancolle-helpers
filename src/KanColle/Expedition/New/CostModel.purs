@@ -8,6 +8,7 @@ module KanColle.Expedition.New.CostModel
 import Prelude
 import KanColle.Expedition.New.Types
 import Data.Map as M
+import Data.Array as A
 import Data.Maybe
 import Control.MonadPlus
 import Data.Unfoldable
@@ -35,6 +36,12 @@ calcFleetActualCost fmc info = FACost (foldl merge z fmc)
     merge acc mc = case calcActualCost mc info of
       (ACost actual) ->
         {fuel: acc.fuel+actual.fuel, ammo: acc.ammo+actual.ammo}
+
+-- | take some elements from a list, fail if the array does not have sufficient elements        
+takeOrFail :: forall a. Int -> Array a -> Maybe (Array a)
+takeOrFail n xs
+  | n <= A.length xs = Just (A.take n xs)
+  | otherwise = Nothing
 
 -- | a normal cost model assumes all ships are remodelled to
 -- | their final forms. (the exceptions are like Taigei, Chitose-A and Chiyoda-A
