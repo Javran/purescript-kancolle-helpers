@@ -13,6 +13,7 @@ module KanColle.Util
   
   , times
   , chooseN
+  , chooseN_FFI
   
   , unsafeArrIndex
   , unsafeArrHead
@@ -45,6 +46,7 @@ import Data.List as L
 import Data.Foldable
 import Control.Plus
 import Partial.Unsafe
+import Data.Function.Uncurried
 
 -- | `JSON.stringify`
 foreign import jsonStringify :: forall a. a -> String
@@ -105,6 +107,9 @@ chooseN xs = L.toUnfoldable <<< pickFrom xsL
         L.Cons hd tl -> do
           rs <- pickFrom tl (i-1)
           pure (L.Cons hd rs)
+          
+chooseN_FFI :: forall a. Fn2 (Array a) Int (Array (Array a))
+chooseN_FFI = mkFn2 (\xs n -> L.toUnfoldable <$> chooseN xs n)
 
 -- | `peekSTArray` without array bound checks
 foreign import peekSTArrayUnsafe :: forall a h r. STArray h a -> Int -> Eff (st :: ST h | r) a
