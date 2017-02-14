@@ -271,6 +271,14 @@ testDamageAnalyzer =
              41-23-14,43,42,30-18,42,29,
              390,160-49-3-4-4,160,88-67-45,88-57-44,88-68,
              57-92,76-6-6-178,76-68-56,66,35-99,35-41]
+             
+      Assert.assert "both combined STF 2" $
+        (mergeBC >>> trimInfo) (analyzeBothCombinedSTFBattle dc12 bothCombinedSTF2) ==
+          map toMaybeInt
+            [42,7,92,81,92,47,
+             57,37,45,86,11,49,
+             405,21,-34,-181,-161,-38,
+             -39,-183,-52,-93,-82,-98]
       Assert.assert "battle with jet assault" $
         (merge >>> trimInfo) (analyzeBattle dc6 jetAssault1) ==
           map toMaybeInt

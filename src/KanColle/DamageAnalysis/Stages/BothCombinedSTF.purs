@@ -4,7 +4,7 @@ import KanColle.KCAPI.Battle
 
 import Prelude
 
-import KanColle.KCAPI.Battle.BothCombinedCTF as BSTF
+import KanColle.KCAPI.Battle.BothCombinedSTF as BSTF
 
 import KanColle.Util
 import KanColle.DamageAnalysis.DamageVector
