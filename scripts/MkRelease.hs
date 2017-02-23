@@ -79,7 +79,10 @@ main = do
         pmConvert pm = ["-m", pm]
         bundleCmd = unwords ("psc-bundle" : pscBundleArgs)
     (ExitSuccess, jsContent) <- shellStrict (T.pack bundleCmd) empty
-    (ExitSuccess, jsOptimized) <- procStrict (toText' uglifyJsBin) ["-c", "-m"] (pure jsContent)
+    (ExitSuccess, jsOptimized) <- procStrict
+        (toText' uglifyJsBin)
+        ["-c", "-m"]
+        (select (textToLines jsContent))
     cd cwd
     let targetFile = "KanColleHelpers.js"
         targetFileNode = "KanColleHelpersN.js"
