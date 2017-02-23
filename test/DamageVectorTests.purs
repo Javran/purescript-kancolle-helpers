@@ -167,6 +167,11 @@ testDamageVector = do
           dv = koukuDVBC bothCombinedCTF1
       Assert.assert "sample1" $
           "0,0,0,0,0,0 && 0,4,0,0,0,0 -- 0,0,0,0,65,0 && 0,0,0,0,0,0" == bothDVtoStr dv
+    test "DamageVector: jetAssaultCTF1 (jet phase)" do
+      let dv :: LR DamageVector
+          dv = injKoukuDV jetAssaultCTF1
+      Assert.assert "sample1" $
+          "0,0,0,0,0,0 -- 0,18,0,0,63,0" == ndvToStr dv
 
 testDamageAnalyzer :: forall e. TestSuite e
 testDamageAnalyzer =

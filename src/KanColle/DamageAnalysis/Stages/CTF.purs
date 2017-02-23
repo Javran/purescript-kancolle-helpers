@@ -28,7 +28,9 @@ hougeki3DV = connectDV CTF.getHougeki3 memptyLR calcHougekiDamage
 -- | note that transport escort battle uses this `CombinedDamageVector` as well
 battleDV :: Battle -> CombinedDamageVector
 battleDV = fconcat2
-    [ landBasedAirStrikeDVs >>> toCombined FRLandBased
+    [ injLandBasedDV >>> toCombined FRLandBased
+    , injKoukuDV >>> toCombined FRMain
+    , landBasedAirStrikeDVs >>> toCombined FRLandBased
     , koukuDV >>> toCombined FRMain
     , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort
     , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport

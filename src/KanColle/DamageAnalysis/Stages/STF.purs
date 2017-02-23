@@ -26,7 +26,9 @@ hougeki3DV = connectDV STF.getHougeki3 memptyLR calcHougekiDamage
 -- | get `CombinedDamageVector` of a surface task force battle
 battleDV :: Battle -> CombinedDamageVector
 battleDV = fconcat2
-    [ landBasedAirStrikeDVs >>> toCombined FRLandBased
+    [ injLandBasedDV >>> toCombined FRLandBased
+    , injKoukuDV >>> toCombined FRMain
+    , landBasedAirStrikeDVs >>> toCombined FRLandBased
     , koukuDV >>> toCombined FRMain
     , koukuCombinedDV >>> lrOnlyLeft >>> toCombined FREscort
     , supportAirAttackDV >>> lrOnlyRight >>> toCombined FRSupport

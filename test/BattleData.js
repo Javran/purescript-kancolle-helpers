@@ -1763,3 +1763,59 @@ exports.jetAssaultLBAS1 = {
                    "api_fdam":[-1,6,0,0,0,0,0],"api_edam":[-1,0,0,0,0,0,0],
                    "api_fydam":[-1,0,0,0,0,0,0],"api_eydam":[-1,6,0,0,0,0,0],
                    "api_fcl":[-1,1,0,0,0,0,0],"api_ecl":[-1,1,0,0,0,0,0]}};
+
+exports.jetAssaultCTF1 = {
+    "api_deck_id":"1","api_ship_ke":[618,618,560,555,577,577],"api_ship_lv":[-1,1,1,1,1,1,1],
+    "api_nowhps":[-1,65,78,78,70,88,70,160,160,84,57,38,38],
+    "api_maxhps":[-1,65,78,86,79,88,70,160,160,84,57,38,38],
+    "api_nowhps_combined":[-1,45,57,64,44,37,31],"api_maxhps_combined":[-1,45,57,64,44,37,31],
+    "api_midnight_flag":1,
+    "api_eSlot":[[556,557,558,558,-1],[556,557,558,558,-1],[520,524,524,517,-1],
+                 [506,525,542,543,-1],[502,515,542,-1,-1],[502,515,542,-1,-1]],
+    "api_eKyouka":[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+    "api_fParam":[[77,83,83,79],[59,0,86,84],[70,0,88,83],[65,0,90,84],[53,0,93,83],[75,84,60,82]],
+    "api_eParam":[[40,0,90,120],[40,0,90,120],[18,0,36,70],[48,80,30,39],[44,72,36,29],[44,72,36,29]],
+    "api_fParam_combined":[[35,68,62,60],[84,84,72,77],[85,86,70,78],
+                           [64,110,72,65],[57,54,116,53],[62,96,53,51]],"api_search":[1,1],
+    "api_formation":["14",3,1],
+    "api_injection_kouku":{
+        "api_plane_from":[[3,4],[-1]],
+        "api_stage1":{"api_f_count":59,"api_f_lostcount":0,"api_e_count":0,"api_e_lostcount":0},
+        "api_stage2":{"api_f_count":59,"api_f_lostcount":6,"api_e_count":0,"api_e_lostcount":0},
+        "api_stage3":{
+            "api_frai_flag":[-1,0,0,0,0,0,0],"api_erai_flag":[-1,0,0,0,0,0,0],"api_fbak_flag":[-1,0,0,0,0,0,0],
+            "api_ebak_flag":[-1,0,1,0,0,1,0],"api_fcl_flag":[-1,0,0,0,0,0,0],"api_ecl_flag":[-1,0,0,0,0,0,0],
+            "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,18,0,0,63,0]},
+        "api_stage3_combined":{
+            "api_frai_flag":[-1,0,0,0,0,0,0],"api_fbak_flag":[-1,0,0,0,0,0,0],"api_fcl_flag":[-1,0,0,0,0,0,0],
+            "api_fdam":[-1,0,0,0,0,0,0]}},
+    "api_stage_flag":[1,1,1],
+    "api_kouku":{
+        "api_plane_from":[[1,2,3,4,5],[1,2,3]],
+        "api_stage1":{"api_f_count":306,"api_f_lostcount":29,"api_e_count":376,"api_e_lostcount":132,"api_disp_seiku":2,"api_touch_plane":[59,-1]},
+        "api_stage2":{"api_f_count":152,"api_f_lostcount":17,"api_e_count":181,"api_e_lostcount":127,"api_air_fire":{"api_idx":10,"api_kind":1,"api_use_items":[122,122,106]}},
+        "api_stage3":{
+            "api_frai_flag":[-1,0,0,0,1,0,0],"api_erai_flag":[-1,1,0,1,0,0,0],"api_fbak_flag":[-1,0,0,0,0,0,0],
+            "api_ebak_flag":[-1,0,1,0,0,0,0],"api_fcl_flag":[-1,0,0,0,0,0,0],"api_ecl_flag":[-1,0,1,1,0,0,0],
+            "api_fdam":[-1,0,0,0,8,0,0],"api_edam":[-1,0,39.1,228,0,0,0]},
+        "api_stage3_combined":{
+            "api_frai_flag":[-1,0,0,0,0,0,1],"api_fbak_flag":[-1,0,0,0,0,1,0],"api_fcl_flag":[-1,0,0,0,0,0,0],
+            "api_fdam":[-1,0,0,0,0,0,3]}},"api_support_flag":0,"api_support_info":null,"api_opening_taisen_flag":0,
+    "api_opening_taisen":null,"api_opening_flag":1,
+    "api_opening_atack":{"api_frai":[-1,0,0,0,4,0,0],"api_erai":[-1,0,0,0,0,0,0],
+                         "api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,0,0,0,116.1,0,0],
+                         "api_fydam":[-1,0,0,0,116,0,0],"api_eydam":[-1,0,0,0,0,0,0],
+                         "api_fcl":[-1,0,0,0,1,0,0],"api_ecl":[-1,0,0,0,0,0,0]},
+    "api_hourai_flag":[1,1,1,0],
+    "api_hougeki1":{
+        "api_at_list":[-1,3,12,4,7,2,1,6,5],"api_at_type":[-1,2,0,0,0,0,0,0,0],
+        "api_df_list":[-1,[8,8],[5],[8],[2],[8],[8],[12],[7]],
+        "api_si_list":[-1,["50","90"],[502],[-1],[-1],[50],[-1],[91],[122]],
+        "api_cl_list":[-1,[1,1],[0],[0],[1],[0],[0],[1],[0]],
+        "api_damage":[-1,[38,7],[0],[0],[35],[0],[0],[52.1],[0]]},
+    "api_raigeki":{"api_frai":[-1,2,0,2,1,2,1],"api_erai":[-1,0,0,0,0,0,0],"api_fdam":[-1,0,0,0,0,0,0],"api_edam":[-1,40,14,0,0,0,0],
+                   "api_fydam":[-1,6,0,5,29,3,11],"api_eydam":[-1,0,0,0,0,0,0],"api_fcl":[-1,1,0,1,1,1,1],"api_ecl":[-1,0,0,0,0,0,0]},
+    "api_hougeki2":{
+        "api_at_list":[-1,4,7,3,6,1,5,2],"api_at_type":[-1,0,0,0,0,0,0,0],
+        "api_df_list":[-1,[7],[2],[7],[8],[7],[7],[7]],"api_si_list":[-1,[-1],[-1],[-1],[50],[-1],[-1],[-1]],
+        "api_cl_list":[-1,[1],[0],[1],[2],[1],[0],[0]],"api_damage":[-1,[35],[0],[46],[46],[4],[0],[0]]}};
