@@ -2,7 +2,7 @@ module KanColle.Remodel where
 
 import Prelude
 import Data.Maybe
-import Data.Array
+import Data.Array hiding (length)
 import Data.Int as I
 import Data.Foldable
 import KanColle.KCAPI.Master
@@ -149,7 +149,8 @@ listToArray :: forall a. L.List a -> Array a
 listToArray = L.toUnfoldable
 
 generateOriginMap :: RemodelGroupMap -> OriginMap
-generateOriginMap rgm = SM.fromFoldable (foldMap expand (SM.toList rgm))
+generateOriginMap rgm =
+    SM.fromFoldable (foldMap expand (SM.toUnfoldable rgm :: L.List (Tuple String RemodelGroup)))
   where
     expand (Tuple _ rg) = map (\x -> Tuple (show x) rg.origin) rg.group
 

@@ -2,7 +2,7 @@ module KanColle.Expedition.Minimal where
 
 import Prelude
 import Data.Monoid
-import Data.Array
+import Data.Array hiding (length, null)
 import Data.Array.Partial as PA
 import Data.Foldable
 import Data.String as Str
@@ -200,7 +200,7 @@ pprFleetNotes xs = if null notes
     else
       let convert (NE.NonEmpty z zs) = z:zs
           grouppedNotes = map formatNote (convert <$> group notes)
-          formatNote note = "{" <> unsafePartial (PA.head note) <> "}x" <> show (length note)
+          formatNote note = "{" <> unsafePartial (PA.head note) <> "}x" <> show (length note :: Int)
       in Str.joinWith ", " grouppedNotes
   where
     notes = mapMaybe (\x -> x.note) xs

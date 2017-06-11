@@ -1,7 +1,7 @@
 module KanColle.Expedition.Requirement where
 
 import Prelude
-import Data.Array
+import Data.Array hiding (length)
 import Data.Foldable
 import Data.Maybe
 import Data.String as Str

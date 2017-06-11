@@ -3,7 +3,7 @@ module ExpeditionTests where
 import Prelude
 import Test.Unit
 import Test.Unit.Assert
-import Data.Array
+import Data.Array hiding (length, null)
 import Data.Foldable
 
 import KanColle.Expedition

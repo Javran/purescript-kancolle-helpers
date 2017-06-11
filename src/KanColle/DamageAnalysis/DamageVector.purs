@@ -233,7 +233,7 @@ simulateHougeki len actions = runPure (STA.runSTArray (resultDmgs))
     resultDmgs :: forall h r . Eff (st :: ST.ST h | r) (STA.STArray h Damage)
     resultDmgs = do
         arr <- STA.thaw (replicate len mempty)
-        traverse (uncurry $ accumulateDamage arr) actions
+        traverse_ (uncurry $ accumulateDamage arr) actions
         pure arr
 
 calcHougekiDamageAC :: Hougeki -> LR (LR DamageVector)

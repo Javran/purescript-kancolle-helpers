@@ -30,7 +30,7 @@ type ExpeNetIncomeHourly =
   , hourly :: HourlyIncome
   }
 
-mergeHNetIncome :: forall f. (Functor f, Foldable f)
+mergeHNetIncome :: forall f. Functor f => Foldable f
                 => f ExpeNetIncomeHourly
                 -> { eIds :: Array Int
                    , hourly :: HourlyIncome

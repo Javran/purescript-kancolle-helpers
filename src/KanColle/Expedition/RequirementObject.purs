@@ -3,7 +3,7 @@ module KanColle.Expedition.RequirementObject where
 import Prelude
 import Data.Foldable
 import Data.Maybe
-import Data.Array
+import Data.Array hiding (length)
 import Data.Nullable
 
 import KanColle.SType
@@ -31,7 +31,7 @@ type RequirementPack =
   , fleetSType :: Array STypeReq
   }
 
-type ResultPack (f :: * -> *) =
+type ResultPack (f :: Type -> Type) =
   { flagShipLevel :: Boolean
   , shipCount :: Boolean
   , flagShipTypeOf :: f Boolean

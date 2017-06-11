@@ -39,7 +39,7 @@ import Control.Monad.Eff
 import Control.Monad.Eff.Exception
 import Control.Monad.ST
 
-import Data.Array
+import Data.Array hiding (length)
 import Data.Array.Partial as PA
 import Data.Array.ST hiding (peekSTArray, pokeSTArray)
 import Data.List as L

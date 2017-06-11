@@ -15,13 +15,14 @@ import Data.Unfoldable
 import Data.Tuple
 import Data.Traversable
 import Data.Int
+import Data.List as L
 
 calcFleetMaxCost :: CostModel -> FleetCompo -> Maybe FleetMaxCost
 calcFleetMaxCost cm fcAr = fold <$> sequence compos
   where
     fc :: M.Map SType Int
     fc = M.fromFoldableWith (+) (map (\x -> Tuple x 1) fcAr)
-    compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toList fc)
+    compos = map (\(Tuple sty cnt) -> cm sty cnt) (M.toUnfoldable fc :: L.List _)
 
 calcActualCost :: MaxCost -> Info -> ActualCost
 calcActualCost (MCost mc) info = ACost
